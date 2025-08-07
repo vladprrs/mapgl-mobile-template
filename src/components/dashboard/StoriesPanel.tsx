@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { StoryItem, type StoryItemProps } from './StoryItem';
+import { StoryItem } from './StoryItem';
 
 export interface Story {
   id: string;
