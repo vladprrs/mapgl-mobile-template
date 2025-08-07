@@ -36,7 +36,7 @@ export function SearchBar({
     <div className={`bg-white rounded-t-2xl ${className}`}>
       {/* Drag Handle */}
       <div 
-        className="flex items-center justify-center w-full pt-4 pb-1.5 cursor-grab active:cursor-grabbing"
+        className="flex items-center justify-center w-full pt-1.5 pb-1.5 cursor-grab active:cursor-grabbing"
         data-drag-handle="true"
       >
         <div className="w-10 h-1 bg-gray-400/25 rounded-md pointer-events-none" />

@@ -179,7 +179,7 @@ Based on Figma design (node-id: 189-220904):
    - Height: 4px (h-1)
    - Color: rgba(137, 137, 137, 0.25)
    - Rounded: 4px radius
-   - Position: Centered, 6px padding bottom
+   - Position: Centered, 6px padding from top edge, 6px padding bottom
 
 2. **Search Input Field**
    - Height: 40px (h-10)
@@ -214,9 +214,9 @@ Based on Figma design (node-id: 189-220904):
    - Icon: Hamburg menu
 
 ### 5.2 Spacing and Layout
-- **Container Padding**: 16px horizontal (px-4), 16px top (pt-4)
+- **Container Padding**: 16px horizontal (px-4)
+- **Drag Handle**: 6px from top edge (pt-1.5), 6px bottom padding (pb-1.5)
 - **Element Gap**: 12px between search field and action button
-- **Drag Handle Area**: Full width, 6px bottom padding
 - **Search Field**: Flex-grow to fill available space
 
 ### 5.3 Typography
