@@ -46,10 +46,13 @@ export function BottomSheet({
         height: '100vh',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
+      data-testid="bottom-sheet"
       data-sheet-state={currentSheetState}
     >
       {/* Drag Handle */}
       <DragHandle
+        data-drag-handle
+        data-testid="drag-handle"
         onTouchStart={(e) => handleDragStart(e.touches[0].clientY, 'touch')}
         onTouchMove={(e) => handleDragMove(e.touches[0].clientY)}
         onTouchEnd={handleDragEnd}
@@ -64,6 +67,7 @@ export function BottomSheet({
           h-full px-4 pb-4
           ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}
         `}
+        data-testid="bottom-sheet-content"
         data-scrollable={isExpanded ? 'true' : undefined}
         style={{
           // Smooth scrolling when expanded

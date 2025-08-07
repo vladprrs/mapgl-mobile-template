@@ -19,24 +19,21 @@ test.describe('Responsive Mobile Layout', () => {
       })
       
       await page.goto('/')
-      
-      // Wait for map to load
-      await page.waitForSelector('[style*="position: absolute"]', { timeout: 10000 })
+      await expect(page.getByTestId('map-root')).toBeVisible()
       
       // Map should fill the viewport
-      const mapContainer = page.locator('[style*="position: absolute"]').first()
+      const mapContainer = page.getByTestId('map-root')
       const mapBox = await mapContainer.boundingBox()
-      
-      expect(mapBox?.width).toBe(viewport.width)
-      expect(mapBox?.height).toBe(viewport.height)
+      await expect.poll(() => mapBox?.width ?? 0).toBe(viewport.width)
+      await expect.poll(() => mapBox?.height ?? 0).toBe(viewport.height)
       
       // Bottom sheet should be visible
-      const bottomSheet = page.locator('.fixed.z-50').first()
+      const bottomSheet = page.getByTestId('bottom-sheet')
       await expect(bottomSheet).toBeVisible()
       
       // Bottom sheet should span full width
       const sheetBox = await bottomSheet.boundingBox()
-      expect(sheetBox?.width).toBe(viewport.width)
+      await expect.poll(() => sheetBox?.width ?? 0).toBe(viewport.width)
     })
   }
 
@@ -58,9 +55,10 @@ test.describe('Responsive Mobile Layout', () => {
     })
     
     await page.goto('/')
+    await expect(page.getByTestId('bottom-sheet')).toBeVisible()
     
     // Bottom sheet content should respect safe areas
-    const content = page.locator('[style*="padding-bottom"]').first()
+    const content = page.getByTestId('bottom-sheet')
     const styles = await content.evaluate(el => {
       return window.getComputedStyle(el).paddingBottom
     })
@@ -79,10 +77,10 @@ test.describe('Responsive Mobile Layout', () => {
         height: height,
       })
       
-      await page.goto('/')
-      await page.waitForSelector('.fixed.z-50')
+    await page.goto('/')
+    await expect(page.getByTestId('bottom-sheet')).toBeVisible()
       
-      const bottomSheet = page.locator('.fixed.z-50').first()
+      const bottomSheet = page.getByTestId('bottom-sheet')
       
       // Get computed height at 50% snap point
       const expectedHeight = height * 0.5
@@ -103,6 +101,7 @@ test.describe('Responsive Mobile Layout', () => {
     })
     
     await page.goto('/')
+    await expect(page.getByTestId('map-root')).toBeVisible()
     
     // Check all interactive elements
     const buttons = page.locator('button')
@@ -129,15 +128,13 @@ test.describe('Responsive Mobile Layout', () => {
     await page.goto('/')
     
     // Map should still be visible
-    const mapContainer = page.locator('[style*="position: absolute"]').first()
+    const mapContainer = page.getByTestId('map-root')
     await expect(mapContainer).toBeVisible()
     
     // Bottom sheet should adapt to landscape
     const bottomSheet = page.locator('.fixed.z-50').first()
     const sheetBox = await bottomSheet.boundingBox()
-    
-    // Sheet should not cover entire screen in landscape
-    expect(sheetBox?.height).toBeLessThan(375)
+    await expect.poll(() => sheetBox?.height ?? 0).toBeLessThan(375)
   })
 
   test('should scale text appropriately for different screen sizes', async ({ page }) => {
@@ -152,17 +149,14 @@ test.describe('Responsive Mobile Layout', () => {
       
       // Check base font size
       const text = page.locator('text=Popular Locations').first()
-      const fontSize = await text.evaluate(el => {
-        return parseInt(window.getComputedStyle(el).fontSize)
-      })
-      
-      // Font should be readable (minimum 16px for body text)
-      expect(fontSize).toBeGreaterThanOrEqual(size.expectedFontSize)
+      await expect.poll(async () => {
+        return await text.evaluate(el => parseInt(window.getComputedStyle(el).fontSize))
+      }).toBeGreaterThanOrEqual(size.expectedFontSize)
     }
   })
 
   test('should handle virtual keyboard appearance', async ({ page, isMobile }) => {
-    test.skip(!isMobile, 'Mobile-only test')
+    if (!isMobile) return
     
     await page.goto('/')
     

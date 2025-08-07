@@ -29,11 +29,11 @@ describe('BottomSheet', () => {
   it('renders children content', () => {
     render(
       <BottomSheet>
-        <div data-testid="sheet-content">Test Content</div>
+        <div data-testid="custom-sheet-child">Test Content</div>
       </BottomSheet>
     );
 
-    expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
+    expect(screen.getByTestId('custom-sheet-child')).toBeInTheDocument();
     expect(screen.getByText('Test Content')).toBeInTheDocument();
   });
 

@@ -58,6 +58,17 @@ export function MapContainer({ className = '' }: MapContainerProps) {
 
         mapInstanceRef.current = map;
 
+        // Test instrumentation: expose stable hooks in E2E when enabled
+        if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+          try {
+            (window as unknown as {
+              __mapInstance?: unknown;
+              __mapClickCount?: number;
+            }).__mapInstance = map;
+            (window as unknown as { __mapClickCount?: number }).__mapClickCount = 0;
+          } catch {}
+        }
+
         // Set map instance in provider if needed
         if ((window as unknown as { __setMapInstance?: (map: unknown) => void }).__setMapInstance) {
           (window as unknown as { __setMapInstance: (map: unknown) => void }).__setMapInstance(map);
@@ -68,6 +79,13 @@ export function MapContainer({ className = '' }: MapContainerProps) {
           map.on('click', (event: unknown) => {
             const mapEvent = event as { lngLat: [number, number] };
             console.log('Map clicked at:', mapEvent.lngLat);
+            // Instrument click counter for tests if enabled
+            if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+              try {
+                const w = window as unknown as { __mapClickCount?: number };
+                w.__mapClickCount = (w.__mapClickCount ?? 0) + 1;
+              } catch {}
+            }
           });
         }
 
@@ -97,6 +115,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
     <div 
       ref={containerRef}
       className={`w-full h-full ${className}`}
+      data-testid="map-root"
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
     />
   );
