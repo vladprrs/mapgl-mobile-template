@@ -94,12 +94,12 @@ export function QuickAccessPanel({
 
   return (
     <div className={`relative w-full ${className}`}>
-      {/* Fade gradients */}
+      {/* Fade gradients - positioned inside the padding area */}
       {showLeftGradient && (
-        <div className="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-4 top-0 bottom-0 w-5 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       )}
       {showRightGradient && (
-        <div className="absolute right-0 top-0 bottom-0 w-5 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-4 top-0 bottom-0 w-5 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
       )}
 
       {/* Scrollable container */}
@@ -109,7 +109,7 @@ export function QuickAccessPanel({
           flex flex-row gap-2 
           overflow-x-auto
           scroll-smooth
-          px-4 -mx-4
+          px-4
           [&::-webkit-scrollbar]:hidden
           [-ms-overflow-style:none]
           [scrollbar-width:none]

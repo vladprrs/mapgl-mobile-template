@@ -39,13 +39,13 @@ export function Dashboard({
         onVoiceClick={handleVoiceClick}
       />
 
-      {/* Quick Access Panel */}
-      <div className="py-3">
+      {/* Quick Access Panel - 16px top margin from SearchBar */}
+      <div className="pt-4 pb-4">
         <QuickAccessPanel onActionClick={handleQuickAction} />
       </div>
 
       {/* Dashboard Content */}
-      <div className="flex-1 px-4 py-2 overflow-y-auto">
+      <div className="flex-1 px-4 overflow-y-auto">
         {/* Placeholder for Stories Panel */}
         <div className="mb-4">
           <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">

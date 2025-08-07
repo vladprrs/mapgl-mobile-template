@@ -48,16 +48,23 @@ Based on codebase exploration:
   - Submit on enter/search button tap
 
 #### 3.2.2 Quick Access Button Panel
-- **Position**: Below search bar
-- **Layout**: Horizontal scrollable panel or grid
+- **Position**: Below search bar with 16px top margin
+- **Layout**: Horizontal scrollable panel
+- **Spacing**:
+  - Top margin: 16px from SearchBar
+  - Left margin: 16px from bottomsheet edge
+  - Right margin: 16px from bottomsheet edge
+  - Bottom margin: 16px before next component
 - **Functionality**:
   - Quick action buttons for common map operations
   - Icons with labels
-  - Examples: Nearby, Restaurants, Parking, ATMs, Gas Stations, Hotels
+  - Traffic time indicators with color coding
+  - Examples: Home (45 min - red), Work (45 min - yellow), Location (50 min - green)
 - **Interaction**:
   - Tap to trigger map search/filter
   - Visual feedback on press
-  - Horizontal scroll if buttons exceed viewport
+  - Horizontal scroll with fade gradients
+  - Smooth scroll behavior
 
 #### 3.2.3 Stories Card Panel
 - **Position**: Below quick access buttons
