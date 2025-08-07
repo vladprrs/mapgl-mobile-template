@@ -159,7 +159,7 @@ describe('Map-Sheet Synchronization', () => {
           <MapContainer />
           <BottomSheet
             snapPoints={[0.1, 0.5, 0.9]}
-            defaultSnapPoint={0}
+           
           >
             <LocationList />
           </BottomSheet>
@@ -200,7 +200,7 @@ describe('Map-Sheet Synchronization', () => {
           <MapContainer />
           <BottomSheet
             snapPoints={[0.1, 0.5, 0.9]}
-            defaultSnapPoint={0} // Collapsed
+            // Collapsed
           >
             <LocationList />
           </BottomSheet>
@@ -223,7 +223,7 @@ describe('Map-Sheet Synchronization', () => {
           <MapContainer />
           <BottomSheet
             snapPoints={[0.1, 0.5, 0.9]}
-            defaultSnapPoint={1} // Half expanded
+            // Half expanded
           >
             <LocationList />
           </BottomSheet>
@@ -324,7 +324,7 @@ describe('Map-Sheet Synchronization', () => {
           <MapContainer />
           <BottomSheet
             snapPoints={[0.1, 0.5, 0.9]}
-            defaultSnapPoint={1}
+           
           >
             <LocationList />
           </BottomSheet>

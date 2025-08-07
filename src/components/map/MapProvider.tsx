@@ -14,7 +14,7 @@ export function MapProvider({ children }: MapProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const markersRef = useRef<globalThis.Map<string, Marker>>(new globalThis.Map());
 
-  const addMarker = useCallback((id: string, coords: [number, number], options?: Record<string, unknown>) => {
+  const addMarker = useCallback(async (id: string, coords: [number, number], options?: Record<string, unknown>) => {
     if (!map) return;
     
     // Remove existing marker with same id
@@ -22,16 +22,28 @@ export function MapProvider({ children }: MapProviderProps) {
       markersRef.current.get(id)?.destroy();
     }
 
-    import('@2gis/mapgl').then(({ load }) => {
-      load().then((mapgl) => {
-      const marker = new mapgl.Marker(map, {
+    try {
+      const { load } = await import('@2gis/mapgl');
+      const mapgl = await load();
+      
+      // Create marker options, filtering out unsupported properties
+      const markerOptions = {
         coordinates: coords,
-        ...MAP_CONFIG.markerDefaults,
-        ...options,
-      });
-        markersRef.current.set(id, marker);
-      });
-    });
+        icon: MAP_CONFIG.markerDefaults.icon,
+        size: MAP_CONFIG.markerDefaults.size,
+        anchor: MAP_CONFIG.markerDefaults.anchor,
+        // Override with valid options if provided
+        ...(options && typeof options.icon === 'string' && { icon: options.icon }),
+        ...(options && Array.isArray(options.size) && { size: options.size as [number, number] }),
+        ...(options && Array.isArray(options.anchor) && { anchor: options.anchor as [number, number] }),
+      };
+      
+      const marker = new mapgl.Marker(map, markerOptions);
+      
+      markersRef.current.set(id, marker);
+    } catch (error) {
+      console.error('Failed to create marker:', error);
+    }
   }, [map]);
 
   const removeMarker = useCallback((id: string) => {

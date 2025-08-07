@@ -20,7 +20,7 @@ describe('BottomSheet SSR', () => {
 
     it('should use CSS classes for initial positioning', () => {
       const html = renderToString(
-        <BottomSheet snapPoints={[0.1, 0.5, 0.9]} defaultSnapPoint={1}>
+        <BottomSheet snapPoints={[0.1, 0.5, 0.9]}>
           <div>Content</div>
         </BottomSheet>
       )

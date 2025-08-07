@@ -7,7 +7,7 @@ export interface MapContextValue {
   map: Map | null;
   isLoading: boolean;
   markers: globalThis.Map<string, Marker>;
-  addMarker: (id: string, coords: [number, number], options?: Record<string, unknown>) => void;
+  addMarker: (id: string, coords: [number, number], options?: Record<string, unknown>) => Promise<void>;
   removeMarker: (id: string) => void;
   clearMarkers: () => void;
   centerOnMarker: (id: string) => void;

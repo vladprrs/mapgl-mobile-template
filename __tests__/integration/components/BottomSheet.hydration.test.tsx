@@ -59,7 +59,7 @@ describe('BottomSheet Hydration', () => {
 
     it('should maintain consistent transform values during hydration', () => {
       const serverHTML = renderToString(
-        <BottomSheet snapPoints={[0.1, 0.5, 0.9]} defaultSnapPoint={0}>
+        <BottomSheet snapPoints={[0.1, 0.5, 0.9]}>
           <div>Content</div>
         </BottomSheet>
       )
@@ -77,7 +77,7 @@ describe('BottomSheet Hydration', () => {
       act(() => {
         hydrateRoot(
           container,
-          <BottomSheet snapPoints={[0.1, 0.5, 0.9]} defaultSnapPoint={0}>
+          <BottomSheet snapPoints={[0.1, 0.5, 0.9]}>
             <div>Content</div>
           </BottomSheet>
         )
@@ -96,7 +96,7 @@ describe('BottomSheet Hydration', () => {
 
     it('should defer client calculations until after mount', async () => {
       const { container: renderContainer } = render(
-        <BottomSheet snapPoints={[0.1, 0.5, 0.9]} defaultSnapPoint={1}>
+        <BottomSheet snapPoints={[0.1, 0.5, 0.9]}>
           <div>Content</div>
         </BottomSheet>
       )
@@ -116,15 +116,15 @@ describe('BottomSheet Hydration', () => {
     })
 
     it('should handle SSR with different snap points', () => {
-      const testCases = [
-        { snapPoints: [0.1, 0.5, 0.9], defaultSnapPoint: 0 },
-        { snapPoints: [0.1, 0.5, 0.9], defaultSnapPoint: 1 },
-        { snapPoints: [0.1, 0.5, 0.9], defaultSnapPoint: 2 },
+      const testCases: Array<{ snapPoints: [number, number, number] }> = [
+        { snapPoints: [0.1, 0.5, 0.9] },
+        { snapPoints: [0.2, 0.6, 0.9] },
+        { snapPoints: [0.15, 0.55, 0.95] },
       ]
       
-      testCases.forEach(({ snapPoints, defaultSnapPoint }) => {
+      testCases.forEach(({ snapPoints }) => {
         const serverHTML = renderToString(
-          <BottomSheet snapPoints={snapPoints} defaultSnapPoint={defaultSnapPoint}>
+          <BottomSheet snapPoints={snapPoints}>
             <div>Content</div>
           </BottomSheet>
         )
@@ -137,7 +137,7 @@ describe('BottomSheet Hydration', () => {
         act(() => {
           hydrateRoot(
             testContainer,
-            <BottomSheet snapPoints={snapPoints} defaultSnapPoint={defaultSnapPoint}>
+            <BottomSheet snapPoints={snapPoints}>
               <div>Content</div>
             </BottomSheet>
           )

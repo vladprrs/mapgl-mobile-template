@@ -149,12 +149,10 @@ export function PlaceDetails() {
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'photos'>('overview');
   const [showAllFeatures, setShowAllFeatures] = useState(false);
 
-  const handlePlaceClick = (place: Place) => {
+  const handlePlaceClick = async (place: Place) => {
     setSelectedPlace(place);
     clearMarkers();
-    addMarker(place.id, place.coordinates, {
-      label: place.name,
-    });
+    await addMarker(place.id, place.coordinates);
     centerOnLocation(place.coordinates, 16);
   };
 

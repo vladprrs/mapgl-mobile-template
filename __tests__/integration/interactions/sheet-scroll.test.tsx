@@ -32,14 +32,14 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={0}
+       
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />
       </BottomSheet>
     );
 
-    const content = container.querySelector('.overflow-y-auto');
+    const content = container.querySelector('[data-scrollable]') || container.querySelector('div[class*="px-4"]');
     expect(content).toBeInTheDocument();
 
     // Simulate scroll up (finger moving up) to expand
@@ -54,14 +54,14 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={1}
+       
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />
       </BottomSheet>
     );
 
-    const content = container.querySelector('.overflow-y-auto');
+    const content = container.querySelector('[data-scrollable]') || container.querySelector('div[class*="px-4"]');
     expect(content).toBeInTheDocument();
 
     // Simulate scroll down (finger moving down) to collapse
@@ -76,7 +76,7 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={2} // Fully expanded
+        // Fully expanded
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />
@@ -112,7 +112,7 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={2} // Fully expanded
+        // Fully expanded
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />
@@ -140,14 +140,14 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={0}
+       
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />
       </BottomSheet>
     );
 
-    const content = container.querySelector('.overflow-y-auto');
+    const content = container.querySelector('[data-scrollable]') || container.querySelector('div[class*="px-4"]');
     expect(content).toBeInTheDocument();
 
     // Simulate upward swipe
@@ -168,7 +168,7 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={2} // Fully expanded
+        // Fully expanded
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />
@@ -201,14 +201,14 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={1}
+       
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />
       </BottomSheet>
     );
 
-    const content = container.querySelector('.overflow-y-auto');
+    const content = container.querySelector('[data-scrollable]') || container.querySelector('div[class*="px-4"]');
     expect(content).toBeInTheDocument();
 
     // Simulate momentum scroll upward (to expand) with multiple events
@@ -226,7 +226,7 @@ describe('BottomSheet Scroll Interactions', () => {
     const { container } = render(
       <BottomSheet
         snapPoints={[0.1, 0.5, 0.9]}
-        defaultSnapPoint={1}
+       
         onSnapChange={mockOnSnapChange}
       >
         <TestContent />

@@ -59,7 +59,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={1}
+         
         >
           <div>Content</div>
         </BottomSheet>
@@ -75,12 +75,12 @@ describe('BottomSheet', () => {
     })
 
     it('should snap to defined positions', async () => {
-      const snapPoints = [0.1, 0.5, 0.9]
+      const snapPoints: [number, number, number] = [0.1, 0.5, 0.9]
       
       render(
         <BottomSheet
           snapPoints={snapPoints}
-          defaultSnapPoint={0}
+         
           onSnapChange={mockOnSnapChange}
         >
           <div>Content</div>
@@ -96,7 +96,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={0}
+         
         >
           <div>Content</div>
         </BottomSheet>
@@ -117,7 +117,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={1}
+         
           onSnapChange={mockOnSnapChange}
         >
           <div>Content</div>
@@ -155,7 +155,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={2} // Start at top
+          // Start at top
         >
           <div>Content</div>
         </BottomSheet>
@@ -188,7 +188,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={1}
+         
           onSnapChange={mockOnSnapChange}
         >
           <div>Content</div>
@@ -227,7 +227,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={2} // Fully expanded
+          // Fully expanded
         >
           <div style={{ height: '200vh' }}>Tall Content</div>
         </BottomSheet>
@@ -244,7 +244,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={0} // Collapsed
+          // Collapsed
         >
           <div>Content</div>
         </BottomSheet>
@@ -275,7 +275,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={0}
+         
         >
           <div>Content</div>
         </BottomSheet>
@@ -293,7 +293,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={1}
+         
         >
           <div>Content</div>
         </BottomSheet>
@@ -324,7 +324,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={1}
+         
           onSnapChange={mockOnSnapChange}
         >
           <div>Content</div>
@@ -349,7 +349,7 @@ describe('BottomSheet', () => {
       const { container } = render(
         <BottomSheet
           snapPoints={[0.1, 0.5, 0.9]}
-          defaultSnapPoint={1}
+         
         >
           <div>Content</div>
         </BottomSheet>

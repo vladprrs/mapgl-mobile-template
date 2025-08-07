@@ -38,13 +38,22 @@ npm run build && npm start
 ```
 src/
 ├── app/                    # Next.js app router
+│   ├── page.tsx           # Main app with MapProvider + BottomSheet
+│   └── layout.tsx         # Root layout with mobile optimization
 ├── components/
 │   ├── map/               # MapContainer, MapProvider
-│   └── bottom-sheet/      # BottomSheet with snap points
-├── hooks/                 # useMapGL, useBottomSheet
-└── lib/
-    ├── mapgl/            # Map config & utilities
-    └── config/           # Environment config
+│   ├── bottom-sheet/      # BottomSheet, DragHandle, useBottomSheet
+│   ├── LocationList.tsx   # Sample location list component  
+│   └── PlaceDetails.tsx   # Detailed place information component
+├── hooks/
+│   ├── useMapGL.ts        # Map context and operations
+│   └── useBottomSheet.ts  # Bottom sheet state and gesture handling
+├── lib/
+│   ├── mapgl/            # Map config & utilities
+│   └── config/           # Environment config
+└── __tests__/            # Component and hook tests
+    ├── components/bottom-sheet/  # BottomSheet test suite
+    └── hooks/            # Hook test suite
 ```
 
 ## Critical Patterns
@@ -96,10 +105,14 @@ const value = isClient
 ### Common Map Operations
 
 ```typescript
-// Add marker
-const marker = new mapgl.Marker(map, {
-  coordinates: [lng, lat],
-  icon: 'url-to-icon.svg'
+// Add marker (use async addMarker from MapProvider)
+await addMarker('marker-id', [lng, lat]);
+
+// Add marker with custom options
+await addMarker('marker-id', [lng, lat], {
+  icon: 'custom-icon.svg',
+  size: [40, 40],
+  anchor: [20, 40]
 });
 
 // Center map
@@ -111,7 +124,77 @@ map.on('click', (e) => {
   const { lngLat } = e;
   // Add marker at click position
 });
+
+// Remove markers
+removeMarker('marker-id');
+clearMarkers(); // Remove all markers
 ```
+
+### Bottom Sheet Component
+
+Mobile-optimized draggable overlay for displaying content over the map.
+
+```typescript
+import { BottomSheet } from '@/components/bottom-sheet';
+
+// Basic usage
+<BottomSheet>
+  <LocationList />
+</BottomSheet>
+
+// With custom snap points
+<BottomSheet snapPoints={[15, 60, 95]} onSnapChange={(snap) => console.log(snap)}>
+  <PlaceDetails />
+</BottomSheet>
+```
+
+**Key Features:**
+- **Snap Points**: Default [10%, 50%, 90%] positions (starts at 50%)
+- **Multi-Modal Gestures**: Touch, mouse wheel, drag handle
+- **Smart Scrolling**: Content scrolling only when fully expanded (90%)
+- **Performance**: 60fps animations with CSS transforms
+- **Mobile-First**: Touch-optimized with proper passive event handling
+
+**CRITICAL: SCROLL DIRECTION (INVERTED - CORRECT BEHAVIOR)**
+- **Scroll DOWN / Mouse wheel DOWN / Swipe DOWN** = EXPAND sheet (natural push-down gesture)
+- **Scroll UP / Mouse wheel UP / Swipe UP** = COLLAPSE sheet (natural pull-up gesture)
+- This matches native iOS/Android bottom sheet behavior - DO NOT CHANGE THIS DIRECTION
+- The implementation uses inverted deltaY values to achieve natural feel
+
+**Hook Usage:**
+```typescript
+import { useBottomSheet } from '@/hooks/useBottomSheet';
+
+const {
+  currentSnap,
+  currentSheetState, // 'collapsed' | 'half' | 'expanded'
+  isExpanded,
+  isDragging,
+  snapTo,
+  sheetRef,
+  contentRef,
+  // Handle handlers for drag handle
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
+  handleMouseDown,
+  // Content handlers for scroll behavior
+  handleContentTouchStart,
+  handleContentTouchMove,
+  handleContentTouchEnd,
+} = useBottomSheet({
+  snapPoints: [10, 50, 90],
+  onSnapChange: (snap) => console.log('Snapped to:', snap)
+});
+
+// Programmatically control
+snapTo(90); // Expand to 90%
+```
+
+**Sheet States:**
+- **Collapsed (10%)**: Scroll DOWN to expand to half
+- **Half (50%)**: DEFAULT starting state, scroll DOWN to expand full, UP to collapse
+- **Expanded (90%)**: Content scrollable, scroll UP from top to collapse
 
 ## TDD Workflow
 
@@ -136,6 +219,22 @@ jest.mock('@2gis/mapgl', () => ({
 }));
 ```
 
+**Mock Bottom Sheet Hook in tests:**
+```typescript
+jest.mock('@/hooks/useBottomSheet', () => ({
+  useBottomSheet: jest.fn(() => ({
+    position: 10,
+    isDragging: false,
+    isExpanded: false,
+    handleTouchStart: jest.fn(),
+    handleTouchMove: jest.fn(),
+    handleTouchEnd: jest.fn(),
+    handleMouseDown: jest.fn(),
+    sheetRef: { current: null },
+  })),
+}));
+```
+
 ## Known Issues & Solutions
 
 | Problem | Solution |
@@ -145,6 +244,9 @@ jest.mock('@2gis/mapgl', () => ({
 | **Hydration mismatch errors** | Use `isClient` pattern for browser-only values |
 | **Map not cleaning up** | Always call `map.destroy()` in useEffect cleanup |
 | **Controls added multiple times** | Don't add controls manually - use 2GIS defaults |
+| **Marker creation TypeError** | Don't pass unsupported props like `label` to 2GIS markers |
+| **Passive event listener warnings** | Bottom sheet uses native events with `passive: false` |
+| **Bottom sheet not dragging** | Ensure `touch-action: none` is set on draggable elements |
 
 ## MCP Servers
 
@@ -216,5 +318,20 @@ git add src/ && git commit -m "feat: implement marker clustering"
 1. Don't add controls manually - let 2GIS handle them
 2. Verify cleanup in useEffect 
 3. Check React StrictMode (dev only)
+
+# Bottom sheet issues?
+1. Check touch-action: none is set on draggable elements
+2. Verify passive: false on native touch listeners
+3. Ensure snap points are valid numbers [10, 50, 90]
+4. Test on actual mobile device for touch gestures
+5. **REMEMBER**: Scroll direction is INVERTED for natural feel:
+   - DOWN = EXPAND, UP = COLLAPSE (matches iOS/Android)
+   - Implementation inverts deltaY values (-deltaY) for correct behavior
+
+# Marker errors?
+1. Don't pass unsupported options like 'label' to 2GIS markers
+2. Use async/await with addMarker function
+3. Verify coordinates are [lng, lat] format
+4. Check map instance exists before adding markers
 ```
 ```

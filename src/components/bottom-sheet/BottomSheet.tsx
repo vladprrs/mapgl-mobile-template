@@ -1,113 +1,90 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useBottomSheet } from '@/hooks/useBottomSheet';
-import { useSheetScrollDirect } from '@/hooks/useSheetScrollDirect';
-import { SheetHandle } from './SheetHandle';
-import { SheetContent } from './SheetContent';
+import React from 'react';
+import { useBottomSheet, type UseBottomSheetOptions } from '@/hooks/useBottomSheet';
+import { DragHandle } from './DragHandle';
 
-interface BottomSheetProps {
+interface BottomSheetProps extends UseBottomSheetOptions {
   children: React.ReactNode;
-  snapPoints?: number[];
-  defaultSnapPoint?: number;
-  onSnapChange?: (index: number) => void;
   className?: string;
 }
 
 export function BottomSheet({
   children,
-  snapPoints = [0.1, 0.5, 0.9],
-  defaultSnapPoint = 0,
-  onSnapChange,
   className = '',
+  snapPoints = [10, 50, 90],
+  onSnapChange,
 }: BottomSheetProps) {
-  // Track if component has mounted on client
-  const [isClient, setIsClient] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-  
   const {
-    containerRef,
-    currentSnapIndex,
+    position,
     isDragging,
-    dragY,
-    setDragY,
-    handlePointerDown,
-    getSnapHeight,
-    snapTo,
-  } = useBottomSheet({
-    snapPoints,
-    defaultSnapPoint,
-    onSnapChange,
-  });
+    isExpanded,
+    currentSheetState,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleMouseDown,
+    handleContentTouchStart,
+    handleContentTouchMove,
+    handleContentTouchEnd,
+    sheetRef,
+    contentRef,
+  } = useBottomSheet({ snapPoints, onSnapChange });
 
-  const isExpanded = currentSnapIndex === snapPoints.length - 1;
-
-  // Use direct scroll handler with inverted direction
-  useSheetScrollDirect({
-    containerRef,
-    currentSnapIndex,
-    snapPoints,
-    onSnapChange: snapTo,
-    isDragging,
-    setDragY,
-    getSnapHeight,
-  });
-
-  // Set isClient to true after mount to enable client-side calculations
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const currentHeight = useMemo(() => {
-    if (!isClient) return 0; // Return 0 during SSR
-    const snapHeight = getSnapHeight(currentSnapIndex);
-    const height = snapHeight + dragY;
-    return height;
-  }, [isClient, currentSnapIndex, dragY, getSnapHeight]);
-
-  // Calculate transform with SSR safety
-  const transform = useMemo(() => {
-    // During SSR or before client mount, use CSS percentage
-    if (!isClient) {
-      // Use percentage based on snap point for initial positioning
-      const snapPercentage = (1 - snapPoints[defaultSnapPoint]) * 100;
-      return `translateY(${snapPercentage}%)`;
-    }
-    
-    // After hydration, use precise pixel calculations
-    const translateY = window.innerHeight - currentHeight;
-    return `translateY(${translateY}px)`;
-  }, [isClient, currentHeight, snapPoints, defaultSnapPoint]);
-
-  // Determine transition based on client state
-  const transition = useMemo(() => {
-    if (!isClient) {
-      // Use CSS transition during SSR
-      return 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-    }
-    // After client mount, control transition based on drag state
-    return isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-  }, [isClient, isDragging]);
+  // Calculate transform based on position
+  const transform = `translateY(${100 - position}%)`;
 
   return (
     <div
-      ref={containerRef}
-      className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl ${className}`}
+      ref={sheetRef}
+      className={`
+        fixed inset-x-0 bottom-0 z-50
+        bg-white rounded-t-2xl shadow-2xl
+        transition-transform duration-300 ease-out
+        ${isDragging ? 'transition-none' : ''}
+        ${currentSheetState === 'expanded' ? 'shadow-3xl' : ''}
+        ${className}
+      `}
       style={{
         transform,
-        transition,
         height: '100vh',
-        willChange: 'transform',
-        touchAction: 'none',
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}
+      data-sheet-state={currentSheetState}
     >
-      <SheetHandle onPointerDown={handlePointerDown} />
-      <SheetContent 
+      {/* Drag Handle */}
+      <DragHandle
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        isDragging={isDragging}
+      />
+
+      {/* Content */}
+      <div
         ref={contentRef}
-        isExpanded={isExpanded}
+        className={`
+          h-full px-4 pb-4
+          ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}
+        `}
+        data-scrollable={isExpanded ? 'true' : undefined}
+        onTouchStart={handleContentTouchStart}
+        onTouchMove={handleContentTouchMove}
+        onTouchEnd={handleContentTouchEnd}
+        style={{
+          // Smooth scrolling when expanded
+          scrollBehavior: 'smooth',
+          // Prevent overscroll bounce when not expanded
+          overscrollBehavior: isExpanded ? 'auto' : 'none',
+          // Ensure proper touch handling
+          touchAction: isExpanded ? 'auto' : 'none',
+        }}
       >
         {children}
-      </SheetContent>
+      </div>
     </div>
   );
 }
+
+export type { BottomSheetProps };
