@@ -30,21 +30,15 @@ export function StoryItem({
         relative shrink-0 rounded-2xl 
         h-[120px] w-[104px]
         p-1
-        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+        outline-none
+        focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
         transition-transform active:scale-95
+        ${isViewed ? 'ring-2 ring-[#1BA136]' : ''}
         ${className}
       `}
       aria-label={`Story: ${label}`}
       data-story-id={id}
     >
-      {/* Green border for viewed state */}
-      {isViewed && (
-        <div 
-          className="absolute inset-0 rounded-2xl border-2 border-[#1BA136] pointer-events-none" 
-          aria-hidden="true"
-        />
-      )}
-      
       {/* Inner content container */}
       <div className="relative w-24 h-28 rounded-xl overflow-hidden bg-gray-900/[0.06]">
         {/* Background image */}

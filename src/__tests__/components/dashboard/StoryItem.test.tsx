@@ -35,14 +35,16 @@ describe('StoryItem', () => {
   it('shows green border when viewed', () => {
     const { rerender } = render(<StoryItem {...defaultProps} isViewed={false} />);
     
-    // Should not have green border initially
-    let borderElement = screen.getByRole('button').querySelector('.border-\\[\\#1BA136\\]');
-    expect(borderElement).not.toBeInTheDocument();
+    // Should not have green ring initially
+    let button = screen.getByRole('button');
+    expect(button).not.toHaveClass('ring-2');
+    expect(button).not.toHaveClass('ring-[#1BA136]');
     
-    // Should have green border when viewed
+    // Should have green ring when viewed
     rerender(<StoryItem {...defaultProps} isViewed={true} />);
-    borderElement = screen.getByRole('button').querySelector('.border-\\[\\#1BA136\\]');
-    expect(borderElement).toBeInTheDocument();
+    button = screen.getByRole('button');
+    expect(button).toHaveClass('ring-2');
+    expect(button).toHaveClass('ring-[#1BA136]');
   });
 
   it('calls onClick when clicked', () => {
