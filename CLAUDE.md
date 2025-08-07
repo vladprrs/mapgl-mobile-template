@@ -39,7 +39,9 @@ npm run build && npm start
 src/
 ├── app/                    # Next.js app router
 │   ├── page.tsx           # Main app with MapProvider + Dashboard
-│   └── layout.tsx         # Root layout with mobile optimization
+│   ├── layout.tsx         # Root layout with mobile optimization
+│   ├── test-stories/      # Story components test page
+│   └── test-advice/       # Advice components test page
 ├── components/
 │   ├── map/               # MapContainer, MapProvider
 │   ├── bottom-sheet/      # BottomSheet, DragHandle, useBottomSheet
@@ -49,7 +51,17 @@ src/
 │   │   ├── QuickAccessPanel.tsx  # Quick action buttons
 │   │   ├── StoriesPanel.tsx  # Horizontal scrolling stories
 │   │   ├── StoryItem.tsx  # Individual story card
-│   │   └── index.ts       # Exports
+│   │   ├── advice/        # Advice section components
+│   │   │   ├── AdviceSection.tsx  # Container with layout logic
+│   │   │   ├── MetaItem.tsx       # Category search cards
+│   │   │   ├── MetaItemAd.tsx     # Advertisement cards
+│   │   │   ├── Interesting.tsx    # Feature promotion cards
+│   │   │   ├── Cover.tsx          # Collection covers
+│   │   │   ├── RD.tsx             # Advertiser cards
+│   │   │   ├── types.ts           # TypeScript interfaces
+│   │   │   ├── mockData.ts        # Sample data
+│   │   │   └── index.ts           # Exports
+│   │   └── index.ts       # Dashboard exports
 │   ├── icons/             # Icon system
 │   │   ├── Icon.tsx       # Reusable icon component
 │   │   └── index.ts       # Icon exports
@@ -66,6 +78,15 @@ src/
     ├── components/
     │   ├── bottom-sheet/  # BottomSheet test suite
     │   └── dashboard/     # Dashboard component tests
+    │       ├── advice/    # Advice component tests
+    │       │   ├── MetaItem.test.tsx
+    │       │   ├── MetaItemAd.test.tsx
+    │       │   ├── Interesting.test.tsx
+    │       │   └── AdviceSection.test.tsx
+    │       ├── SearchBar.test.tsx
+    │       ├── QuickAccessPanel.test.tsx
+    │       ├── StoryItem.test.tsx
+    │       └── StoriesPanel.test.tsx
     └── hooks/            # Hook test suite
 ```
 
@@ -376,7 +397,12 @@ mcp__figma-dev-mode-mcp-server__get_code({
 - SearchBar: `189-220904`
 - QuickAccessPanel: `189-220977`
 - StoryItem: `198-221026`
-- Tips Block: [Pending]
+- Interesting: `119-67257`
+- MetaItem: `119-67226`
+- MetaItemAd: `119-66974`
+- Cover: `119-66903` (Default) / `119-66910` (Big)
+- RD: `119-66916`
+- AdviceSection: `162-220899`
 
 **Extracted Icon SVG Files:**
 - Search: `/assets/icons/78b4aac2c15552b8c0acc3c49dc2805e66dfdcad.svg`
@@ -389,6 +415,12 @@ mcp__figma-dev-mode-mcp-server__get_code({
 - Multiple story background images in `/assets/stories/`
 - Images include various medical/health related visuals
 - All images properly sized for 96x112px display area
+
+**Advice Component Assets Extracted:**
+- Tourist illustration: `/assets/advice/e54c37b478c3fbeeadd3e7ff6c943f19ac03e375.png`
+- Ice rink icons: `/assets/advice/d09f29e90c1485808c9c5f19153fbd5bde35b060.svg`, `/assets/advice/18f5b1e0152b51de3ce4cf9f463c841f262c2a6a.svg`
+- Xiaomi logo: `/assets/advice/74f7e8baab90184b05499ea80dce96f157e67779.png`
+- Gradient masks: `/assets/advice/a81e514928dac622f5cd9e79d6ae0c85e8041eda.svg`, `/assets/advice/8a864d910be8ae51e64885c1673c28f86d3a82d6.svg`
 
 **Asset Workflow:**
 1. Extract assets using MCP tool with node ID
@@ -459,6 +491,12 @@ git add src/ && git commit -m "feat: implement marker clustering"
 - **StoryItem**: Individual story cards (96x112px) with image backgrounds and labels
 - **Icon System**: Exact SVG icons from Figma with proper aspect ratios
 - **Design Tokens**: Colors, fonts, and spacing from Figma
+- **AdviceSection**: Container for rendering advice cards in various layouts (single/double/triple/mixed)
+  - **MetaItem**: Category/rubric search cards with icon (116px height, Light/Dark themes)
+  - **MetaItemAd**: Advertisement cards with gradient mask and logo (Xiaomi example)
+  - **Interesting**: Feature promotion cards with illustration (Tourist layer example)
+  - **Cover**: Featured collection covers (placeholder)
+  - **RD**: Advertiser cards (placeholder)
 
 ### Icon Positioning Fix ✅
 **Problem**: Icons were stretching to fill 24x24 containers
@@ -484,10 +522,10 @@ git add src/ && git commit -m "feat: implement marker clustering"
 
 ### Double Border Fix ✅
 **Problem**: Clicking stories created overlapping focus rings and borders
-**Solution**: Consolidated border styling using Tailwind ring utilities
+**Solution**: Consolidated border styling using inset box-shadow
 - Removed separate border div element
 - Used `focus-visible` for keyboard-only focus indication
-- Viewed state uses `ring-2 ring-[#1BA136]` directly on button
+- Viewed state uses `box-shadow: inset 0 0 0 2px #1BA136` for inside border
 - Clean visual hierarchy without conflicts
 
 ### Gesture Fixes ✅
@@ -511,6 +549,34 @@ let newPosition = gestureState.current.startPosition + deltaPercent;
 ### Gesture State Corruption - FIXED ✅
 **Problem**: Rapid gestures caused unresponsive or stuck states
 **Solution**: Improved state synchronization and cleanup
+
+### Advice Section Implementation ✅
+**Complete Advice Section Layout** (from Figma node 162-220899):
+- Title: "Советы к месту" (19px Semibold, -0.38px tracking)
+- Background: #F1F1F1
+- Two-column grid layout with 12px gap
+- Components have white backgrounds
+
+**All 5 Components Completed**:
+- **MetaItem**: Category cards with 116px height, icon in circle, Light/Dark themes
+- **MetaItemAd**: Advertisement cards with gradient mask effect, "Реклама" label
+- **Interesting**: Feature promotion cards with illustration (Default: 160px, Big: 244px height)
+- **Cover**: Collection covers with gradient overlay (Default: 142px, Big: 200px height)
+- **RD**: Advertiser cards with gallery and ratings (116px standard, 244px with gallery)
+
+**Component Heights**:
+- Standard: 116px (MetaItem, MetaItemAd, RD without gallery)
+- Cover Default: 142px
+- Interesting Default: 160px min
+- Cover Big: 200px
+- Interesting/RD with gallery: 244px
+
+**Design Specifications**:
+- Border radius: 12px (rounded-xl) for all components
+- Typography: 16px Medium for titles, 13-14px for subtitles
+- Theme support: Light and Dark variants for all components
+- Active states: scale-95 transform on press
+- Mixed layout: Smart arrangement based on component types and states
 
 ## 🚨 Critical Debugging - Gesture Issues
 
