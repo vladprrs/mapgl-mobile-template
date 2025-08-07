@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+import { Icon, ICONS, COLORS } from '@/components/icons';
 
 export interface QuickAction {
   id: string;
@@ -21,43 +22,25 @@ interface QuickAccessPanelProps {
 const defaultActions: QuickAction[] = [
   {
     id: 'bookmark',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z" 
-          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
+    icon: <Icon name={ICONS.BOOKMARK} color={COLORS.TEXT_PRIMARY} />,
   },
   {
     id: 'home',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" 
-          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M9 22V12H15V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
+    icon: <Icon name={ICONS.HOME} color={COLORS.TEXT_PRIMARY} />,
     label: '45 мин',
-    labelColor: '#f5373c', // Red for heavy traffic
+    labelColor: COLORS.TRAFFIC_HEAVY,
   },
   {
     id: 'work',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M8 7V5C8 4.46957 8.21071 3.96086 8.58579 3.58579C8.96086 3.21071 9.46957 3 10 3H14C14.5304 3 15.0391 3.21071 15.4142 3.58579C15.7893 3.96086 16 4.46957 16 5V7" 
-          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 12V12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-      </svg>
-    ),
+    icon: <Icon name={ICONS.WORK} color={COLORS.TEXT_PRIMARY} />,
     label: '45 мин',
-    labelColor: '#efa701', // Yellow for moderate traffic
+    labelColor: COLORS.TRAFFIC_MODERATE,
   },
   {
     id: 'location',
     label: 'Немировича-Данченко, 45',
     sublabel: '50 мин',
-    sublabelColor: '#1ba136', // Green for light traffic
+    sublabelColor: COLORS.TRAFFIC_LIGHT,
   },
 ];
 

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Icon, ICONS, IMAGES, COLORS } from '@/components/icons';
+import Image from 'next/image';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -39,7 +41,7 @@ export function SearchBar({
         className="flex items-center justify-center w-full pt-1.5 pb-1.5 cursor-grab active:cursor-grabbing"
         data-drag-handle="true"
       >
-        <div className="w-10 h-1 bg-gray-400/25 rounded-md pointer-events-none" />
+        <div className="w-10 h-1 rounded-md pointer-events-none" style={{ backgroundColor: COLORS.DRAG_HANDLE }} />
       </div>
 
       {/* Search Bar Container */}
@@ -57,29 +59,7 @@ export function SearchBar({
             >
               {/* Search Icon */}
               <div className="flex items-center justify-center w-6 h-6 shrink-0">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="text-gray-500"
-                >
-                  <path
-                    d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M19 19L14.65 14.65"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Icon name={ICONS.SEARCH} size={20} color={COLORS.TEXT_SECONDARY} />
               </div>
 
               {/* Input Field */}
@@ -105,49 +85,16 @@ export function SearchBar({
               <button
                 type="button"
                 onClick={onVoiceClick}
-                className="flex items-center justify-center w-6 h-6 shrink-0 rounded-md hover:bg-gray-900/5 transition-colors"
+                className="flex items-center justify-center w-6 h-6 shrink-0 rounded-md hover:opacity-80 transition-opacity"
                 aria-label="Voice search"
               >
-                <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 1V13"
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M4 3V11"
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M10 3V11"
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M1 5V9"
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M13 5V9"
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </div>
+                <Image 
+                  src={IMAGES.SALUT_ASSISTANT} 
+                  alt="Salut Assistant" 
+                  width={24} 
+                  height={24}
+                  className="rounded-md"
+                />
               </button>
             </div>
           </form>
@@ -159,39 +106,14 @@ export function SearchBar({
           className="
             flex items-center justify-center
             w-10 h-10 shrink-0
-            bg-gray-900/[0.06] rounded-lg
-            hover:bg-gray-900/[0.08] active:bg-gray-900/[0.10]
-            transition-colors
+            rounded-lg
+            hover:opacity-80 active:opacity-60
+            transition-opacity
           "
+          style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
           aria-label="Menu"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="text-gray-900"
-          >
-            <path
-              d="M3 5H17"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M3 10H17"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M3 15H17"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
+          <Icon name={ICONS.MENU} size={20} color={COLORS.TEXT_PRIMARY} />
         </button>
       </div>
     </div>
