@@ -1,5 +1,10 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
+// Optional: jest-axe matchers (skip if not installed in environment)
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  require('jest-axe/extend-expect')
+} catch {}
 
 // Only set up DOM-related mocks if window is defined (not in Node environment)
 if (typeof window !== 'undefined') {

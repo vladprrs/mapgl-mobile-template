@@ -44,6 +44,7 @@ export function BottomSheetWithDashboard({
         height: '100vh',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
+      data-testid="bottom-sheet"
       data-sheet-state={currentSheetState}
     >
       {/* Dashboard Content with integrated drag handle */}
@@ -53,6 +54,7 @@ export function BottomSheetWithDashboard({
           h-full
           ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}
         `}
+        data-testid="bottom-sheet-content"
         data-scrollable={isExpanded ? 'true' : undefined}
         style={{
           scrollBehavior: 'smooth',

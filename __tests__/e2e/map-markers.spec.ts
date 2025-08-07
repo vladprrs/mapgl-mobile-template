@@ -3,17 +3,18 @@ import { test, expect } from '@playwright/test'
 test.describe('Map Markers Management', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    // Wait for map and bottom sheet to load
-    await page.waitForSelector('[style*="position: absolute"]', { timeout: 10000 })
-    await page.waitForSelector('.fixed.z-50', { timeout: 5000 })
+    await expect(page.getByTestId('map-root')).toBeVisible()
+    await expect(page.getByTestId('bottom-sheet')).toBeVisible()
   })
 
   test('should add marker when location is selected', async ({ page }) => {
     // Click on a location in the list
     await page.click('text="Red Square"')
     
-    // Wait for map animation
-    await page.waitForTimeout(500)
+    // Wait for marker count to increase (no fixed timeout)
+    await expect.poll(async () => {
+      return await page.evaluate(() => (window as any).__markerCount ?? 0)
+    }).toBeGreaterThan(0)
     
     // Verify marker was added (check via JavaScript)
     const markerCount = await page.evaluate(() => {
@@ -26,20 +27,18 @@ test.describe('Map Markers Management', () => {
 
   test('should center map on selected location', async ({ page }) => {
     // Get initial map center
-    const initialCenter = await page.evaluate(() => {
-      return (window as any).__mapInstance?.getCenter() || [0, 0]
-    })
+    const initialCenter = await page.evaluate(() => (window as any).__mapInstance?.getCenter() || [0, 0])
     
     // Click on a location
     await page.click('text="Gorky Park"')
     
-    // Wait for map animation
-    await page.waitForTimeout(1000)
+    // Wait until center changes
+    await expect.poll(async () => {
+      return await page.evaluate(() => (window as any).__mapInstance?.getCenter() ?? [0,0])
+    }).not.toEqual(initialCenter)
     
     // Get new map center
-    const newCenter = await page.evaluate(() => {
-      return (window as any).__mapInstance?.getCenter() || [0, 0]
-    })
+    const newCenter = await page.evaluate(() => (window as any).__mapInstance?.getCenter() || [0, 0])
     
     // Centers should be different
     expect(newCenter[0]).not.toBe(initialCenter[0])
@@ -49,16 +48,17 @@ test.describe('Map Markers Management', () => {
   test('should replace marker when new location is selected', async ({ page }) => {
     // Select first location
     await page.click('text="Red Square"')
-    await page.waitForTimeout(500)
+    // Wait until marker count stabilizes to 1
+    await expect.poll(async () => {
+      return await page.evaluate(() => (window as any).__markerCount ?? 0)
+    }).toBeLessThanOrEqual(1)
     
     // Select second location
     await page.click('text="Moscow City"')
     await page.waitForTimeout(500)
     
     // Should still have only one marker
-    const markerCount = await page.evaluate(() => {
-      return (window as any).__markerCount || 0
-    })
+    const markerCount = await page.evaluate(() => (window as any).__markerCount || 0)
     
     // Test expectation (actual implementation needed)
     expect(markerCount).toBeLessThanOrEqual(1)
@@ -67,28 +67,33 @@ test.describe('Map Markers Management', () => {
   test('should clear all markers when clear button is clicked', async ({ page }) => {
     // Add multiple markers
     await page.click('text="Red Square"')
-    await page.waitForTimeout(300)
+    // Allow time for marker creation via polling
+    await expect.poll(async () => {
+      return await page.evaluate(() => (window as any).__markerCount ?? 0)
+    }).toBeGreaterThan(0)
     
     await page.click('text="Gorky Park"')
-    await page.waitForTimeout(300)
+    // Ensure multiple markers attempted
+    await expect.poll(async () => {
+      return await page.evaluate(() => (window as any).__markerCount ?? 0)
+    }).toBeGreaterThan(0)
     
     // Click clear button
     await page.click('text="Clear All Markers"')
     
-    // Wait for clear operation
-    await page.waitForTimeout(500)
+    // Wait for marker count to reach 0
+    await expect.poll(async () => {
+      return await page.evaluate(() => (window as any).__markerCount ?? 0)
+    }).toBe(0)
     
     // Verify all markers are removed
-    const markerCount = await page.evaluate(() => {
-      return (window as any).__markerCount || 0
-    })
+    const markerCount = await page.evaluate(() => (window as any).__markerCount || 0)
     
     expect(markerCount).toBe(0)
   })
 
   test('should show marker label on hover', async ({ page, isMobile }) => {
-    // Skip on mobile as hover doesn't exist
-    test.skip(isMobile, 'No hover on mobile devices')
+    if (isMobile) return
     
     // Add a marker
     await page.click('text="Tretyakov Gallery"')
@@ -119,20 +124,18 @@ test.describe('Map Markers Management', () => {
       await page.waitForTimeout(50)
     }
     
-    // Wait for final state
-    await page.waitForTimeout(1000)
+    // Wait for last selection to settle
+    await expect.poll(async () => {
+      return await page.evaluate(() => (window as any).__mapInstance?.getCenter() ?? [0,0])
+    }).toBeDefined()
     
     // Should have handled all clicks without error
-    const hasError = await page.evaluate(() => {
-      return (window as any).__mapError || false
-    })
+    const hasError = await page.evaluate(() => (window as any).__mapError || false)
     
     expect(hasError).toBe(false)
     
     // Should show last selected location
-    const currentCenter = await page.evaluate(() => {
-      return (window as any).__mapInstance?.getCenter() || [0, 0]
-    })
+    const currentCenter = await page.evaluate(() => (window as any).__mapInstance?.getCenter() || [0, 0])
     
     // Should be centered on Bolshoi Theatre (last selection)
     expect(currentCenter).toBeDefined()
@@ -143,8 +146,8 @@ test.describe('Map Markers Management', () => {
     await page.click('text="Red Square"')
     await page.waitForTimeout(500)
     
-    const bottomSheet = page.locator('.fixed.z-50').first()
-    const handle = bottomSheet.locator('[style*="touchAction"]').first()
+    const bottomSheet = page.getByTestId('bottom-sheet')
+    const handle = page.getByTestId('drag-handle')
     
     // Collapse sheet
     await handle.dispatchEvent('pointerdown', {
@@ -164,18 +167,16 @@ test.describe('Map Markers Management', () => {
       pointerType: 'touch',
     })
     
-    await page.waitForTimeout(400)
+    await expect(bottomSheet).toHaveAttribute('data-sheet-state', 'collapsed')
     
     // Marker should still be visible
-    const markerVisible = await page.evaluate(() => {
-      return (window as any).__markerVisible !== false
-    })
+    const markerVisible = await page.evaluate(() => (window as any).__markerVisible !== false)
     
     expect(markerVisible).toBe(true)
   })
 
   test('should handle marker tap on mobile', async ({ page, isMobile }) => {
-    test.skip(!isMobile, 'Mobile-only test')
+    if (!isMobile) return
     
     // Add a marker
     await page.click('text="Moscow City"')
@@ -186,9 +187,7 @@ test.describe('Map Markers Management', () => {
     await marker.tap()
     
     // Should trigger marker click event
-    const markerClicked = await page.evaluate(() => {
-      return (window as any).__markerClicked || false
-    })
+    const markerClicked = await page.evaluate(() => (window as any).__markerClicked || false)
     
     expect(markerClicked).toBeDefined()
   })

@@ -41,6 +41,14 @@ export function MapProvider({ children }: MapProviderProps) {
       const marker = new mapgl.Marker(map, markerOptions);
       
       markersRef.current.set(id, marker);
+      
+      // Instrumentation: track marker counts in E2E
+      if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+        try {
+          const w = window as unknown as { __markerCount?: number };
+          w.__markerCount = markersRef.current.size;
+        } catch {}
+      }
     } catch (error) {
       console.error('Failed to create marker:', error);
     }
@@ -51,12 +59,24 @@ export function MapProvider({ children }: MapProviderProps) {
     if (marker) {
       marker.destroy();
       markersRef.current.delete(id);
+      if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+        try {
+          const w = window as unknown as { __markerCount?: number };
+          w.__markerCount = markersRef.current.size;
+        } catch {}
+      }
     }
   }, []);
 
   const clearMarkers = useCallback(() => {
     markersRef.current.forEach((marker: Marker) => marker.destroy());
     markersRef.current.clear();
+    if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+      try {
+        const w = window as unknown as { __markerCount?: number };
+        w.__markerCount = 0;
+      } catch {}
+    }
   }, []);
 
   const centerOnMarker = useCallback((id: string) => {
