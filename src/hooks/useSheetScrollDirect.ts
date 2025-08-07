@@ -51,26 +51,34 @@ export function useSheetScrollDirect({
     // Prevent if dragging
     if (isDragging) return;
     
-    // Check if we're at full expansion and content is scrollable
+    // Check if we're at full expansion (index 2 = 90% expanded)
     const isFullyExpanded = currentSnapIndex === snapPoints.length - 1;
-    const content = e.target as HTMLElement;
-    const isContentScrollable = content.scrollHeight > content.clientHeight;
     
-    // If fully expanded with scrollable content
-    if (isFullyExpanded && isContentScrollable) {
-      // If scrolled into content, let it scroll normally
-      if (content.scrollTop > 0) {
-        return;
-      }
-      // At top of content - only respond to scroll down (deltaY > 0) to collapse
-      // With Natural Scrolling: fingers UP (deltaY < 0) = content UP, fingers DOWN (deltaY > 0) = content DOWN
-      if (e.deltaY < 0) {
-        // Scrolling up at top - let content scroll if it can
-        return;
+    // If fully expanded, let content scroll normally
+    if (isFullyExpanded) {
+      // Find the scrollable content container
+      const container = containerRef.current;
+      const contentEl = container?.querySelector('.overflow-y-auto') as HTMLElement;
+      
+      if (contentEl && contentEl.scrollHeight > contentEl.clientHeight) {
+        // Content is scrollable
+        if (contentEl.scrollTop > 0 && e.deltaY < 0) {
+          // Scrolling up while not at top - let content scroll
+          return;
+        }
+        if (contentEl.scrollTop < contentEl.scrollHeight - contentEl.clientHeight && e.deltaY > 0) {
+          // Scrolling down while not at bottom - let content scroll
+          return;
+        }
+        // At boundaries - only collapse if scrolling down at top
+        if (contentEl.scrollTop === 0 && e.deltaY < 0) {
+          // At top, scrolling up - let content handle it
+          return;
+        }
       }
     }
     
-    // Always prevent default to stop page scroll when controlling sheet
+    // Prevent default to control sheet movement
     e.preventDefault();
     e.stopPropagation();
     
