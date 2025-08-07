@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { MapContainer } from '@/components/map/MapContainer'
 import { MapProvider } from '@/components/map/MapProvider'
 
@@ -45,14 +45,19 @@ describe('MapContainer', () => {
 
     it('should initialize with correct mobile settings', async () => {
       const { load } = require('@2gis/mapgl')
-      const mockMapConstructor = jest.fn()
+      const mockMapConstructor = jest.fn().mockImplementation(() => ({
+        on: jest.fn(),
+        destroy: jest.fn(),
+      }))
       load.mockResolvedValue({ Map: mockMapConstructor })
 
-      render(
-        <MapProvider>
-          <MapContainer />
-        </MapProvider>
-      )
+      await act(async () => {
+        render(
+          <MapProvider>
+            <MapContainer />
+          </MapProvider>
+        )
+      })
 
       await waitFor(() => {
         expect(mockMapConstructor).toHaveBeenCalledWith(
@@ -70,14 +75,19 @@ describe('MapContainer', () => {
 
     it('should set correct viewport constraints for mobile', async () => {
       const { load } = require('@2gis/mapgl')
-      const mockMapConstructor = jest.fn()
+      const mockMapConstructor = jest.fn().mockImplementation(() => ({
+        on: jest.fn(),
+        destroy: jest.fn(),
+      }))
       load.mockResolvedValue({ Map: mockMapConstructor })
 
-      render(
-        <MapProvider>
-          <MapContainer />
-        </MapProvider>
-      )
+      await act(async () => {
+        render(
+          <MapProvider>
+            <MapContainer />
+          </MapProvider>
+        )
+      })
 
       await waitFor(() => {
         expect(mockMapConstructor).toHaveBeenCalledWith(
@@ -99,31 +109,28 @@ describe('MapContainer', () => {
     it('should handle API key configuration errors gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
       
-      // Mock config to throw error
-      jest.mock('@/lib/config/env', () => ({
-        config: {
-          mapgl: {
-            get apiKey() {
-              throw new Error('API key not configured')
-            },
-          },
-        },
-        ConfigError: Error,
-      }))
+      // Mock the load function to simulate API key error
+      const { load } = require('@2gis/mapgl')
+      const originalLoad = load
+      load.mockRejectedValue(new Error('Invalid API key'))
 
-      render(
-        <MapProvider>
-          <MapContainer />
-        </MapProvider>
-      )
-
-      await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith(
-          'Configuration Error:',
-          expect.any(String)
+      await act(async () => {
+        render(
+          <MapProvider>
+            <MapContainer />
+          </MapProvider>
         )
       })
 
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'Failed to initialize map:',
+          expect.any(Error)
+        )
+      }, { timeout: 2000 })
+
+      // Restore the original mock
+      load.mockImplementation(originalLoad)
       consoleSpy.mockRestore()
     })
   })
@@ -139,11 +146,13 @@ describe('MapContainer', () => {
         Map: jest.fn().mockImplementation(() => mockMap),
       })
 
-      render(
-        <MapProvider>
-          <MapContainer />
-        </MapProvider>
-      )
+      await act(async () => {
+        render(
+          <MapProvider>
+            <MapContainer />
+          </MapProvider>
+        )
+      })
 
       await waitFor(() => {
         // Map should be created without manual control additions
@@ -165,11 +174,13 @@ describe('MapContainer', () => {
         GeoControl: mockGeoControl,
       })
 
-      render(
-        <MapProvider>
-          <MapContainer />
-        </MapProvider>
-      )
+      await act(async () => {
+        render(
+          <MapProvider>
+            <MapContainer />
+          </MapProvider>
+        )
+      })
 
       await waitFor(() => {
         // Controls should not be manually created
@@ -192,11 +203,13 @@ describe('MapContainer', () => {
         GeoControl: jest.fn(),
       })
 
-      render(
-        <MapProvider>
-          <MapContainer />
-        </MapProvider>
-      )
+      await act(async () => {
+        render(
+          <MapProvider>
+            <MapContainer />
+          </MapProvider>
+        )
+      })
 
       await waitFor(() => {
         expect(mockOn).toHaveBeenCalledWith('click', expect.any(Function))
@@ -228,17 +241,24 @@ describe('MapContainer', () => {
         GeoControl: jest.fn(),
       })
 
-      const { unmount } = render(
-        <MapProvider>
-          <MapContainer />
-        </MapProvider>
-      )
+      let unmount: () => void
+
+      await act(async () => {
+        const result = render(
+          <MapProvider>
+            <MapContainer />
+          </MapProvider>
+        )
+        unmount = result.unmount
+      })
 
       await waitFor(() => {
         expect(mockDestroy).not.toHaveBeenCalled()
       })
 
-      unmount()
+      await act(async () => {
+        unmount()
+      })
 
       expect(mockDestroy).toHaveBeenCalled()
     })

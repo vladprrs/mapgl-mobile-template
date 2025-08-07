@@ -34,8 +34,12 @@ export function MapContainer({ className = '' }: MapContainerProps) {
         }
 
         // Clean up any existing map instance first
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.destroy();
+        if (mapInstanceRef.current && typeof mapInstanceRef.current.destroy === 'function') {
+          try {
+            mapInstanceRef.current.destroy();
+          } catch (error) {
+            console.warn('Failed to destroy existing map instance:', error);
+          }
           mapInstanceRef.current = null;
         }
 
@@ -59,11 +63,13 @@ export function MapContainer({ className = '' }: MapContainerProps) {
           (window as unknown as { __setMapInstance: (map: unknown) => void }).__setMapInstance(map);
         }
 
-        // Handle map events
-        map.on('click', (event: unknown) => {
-          const mapEvent = event as { lngLat: [number, number] };
-          console.log('Map clicked at:', mapEvent.lngLat);
-        });
+        // Handle map events (with safety check)
+        if (map && typeof map.on === 'function') {
+          map.on('click', (event: unknown) => {
+            const mapEvent = event as { lngLat: [number, number] };
+            console.log('Map clicked at:', mapEvent.lngLat);
+          });
+        }
 
       } catch (error) {
         console.error('Failed to initialize map:', error);
@@ -76,8 +82,12 @@ export function MapContainer({ className = '' }: MapContainerProps) {
 
     return () => {
       // Clean up map instance on unmount
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.destroy();
+      if (mapInstanceRef.current && typeof mapInstanceRef.current.destroy === 'function') {
+        try {
+          mapInstanceRef.current.destroy();
+        } catch (error) {
+          console.warn('Failed to destroy map instance:', error);
+        }
         mapInstanceRef.current = null;
       }
     };

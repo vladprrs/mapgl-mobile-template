@@ -56,6 +56,12 @@ const customJestConfig = {
     '**/?(*.)+(spec|test).[jt]s?(x)',
   ],
   
+  // Exclude Playwright e2e tests from Jest
+  testPathIgnorePatterns: [
+    '<rootDir>/__tests__/e2e/',
+    '<rootDir>/node_modules/',
+  ],
+  
   // Transform ignore patterns
   transformIgnorePatterns: [
     'node_modules/(?!(@2gis/mapgl)/)',

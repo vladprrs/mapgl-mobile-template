@@ -46,6 +46,32 @@ if (typeof window !== 'undefined') {
 process.env.NEXT_PUBLIC_2GIS_API_KEY = 'test-api-key'
 process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
 
+// Mock 2GIS MapGL globally
+jest.mock('@2gis/mapgl', () => ({
+  load: jest.fn().mockResolvedValue({
+    Map: jest.fn().mockImplementation(() => ({
+      setCenter: jest.fn(),
+      setZoom: jest.fn(),
+      on: jest.fn(),
+      off: jest.fn(),
+      destroy: jest.fn(),
+      getContainer: jest.fn(() => document.createElement('div')),
+      getZoom: jest.fn(() => 13),
+      getCenter: jest.fn(() => [37.618423, 55.751244]),
+      getBounds: jest.fn(() => ({
+        getNorthEast: jest.fn(() => ({ lng: 38, lat: 56 })),
+        getSouthWest: jest.fn(() => ({ lng: 37, lat: 55 }))
+      })),
+      fitBounds: jest.fn(),
+      addControl: jest.fn(),
+      removeControl: jest.fn(),
+      queryRenderedFeatures: jest.fn(() => []),
+      project: jest.fn(),
+      unproject: jest.fn(),
+    }))
+  })
+}))
+
 // Set up mobile viewport mocking (only in jsdom environment)
 if (typeof window !== 'undefined') {
   global.innerWidth = 375
@@ -82,9 +108,12 @@ if (typeof window !== 'undefined') {
 const originalError = console.error
 beforeAll(() => {
   console.error = (...args) => {
+    const firstArg = args[0]
     if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render')
+      typeof firstArg === 'string' &&
+      (firstArg.includes('Warning: ReactDOM.render') ||
+       firstArg.includes('An update to MapProvider inside a test was not wrapped in act') ||
+       firstArg.includes('Warning: An update to'))
     ) {
       return
     }
