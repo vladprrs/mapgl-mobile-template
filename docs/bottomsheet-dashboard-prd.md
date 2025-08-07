@@ -48,13 +48,17 @@ Based on codebase exploration:
   - Submit on enter/search button tap
 
 #### 3.2.2 Quick Access Button Panel
-- **Position**: Below search bar with 16px top margin
-- **Layout**: Horizontal scrollable panel
+- **Position**: Below search bar (SearchBar's bottom padding creates the gap)
+- **Layout**: Horizontal scrollable panel with edge-to-edge fade mask
 - **Spacing**:
-  - Top margin: 16px from SearchBar
-  - Left margin: 16px from bottomsheet edge
-  - Right margin: 16px from bottomsheet edge
+  - Top margin: 4px (combined with SearchBar's 12px bottom padding = 16px total gap)
+  - Content left margin: 16px from bottomsheet edge
+  - Content right margin: Scrollable content with fade mask extending to edge
   - Bottom margin: 16px before next component
+- **Visual Design**:
+  - Fade mask: Extends to the very edges of bottomsheet (0px margins)
+  - Content: Starts 16px from left edge, scrolls horizontally
+  - Gradient: 32px wide fade effect on both sides when scrollable
 - **Functionality**:
   - Quick action buttons for common map operations
   - Icons with labels

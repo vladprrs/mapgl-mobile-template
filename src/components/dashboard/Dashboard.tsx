@@ -39,8 +39,8 @@ export function Dashboard({
         onVoiceClick={handleVoiceClick}
       />
 
-      {/* Quick Access Panel - 16px top margin from SearchBar */}
-      <div className="pt-4 pb-4">
+      {/* Quick Access Panel - No top padding (SearchBar pb-3 + 4px = 16px total) */}
+      <div className="pt-1 pb-4">
         <QuickAccessPanel onActionClick={handleQuickAction} />
       </div>
 
