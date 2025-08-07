@@ -3,6 +3,7 @@
 import React from 'react';
 import { SearchBar } from './SearchBar';
 import { QuickAccessPanel } from './QuickAccessPanel';
+import { StoriesPanel } from './StoriesPanel';
 
 interface DashboardProps {
   className?: string;
@@ -30,6 +31,10 @@ export function Dashboard({
     console.log('Quick action clicked:', actionId);
   };
 
+  const handleStoryClick = (storyId: string) => {
+    console.log('Story clicked:', storyId);
+  };
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {/* Search Bar */}
@@ -44,14 +49,13 @@ export function Dashboard({
         <QuickAccessPanel onActionClick={handleQuickAction} />
       </div>
 
+      {/* Stories Panel - No extra padding needed (already has px-4) */}
+      <div className="pb-4">
+        <StoriesPanel onStoryClick={handleStoryClick} />
+      </div>
+
       {/* Dashboard Content */}
       <div className="flex-1 px-4 overflow-y-auto">
-        {/* Placeholder for Stories Panel */}
-        <div className="mb-4">
-          <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-            Stories Panel (Coming Soon)
-          </div>
-        </div>
 
         {/* Placeholder for Tips Block */}
         <div className="mb-4">
