@@ -221,7 +221,7 @@ export function useBottomSheet({
     // Process wheel events immediately to prevent erratic behavior
     const result = handleScrollGesture(delta, 'wheel');
     
-    if (result === 'sheet') {
+    if (result === 'sheet' && event.cancelable) {
       event.preventDefault();
     }
   }, [handleScrollGesture]);
@@ -315,7 +315,9 @@ export function useBottomSheet({
     }
     
     // CRITICAL FIX: Handle as direct drag gesture, bypassing problematic scroll gesture logic
-    e.preventDefault(); // Prevent default to handle sheet movement
+    if (e.cancelable) {
+      e.preventDefault(); // Prevent default to handle sheet movement only if cancelable
+    }
     
     // Start dragging if not already
     if (!state.isDragging) {
@@ -363,7 +365,9 @@ export function useBottomSheet({
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (state.isDragging && gestureState.current.type === 'drag') {
-      e.preventDefault();
+      if (e.cancelable) {
+        e.preventDefault();
+      }
       handleDragMove(e.clientY);
     }
   }, [state.isDragging, handleDragMove]);

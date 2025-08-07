@@ -351,7 +351,8 @@ describe('Gesture Edge Cases', () => {
       })
 
       const touchMove = new TouchEvent('touchmove', {
-        touches: [{ clientY: 250, identifier: 0 } as Touch] // Downward
+        touches: [{ clientY: 250, identifier: 0 } as Touch], // Downward
+        cancelable: true // Make event cancelable so preventDefault can be called
       })
 
       let preventDefaultCalled = false
