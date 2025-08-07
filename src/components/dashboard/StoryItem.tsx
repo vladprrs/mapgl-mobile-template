@@ -33,9 +33,13 @@ export function StoryItem({
         outline-none
         focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
         transition-transform active:scale-95
-        ${isViewed ? 'ring-2 ring-[#1BA136]' : ''}
+        overflow-hidden
         ${className}
       `}
+      style={{
+        // Use inset box-shadow for inside border when viewed
+        boxShadow: isViewed ? 'inset 0 0 0 2px #1BA136' : undefined,
+      }}
       aria-label={`Story: ${label}`}
       data-story-id={id}
     >

@@ -35,16 +35,14 @@ describe('StoryItem', () => {
   it('shows green border when viewed', () => {
     const { rerender } = render(<StoryItem {...defaultProps} isViewed={false} />);
     
-    // Should not have green ring initially
+    // Should not have green border initially
     let button = screen.getByRole('button');
-    expect(button).not.toHaveClass('ring-2');
-    expect(button).not.toHaveClass('ring-[#1BA136]');
+    expect(button).not.toHaveStyle({ boxShadow: 'inset 0 0 0 2px #1BA136' });
     
-    // Should have green ring when viewed
+    // Should have green inset border when viewed
     rerender(<StoryItem {...defaultProps} isViewed={true} />);
     button = screen.getByRole('button');
-    expect(button).toHaveClass('ring-2');
-    expect(button).toHaveClass('ring-[#1BA136]');
+    expect(button).toHaveStyle({ boxShadow: 'inset 0 0 0 2px #1BA136' });
   });
 
   it('calls onClick when clicked', () => {

@@ -60,15 +60,13 @@ describe('StoriesPanel', () => {
   it('passes isViewed prop correctly to StoryItem', () => {
     render(<StoriesPanel stories={mockStories} />);
     
-    // Story 2 should have viewed state (green ring)
+    // Story 2 should have viewed state (green inset border)
     const story2Button = screen.getByRole('button', { name: /Story: Story 2/i });
-    expect(story2Button).toHaveClass('ring-2');
-    expect(story2Button).toHaveClass('ring-[#1BA136]');
+    expect(story2Button).toHaveStyle({ boxShadow: 'inset 0 0 0 2px #1BA136' });
     
     // Story 1 should not have viewed state
     const story1Button = screen.getByRole('button', { name: /Story: Story 1/i });
-    expect(story1Button).not.toHaveClass('ring-2');
-    expect(story1Button).not.toHaveClass('ring-[#1BA136]');
+    expect(story1Button).not.toHaveStyle({ boxShadow: 'inset 0 0 0 2px #1BA136' });
   });
 
   it('handles scroll events for gradient visibility', () => {
