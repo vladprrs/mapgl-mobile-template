@@ -21,6 +21,11 @@ npm run test:coverage       # Check coverage
 npm run build && npm start
 ```
 
+## Test Pages
+
+- `/test-stories` - Story components preview
+- `/test-advice` - Advice section components with Figma layout
+
 
 ## Commands
 
@@ -397,12 +402,13 @@ mcp__figma-dev-mode-mcp-server__get_code({
 - SearchBar: `189-220904`
 - QuickAccessPanel: `189-220977`
 - StoryItem: `198-221026`
-- Interesting: `119-67257`
+- StoriesPanel: `189-221058`
+- AdviceSection: `162-220899`
 - MetaItem: `119-67226`
 - MetaItemAd: `119-66974`
+- Interesting: `119-67257`
 - Cover: `119-66903` (Default) / `119-66910` (Big)
 - RD: `119-66916`
-- AdviceSection: `162-220899`
 
 **Extracted Icon SVG Files:**
 - Search: `/assets/icons/78b4aac2c15552b8c0acc3c49dc2805e66dfdcad.svg`
@@ -416,11 +422,13 @@ mcp__figma-dev-mode-mcp-server__get_code({
 - Images include various medical/health related visuals
 - All images properly sized for 96x112px display area
 
-**Advice Component Assets Extracted:**
-- Tourist illustration: `/assets/advice/e54c37b478c3fbeeadd3e7ff6c943f19ac03e375.png`
-- Ice rink icons: `/assets/advice/d09f29e90c1485808c9c5f19153fbd5bde35b060.svg`, `/assets/advice/18f5b1e0152b51de3ce4cf9f463c841f262c2a6a.svg`
-- Xiaomi logo: `/assets/advice/74f7e8baab90184b05499ea80dce96f157e67779.png`
-- Gradient masks: `/assets/advice/a81e514928dac622f5cd9e79d6ae0c85e8041eda.svg`, `/assets/advice/8a864d910be8ae51e64885c1673c28f86d3a82d6.svg`
+**Advice Component Assets Extracted (67 files):**
+- Category icons: Various SVG icons for different categories in `/assets/advice/`
+- Feature illustrations: Tourist guide, city visuals
+- Brand logos: Xiaomi and other advertiser logos
+- Gallery images: Restaurant photos for RD components
+- Gradient masks and overlays for visual effects
+- Collection cover images for Cover components
 
 **Asset Workflow:**
 1. Extract assets using MCP tool with node ID
@@ -551,32 +559,37 @@ let newPosition = gestureState.current.startPosition + deltaPercent;
 **Solution**: Improved state synchronization and cleanup
 
 ### Advice Section Implementation ✅
-**Complete Advice Section Layout** (from Figma node 162-220899):
+**Complete Advice Section with 2-Column Masonry Layout** (from Figma node 162-220899):
 - Title: "Советы к месту" (19px Semibold, -0.38px tracking)
 - Background: #F1F1F1
-- Two-column grid layout with 12px gap
-- Components have white backgrounds
+- **Masonry Layout**: Always 2 columns, variable component heights
+- Components maintain fixed column positions, never span across
 
 **All 5 Components Completed**:
-- **MetaItem**: Category cards with 116px height, icon in circle, Light/Dark themes
-- **MetaItemAd**: Advertisement cards with gradient mask effect, "Реклама" label
-- **Interesting**: Feature promotion cards with illustration (Default: 160px, Big: 244px height)
-- **Cover**: Collection covers with gradient overlay (Default: 142px, Big: 200px height)
-- **RD**: Advertiser cards with gallery and ratings (116px standard, 244px with gallery)
+- **MetaItem**: Category/rubric search cards (always 116px height)
+- **MetaItemAd**: Advertisement cards with gradient mask (always 116px height)
+- **Interesting**: Feature promotion cards with illustration (always 244px height)
+- **Cover**: Collection covers with gradient overlay (116px default / 244px big)
+- **RD**: Advertiser cards with 100px gallery + content (always 244px height)
 
-**Component Heights**:
-- Standard: 116px (MetaItem, MetaItemAd, RD without gallery)
-- Cover Default: 142px
-- Interesting Default: 160px min
-- Cover Big: 200px
-- Interesting/RD with gallery: 244px
+**Masonry Grid Height Rules**:
+- **Single Height (116px)**: MetaItem, MetaItemAd, Cover (default state)
+- **Double Height (244px)**: Interesting, RD, Cover (big state)
+- Components placed in shorter column for balanced layout
+- No horizontal spanning - components stay in their column
+
+**RD Component Specifications**:
+- Total height: 244px (double height in masonry)
+- Gallery section: Exactly 100px height
+- Content positioned at top-[116px] to prevent overlap
+- Gallery images: Main image + counter badge for additional photos
 
 **Design Specifications**:
 - Border radius: 12px (rounded-xl) for all components
 - Typography: 16px Medium for titles, 13-14px for subtitles
 - Theme support: Light and Dark variants for all components
 - Active states: scale-95 transform on press
-- Mixed layout: Smart arrangement based on component types and states
+- Masonry algorithm places items in shorter column dynamically
 
 ## 🚨 Critical Debugging - Gesture Issues
 
