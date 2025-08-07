@@ -61,15 +61,11 @@ export function useBottomSheet({
     onSnapChange?.(targetSnap);
   }, [snapPoints, onSnapChange]);
 
-  // Determine sheet state based on snap point
-  const getSheetState = useCallback((snapPoint: SnapPoint) => {
-    const [collapsed, half] = snapPoints;
-    if (snapPoint <= collapsed) return 'collapsed';
-    if (snapPoint <= half) return 'half';
-    return 'expanded';
-  }, [snapPoints]);
-
-  const currentSheetState = getSheetState(state.snapPoint);
+  // Determine current sheet state based on snap point
+  const [collapsed, half] = snapPoints;
+  const currentSheetState = 
+    state.snapPoint <= collapsed ? 'collapsed' :
+    state.snapPoint <= half ? 'half' : 'expanded';
 
   const findNearestSnapPoint = useCallback((position: number, velocity: number): SnapPoint => {
     const velocityThreshold = 0.5;
