@@ -268,8 +268,8 @@ export function useBottomSheet({
     gestureState.current.isActive = false;
   }, [state.isDragging, state.position, state.velocity, findNearestSnapPoint, snapTo]);
 
-  // Touch event handlers for content area
-  const handleContentTouchStart = useCallback((e: React.TouchEvent) => {
+  // Native touch event handlers for content area (with proper passive: false)
+  const handleContentTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
     gestureState.current = {
       type: 'touch',
@@ -280,11 +280,12 @@ export function useBottomSheet({
     };
   }, []);
 
-  const handleContentTouchMove = useCallback((e: React.TouchEvent) => {
+  const handleContentTouchMove = useCallback((e: TouchEvent) => {
     if (!gestureState.current.isActive) return;
     
     const touch = e.touches[0];
     const deltaY = gestureState.current.startY - touch.clientY;
+    gestureState.current.currentY = touch.clientY;
     
     // Calculate velocity for momentum detection
     const now = Date.now();
@@ -422,36 +423,21 @@ export function useBottomSheet({
     };
   }, []);
 
-  // Native touch event handlers for overscroll protection
+  // Add native touch event listeners with proper passive configuration
   useEffect(() => {
     const element = contentRef.current;
     if (!element) return;
 
-    const handleNativeTouchMove = (e: TouchEvent) => {
-      // Prevent overscroll bouncing on iOS when sheet is not expanded
-      if (currentSheetState !== 'expanded') {
-        e.preventDefault();
-        return;
-      }
-      
-      // In expanded state, let content scroll naturally but prevent sheet movement
-      if (state.isDragging && gestureState.current.type === 'touch') {
-        const touch = e.touches[0];
-        const deltaY = gestureState.current.startY - touch.clientY;
-        const result = handleScrollGesture(deltaY, 'touch');
-        
-        if (result === 'sheet') {
-          e.preventDefault();
-        }
-      }
-    };
-
-    element.addEventListener('touchmove', handleNativeTouchMove, { passive: false });
+    element.addEventListener('touchstart', handleContentTouchStart, { passive: false });
+    element.addEventListener('touchmove', handleContentTouchMove, { passive: false });
+    element.addEventListener('touchend', handleContentTouchEnd, { passive: false });
 
     return () => {
-      element.removeEventListener('touchmove', handleNativeTouchMove);
+      element.removeEventListener('touchstart', handleContentTouchStart);
+      element.removeEventListener('touchmove', handleContentTouchMove);
+      element.removeEventListener('touchend', handleContentTouchEnd);
     };
-  }, [state.isDragging, currentSheetState, handleScrollGesture]);
+  }, [handleContentTouchStart, handleContentTouchMove, handleContentTouchEnd]);
 
   return {
     // State
@@ -469,11 +455,6 @@ export function useBottomSheet({
     handleTouchMove,
     handleTouchEnd,
     handleMouseDown,
-    
-    // Event handlers for content area
-    handleContentTouchStart,
-    handleContentTouchMove,
-    handleContentTouchEnd,
     
     // Refs
     sheetRef,

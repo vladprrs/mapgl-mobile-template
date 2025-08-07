@@ -24,9 +24,6 @@ export function BottomSheet({
     handleTouchMove,
     handleTouchEnd,
     handleMouseDown,
-    handleContentTouchStart,
-    handleContentTouchMove,
-    handleContentTouchEnd,
     sheetRef,
     contentRef,
   } = useBottomSheet({ snapPoints, onSnapChange });
@@ -69,9 +66,6 @@ export function BottomSheet({
           ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}
         `}
         data-scrollable={isExpanded ? 'true' : undefined}
-        onTouchStart={handleContentTouchStart}
-        onTouchMove={handleContentTouchMove}
-        onTouchEnd={handleContentTouchEnd}
         style={{
           // Smooth scrolling when expanded
           scrollBehavior: 'smooth',
