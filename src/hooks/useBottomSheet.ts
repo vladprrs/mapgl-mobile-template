@@ -139,6 +139,7 @@ export function useBottomSheet({
     currentSnapIndex,
     isDragging,
     dragY,
+    setDragY,
     snapTo,
     handlePointerDown,
     getSnapHeight,

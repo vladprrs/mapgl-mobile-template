@@ -3,7 +3,7 @@
 import { MapProvider } from '@/components/map/MapProvider';
 import { MapContainer } from '@/components/map/MapContainer';
 import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
-import { LocationList } from '@/components/LocationList';
+import { PlaceDetails } from '@/components/PlaceDetails';
 
 export default function Home() {
   return (
@@ -18,7 +18,7 @@ export default function Home() {
             console.log('Snapped to:', index);
           }}
         >
-          <LocationList />
+          <PlaceDetails />
         </BottomSheet>
       </main>
     </MapProvider>

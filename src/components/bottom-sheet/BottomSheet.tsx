@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useBottomSheet } from '@/hooks/useBottomSheet';
+import { useSheetScrollDirect } from '@/hooks/useSheetScrollDirect';
 import { SheetHandle } from './SheetHandle';
 import { SheetContent } from './SheetContent';
 
@@ -22,18 +23,34 @@ export function BottomSheet({
 }: BottomSheetProps) {
   // Track if component has mounted on client
   const [isClient, setIsClient] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   
   const {
     containerRef,
     currentSnapIndex,
     isDragging,
     dragY,
+    setDragY,
     handlePointerDown,
     getSnapHeight,
+    snapTo,
   } = useBottomSheet({
     snapPoints,
     defaultSnapPoint,
     onSnapChange,
+  });
+
+  const isExpanded = currentSnapIndex === snapPoints.length - 1;
+
+  // Use direct scroll handler with inverted direction
+  useSheetScrollDirect({
+    containerRef,
+    currentSnapIndex,
+    snapPoints,
+    onSnapChange: snapTo,
+    isDragging,
+    setDragY,
+    getSnapHeight,
   });
 
   // Set isClient to true after mount to enable client-side calculations
@@ -44,7 +61,8 @@ export function BottomSheet({
   const currentHeight = useMemo(() => {
     if (!isClient) return 0; // Return 0 during SSR
     const snapHeight = getSnapHeight(currentSnapIndex);
-    return snapHeight + dragY;
+    const height = snapHeight + dragY;
+    return height;
   }, [isClient, currentSnapIndex, dragY, getSnapHeight]);
 
   // Calculate transform with SSR safety
@@ -84,7 +102,10 @@ export function BottomSheet({
       }}
     >
       <SheetHandle onPointerDown={handlePointerDown} />
-      <SheetContent isExpanded={currentSnapIndex === snapPoints.length - 1}>
+      <SheetContent 
+        ref={contentRef}
+        isExpanded={isExpanded}
+      >
         {children}
       </SheetContent>
     </div>
