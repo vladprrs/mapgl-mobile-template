@@ -54,45 +54,24 @@ export function useSheetScrollDirect({
     // Check if we're at full expansion (index 2 = 90% expanded)
     const isFullyExpanded = currentSnapIndex === snapPoints.length - 1;
     
-    // If fully expanded, check if we should let content scroll
+    // If fully expanded, DON'T prevent default - let content scroll naturally
     if (isFullyExpanded) {
-      // Check if the event target is within scrollable content
-      const target = e.target as HTMLElement;
-      const scrollableContent = target.closest('.overflow-y-auto') as HTMLElement;
+      // Find the scrollable content
+      const container = containerRef.current;
+      const contentEl = container?.querySelector('.overflow-y-auto') as HTMLElement;
       
-      if (scrollableContent && scrollableContent.scrollHeight > scrollableContent.clientHeight) {
-        // Content is scrollable
-        const atTop = scrollableContent.scrollTop === 0;
-        const atBottom = scrollableContent.scrollTop >= scrollableContent.scrollHeight - scrollableContent.clientHeight - 1;
+      if (contentEl) {
+        const atTop = contentEl.scrollTop <= 0;
+        const shouldCollapse = atTop && e.deltaY > 0; // Scrolling down at top
         
-        // Check if we should let content scroll
-        const shouldContentScroll = 
-          (e.deltaY < 0 && !atBottom) || // Scrolling up and not at bottom
-          (e.deltaY > 0 && !atTop);      // Scrolling down and not at top
-        
-        if (shouldContentScroll) {
-          // Clear any existing timer to prevent unwanted snapping
-          clearTimeout(scrollTimer.current);
-          isScrolling.current = false;
-          accumulatedDelta.current = 0;
-          return; // Let the content handle scrolling
-        }
-        
-        // At this point, we're at a boundary and should consider collapsing
-        if (e.deltaY > 0 && atTop) {
-          // Scrolling down at top - collapse the sheet
-          // Fall through to sheet movement
-        } else {
-          // Any other boundary case - let content handle it
-          clearTimeout(scrollTimer.current);
-          isScrolling.current = false;
-          accumulatedDelta.current = 0;
+        if (!shouldCollapse) {
+          // Let content scroll naturally
           return;
         }
       }
     }
     
-    // Prevent default to control sheet movement
+    // Only prevent default when we want to control the sheet
     e.preventDefault();
     e.stopPropagation();
     
