@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useBottomSheet } from '@/hooks/useBottomSheet';
 import { SheetHandle } from './SheetHandle';
 import { SheetContent } from './SheetContent';
@@ -20,6 +20,9 @@ export function BottomSheet({
   onSnapChange,
   className = '',
 }: BottomSheetProps) {
+  // Track if component has mounted on client
+  const [isClient, setIsClient] = useState(false);
+  
   const {
     containerRef,
     currentSnapIndex,
@@ -33,16 +36,40 @@ export function BottomSheet({
     onSnapChange,
   });
 
+  // Set isClient to true after mount to enable client-side calculations
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const currentHeight = useMemo(() => {
+    if (!isClient) return 0; // Return 0 during SSR
     const snapHeight = getSnapHeight(currentSnapIndex);
     return snapHeight + dragY;
-  }, [currentSnapIndex, dragY, getSnapHeight]);
+  }, [isClient, currentSnapIndex, dragY, getSnapHeight]);
 
+  // Calculate transform with SSR safety
   const transform = useMemo(() => {
-    if (typeof window === 'undefined') return 'translateY(100%)';
+    // During SSR or before client mount, use CSS percentage
+    if (!isClient) {
+      // Use percentage based on snap point for initial positioning
+      const snapPercentage = (1 - snapPoints[defaultSnapPoint]) * 100;
+      return `translateY(${snapPercentage}%)`;
+    }
+    
+    // After hydration, use precise pixel calculations
     const translateY = window.innerHeight - currentHeight;
     return `translateY(${translateY}px)`;
-  }, [currentHeight]);
+  }, [isClient, currentHeight, snapPoints, defaultSnapPoint]);
+
+  // Determine transition based on client state
+  const transition = useMemo(() => {
+    if (!isClient) {
+      // Use CSS transition during SSR
+      return 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    }
+    // After client mount, control transition based on drag state
+    return isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+  }, [isClient, isDragging]);
 
   return (
     <div
@@ -50,7 +77,7 @@ export function BottomSheet({
       className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl ${className}`}
       style={{
         transform,
-        transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition,
         height: '100vh',
         willChange: 'transform',
         touchAction: 'none',

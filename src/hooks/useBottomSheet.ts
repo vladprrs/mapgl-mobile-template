@@ -26,11 +26,15 @@ export function useBottomSheet({
   // const animationFrameRef = useRef<number | undefined>(undefined);
 
   const getSnapHeight = useCallback((index: number) => {
+    // Return 0 during SSR to avoid window reference
     if (typeof window === 'undefined') return 0;
     return window.innerHeight * snapPoints[index];
   }, [snapPoints]);
 
   const findClosestSnapIndex = useCallback((height: number) => {
+    // SSR safety check
+    if (typeof window === 'undefined') return 0;
+    
     const windowHeight = window.innerHeight;
     const currentRatio = height / windowHeight;
     
@@ -79,7 +83,7 @@ export function useBottomSheet({
   }, [currentSnapIndex, getSnapHeight]);
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || typeof window === 'undefined') return;
     
     const deltaY = startYRef.current - e.clientY;
     
