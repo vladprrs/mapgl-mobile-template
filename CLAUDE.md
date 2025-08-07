@@ -431,6 +431,338 @@ test('mobile map interaction', async ({ page }) => {
 - Group by feature, not file type
 - Keep test files adjacent
 
+## Test-Driven Development (TDD) Workflow
+
+### Core Principles
+
+**Red-Green-Refactor Cycle:**
+1. **RED**: Write a failing test first
+2. **GREEN**: Write minimal code to make the test pass
+3. **REFACTOR**: Improve the code while keeping tests green
+
+### Test Structure
+
+```
+__tests__/
+├── unit/
+│   ├── utils/           # Utility function tests
+│   └── hooks/           # Custom React hooks tests
+├── integration/
+│   ├── components/      # Component integration tests
+│   └── interactions/    # Cross-component interaction tests
+└── e2e/
+    └── *.spec.ts        # End-to-end mobile tests
+```
+
+### TDD Commands
+
+```bash
+# Run tests in watch mode during development
+npm run test:watch
+
+# Run specific test file in watch mode
+npm run test:watch MapContainer
+
+# Check test coverage
+npm run test:coverage
+
+# Run unit tests only
+npm run test:unit
+
+# Run integration tests only
+npm run test:integration
+
+# Run E2E tests for mobile viewports
+npm run test:e2e:mobile
+
+# Run all map-related tests
+npm run test:map
+
+# Run all bottom sheet tests
+npm run test:sheet
+
+# Run complete test suite
+npm run test:all
+```
+
+### Writing Tests for New Features
+
+#### 1. Start with a Failing Test
+```typescript
+// Write test BEFORE implementation
+describe('NewFeature', () => {
+  it('should perform expected behavior', () => {
+    // Arrange
+    const input = setupTestData()
+    
+    // Act
+    const result = newFeature(input)
+    
+    // Assert
+    expect(result).toBe(expectedOutput)
+  })
+})
+```
+
+#### 2. Verify Test Fails
+```bash
+npm run test:watch NewFeature
+# ✗ Test should fail (RED)
+```
+
+#### 3. Implement Minimal Code
+```typescript
+// Write just enough code to pass
+function newFeature(input) {
+  return expectedOutput // Minimal implementation
+}
+```
+
+#### 4. Verify Test Passes
+```bash
+# ✓ Test should pass (GREEN)
+```
+
+#### 5. Refactor with Confidence
+```typescript
+// Improve implementation while tests stay green
+function newFeature(input) {
+  // Better implementation
+  return processInput(input)
+}
+```
+
+### Testing 2GIS MapGL Components
+
+#### Mock Setup
+```typescript
+// Always mock MapGL for unit tests
+jest.mock('@2gis/mapgl', () => ({
+  load: jest.fn().mockResolvedValue({
+    Map: jest.fn().mockImplementation(() => ({
+      setCenter: jest.fn(),
+      setZoom: jest.fn(),
+      on: jest.fn(),
+      destroy: jest.fn(),
+    })),
+    Marker: jest.fn(),
+    ZoomControl: jest.fn(),
+    GeoControl: jest.fn(),
+  }),
+}))
+```
+
+#### Testing Map Initialization
+```typescript
+describe('Map Initialization', () => {
+  it('should initialize with mobile settings', async () => {
+    render(<MapContainer />)
+    
+    await waitFor(() => {
+      expect(mockMap).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        expect.objectContaining({
+          pitch: 0,
+          rotation: 0,
+          cooperativeGestures: false,
+          maxZoom: 18,
+        })
+      )
+    })
+  })
+})
+```
+
+### Testing Mobile Interactions
+
+#### Touch Gesture Testing
+```typescript
+describe('Touch Gestures', () => {
+  it('should handle drag on bottom sheet', async () => {
+    const { container } = render(<BottomSheet />)
+    const handle = container.querySelector('[data-testid="sheet-handle"]')
+    
+    // Simulate touch drag
+    fireEvent.pointerDown(handle, {
+      clientY: 500,
+      pointerType: 'touch',
+    })
+    
+    fireEvent.pointerMove(window, {
+      clientY: 200,
+      pointerType: 'touch',
+    })
+    
+    fireEvent.pointerUp(window)
+    
+    // Assert sheet moved
+    expect(onSnapChange).toHaveBeenCalledWith(2)
+  })
+})
+```
+
+#### E2E Mobile Testing
+```typescript
+// playwright.config.ts devices
+test('should work on iPhone SE', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 })
+  await page.goto('/')
+  
+  // Test mobile-specific behavior
+  const sheet = page.locator('.bottom-sheet')
+  await sheet.dragTo({ y: 200 })
+  
+  await expect(sheet).toHaveCSS('transform', /translateY/)
+})
+```
+
+### Coverage Requirements
+
+```javascript
+// jest.config.js thresholds
+coverageThreshold: {
+  global: {
+    branches: 80,
+    functions: 80,
+    lines: 80,
+    statements: 80,
+  },
+  './src/components/map/': {
+    branches: 100,  // Critical path: 100% coverage
+    functions: 100,
+    lines: 100,
+    statements: 100,
+  },
+}
+```
+
+### TDD Rules for This Project
+
+1. **No Implementation Without Tests**
+   - Every feature starts with a failing test
+   - Tests define the expected behavior
+
+2. **Tests First, Code Second**
+   - Write the test
+   - See it fail (RED)
+   - Then implement (GREEN)
+
+3. **Mobile-First Testing**
+   - All tests consider mobile constraints
+   - Test touch gestures and viewport sizes
+
+4. **Mock External Dependencies**
+   ```typescript
+   // Mock 2GIS MapGL in unit tests
+   jest.mock('@2gis/mapgl')
+   
+   // Use real map only in E2E tests
+   test.use({ baseURL: 'http://localhost:3000' })
+   ```
+
+5. **Separate Test Commits**
+   ```bash
+   # Commit 1: Add failing tests
+   git commit -m "test: add tests for marker clustering"
+   
+   # Commit 2: Add implementation
+   git commit -m "feat: implement marker clustering"
+   ```
+
+### Common Testing Patterns
+
+#### Testing Async Map Operations
+```typescript
+it('should load map asynchronously', async () => {
+  render(<MapContainer />)
+  
+  // Wait for async load
+  await waitFor(() => {
+    expect(screen.getByTestId('map-container')).toBeInTheDocument()
+  })
+  
+  // Verify map instance
+  expect(mapInstance).toBeDefined()
+})
+```
+
+#### Testing State Updates
+```typescript
+it('should update markers when location selected', async () => {
+  const { rerender } = render(<LocationList />)
+  
+  // Select location
+  await userEvent.click(screen.getByText('Red Square'))
+  
+  // Verify state update
+  await waitFor(() => {
+    expect(mockAddMarker).toHaveBeenCalledWith(
+      expect.objectContaining({
+        coordinates: [37.6173, 55.7558],
+      })
+    )
+  })
+})
+```
+
+#### Testing Error Scenarios
+```typescript
+it('should handle API key errors gracefully', async () => {
+  // Mock error
+  mockConfig.mapgl.apiKey = undefined
+  
+  render(<MapContainer />)
+  
+  // Should show error message
+  expect(screen.getByText(/API key not configured/)).toBeInTheDocument()
+  
+  // App should not crash
+  expect(screen.getByRole('main')).toBeInTheDocument()
+})
+```
+
+### Debugging Failed Tests
+
+```bash
+# Run single test with debugging
+npm run test:watch -- --verbose MapContainer
+
+# Run with coverage to find untested code
+npm run test:coverage
+
+# Debug E2E tests with headed browser
+npx playwright test --headed --debug
+
+# Generate E2E test report
+npx playwright show-report
+```
+
+### Pre-commit Testing
+
+```json
+// .husky/pre-commit
+"npm run test:unit -- --findRelatedTests"
+"npm run lint"
+"npm run type-check"
+```
+
+### CI/CD Testing Strategy
+
+1. **On Every Push**
+   - Run unit tests
+   - Run integration tests
+   - Check coverage thresholds
+
+2. **On Pull Requests**
+   - Full test suite
+   - E2E tests on multiple viewports
+   - Performance benchmarks
+
+3. **Before Deploy**
+   - Complete test suite
+   - Visual regression tests
+   - Load testing
+
 ## Git Workflow
 
 ### Branch Naming

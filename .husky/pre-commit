@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Run type checking
+echo "🔍 Running type check..."
+npm run type-check || {
+  echo "❌ Type check failed. Please fix TypeScript errors before committing."
+  exit 1
+}
+
+# Run linting
+echo "🧹 Running linter..."
+npm run lint || {
+  echo "❌ Linting failed. Please fix linting errors before committing."
+  exit 1
+}
+
+# Run tests for changed files
+echo "🧪 Running tests for changed files..."
+npx jest --bail --findRelatedTests $(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx)$' | tr '\n' ' ') || {
+  echo "❌ Tests failed. Following TDD, all tests must pass before committing."
+  echo "💡 Tip: Write tests first (RED), then implementation (GREEN), then refactor."
+  exit 1
+}
+
+# Check for .only or .skip in tests
+echo "🔎 Checking for .only or .skip in tests..."
+git diff --cached --name-only | xargs grep -l "\.only\|\.skip" | grep -E "\.(test|spec)\.(ts|tsx|js|jsx)$" && {
+  echo "❌ Found .only or .skip in test files. Please remove them before committing."
+  exit 1
+}
+
+echo "✅ All pre-commit checks passed!"

@@ -58,8 +58,9 @@ export function MapContainer({ className = '' }: MapContainerProps) {
         });
 
         // Handle map events
-        map.on('click', (event: { lngLat: [number, number] }) => {
-          console.log('Map clicked at:', event.lngLat);
+        map.on('click', (event: unknown) => {
+          const mapEvent = event as { lngLat: [number, number] };
+          console.log('Map clicked at:', mapEvent.lngLat);
         });
 
       } catch (error) {
