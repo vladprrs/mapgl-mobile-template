@@ -219,10 +219,10 @@ describe('useBottomSheet', () => {
       expect(result.current.sheetRef).toBeDefined();
     });
 
-    it('cleans up timeouts on unmount', () => {
+    it('cleans up resources on unmount', () => {
       const { unmount } = renderHook(() => useBottomSheet());
       
-      // Should not throw on unmount
+      // Should not throw on unmount (event listeners cleanup)
       expect(() => unmount()).not.toThrow();
     });
   });

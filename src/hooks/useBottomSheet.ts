@@ -46,8 +46,6 @@ export function useBottomSheet({
     isActive: false,
     startPosition: snapPoints[1], // Initialize with middle snap point
   });
-  const wheelAccumulator = useRef<number>(0);
-  const wheelTimeoutId = useRef<NodeJS.Timeout | null>(null);
 
   const snapTo = useCallback((targetSnap: SnapPoint) => {
     if (!snapPoints.includes(targetSnap)) return;
@@ -219,26 +217,17 @@ export function useBottomSheet({
     }));
   }, [state.position]);
 
-  // Handle wheel events for desktop scroll with momentum handling
+  // Handle wheel events for desktop scroll
   const handleWheelGesture = useCallback((event: WheelEvent) => {
-    // Clear previous timeout to prevent accumulation issues
-    if (wheelTimeoutId.current) {
-      clearTimeout(wheelTimeoutId.current);
-      wheelTimeoutId.current = null;
-    }
-    
     // INVERTED: Direct handling with inverted deltaY for natural scroll direction
     const delta = -event.deltaY;
     
-    // CRITICAL FIX: Process wheel events immediately to prevent erratic behavior
+    // Process wheel events immediately to prevent erratic behavior
     const result = handleScrollGesture(delta, 'wheel');
     
     if (result === 'sheet') {
       event.preventDefault();
     }
-    
-    // Reset accumulator to prevent stale values
-    wheelAccumulator.current = 0;
   }, [handleScrollGesture]);
 
   const handleDragMove = useCallback((clientY: number) => {
@@ -425,7 +414,6 @@ export function useBottomSheet({
     if (!element) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // CRITICAL FIX: Use simplified wheel handling to prevent double processing
       handleWheelGesture(e);
     };
 
@@ -433,20 +421,9 @@ export function useBottomSheet({
 
     return () => {
       element.removeEventListener('wheel', handleWheel);
-      if (wheelTimeoutId.current) {
-        clearTimeout(wheelTimeoutId.current);
-      }
     };
   }, [handleWheelGesture]);
 
-  // Cleanup timeouts on unmount
-  useEffect(() => {
-    return () => {
-      if (wheelTimeoutId.current) {
-        clearTimeout(wheelTimeoutId.current);
-      }
-    };
-  }, []);
 
   // Add native touch event listeners with proper passive configuration
   useEffect(() => {
