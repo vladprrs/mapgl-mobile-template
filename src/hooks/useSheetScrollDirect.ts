@@ -62,10 +62,10 @@ export function useSheetScrollDirect({
       if (content.scrollTop > 0) {
         return;
       }
-      // At top of content - only respond to scroll up (deltaY < 0) to collapse
-      // INVERTED: deltaY < 0 (scroll up) should collapse (opposite of normal)
-      if (e.deltaY > 0) {
-        // Scrolling down at top - let content scroll if it can
+      // At top of content - only respond to scroll down (deltaY > 0) to collapse
+      // With Natural Scrolling: fingers UP (deltaY < 0) = content UP, fingers DOWN (deltaY > 0) = content DOWN
+      if (e.deltaY < 0) {
+        // Scrolling up at top - let content scroll if it can
         return;
       }
     }
@@ -83,9 +83,9 @@ export function useSheetScrollDirect({
       accumulatedDelta.current = 0;
     }
     
-    // INVERTED: deltaY > 0 (scroll down) = expand, deltaY < 0 (scroll up) = collapse
-    // Accumulate delta (inverted)
-    accumulatedDelta.current -= deltaY * 0.5; // Multiply by factor to control sensitivity
+    // Natural Scrolling: deltaY < 0 (fingers UP) = expand, deltaY > 0 (fingers DOWN) = collapse
+    // Direct movement - sheet follows finger direction
+    accumulatedDelta.current += deltaY * 0.8; // Just inverted the sign
     
     // Calculate new drag position
     const newDragY = accumulatedDelta.current;
@@ -147,9 +147,9 @@ export function useSheetScrollDirect({
     const touch = e.touches[0];
     const deltaY = touchStartY.current - touch.clientY;
     
-    // INVERTED: finger up (deltaY > 0) = collapse, finger down (deltaY < 0) = expand
-    // Direct movement (inverted)
-    touchDelta.current = -deltaY; // Invert the direction
+    // Natural touch: finger up (deltaY > 0) = expand, finger down (deltaY < 0) = collapse
+    // Direct movement - sheet follows finger
+    touchDelta.current = deltaY; // Direct movement, no inversion
     
     // Apply boundaries
     const currentHeight = touchStartHeight.current + touchDelta.current;
