@@ -1,7 +1,7 @@
 ```markdown
 # 2GIS MapGL Mobile App
 
-Mobile-first map application with draggable bottom sheet overlay.
+Mobile-first map application with draggable bottom sheet overlay and dashboard interface.
 **Stack:** Next.js 15, TypeScript, 2GIS MapGL, React 19, Tailwind CSS
 
 ## Quick Start
@@ -38,11 +38,19 @@ npm run build && npm start
 ```
 src/
 ├── app/                    # Next.js app router
-│   ├── page.tsx           # Main app with MapProvider + BottomSheet
+│   ├── page.tsx           # Main app with MapProvider + Dashboard
 │   └── layout.tsx         # Root layout with mobile optimization
 ├── components/
 │   ├── map/               # MapContainer, MapProvider
 │   ├── bottom-sheet/      # BottomSheet, DragHandle, useBottomSheet
+│   ├── dashboard/         # Dashboard components
+│   │   ├── Dashboard.tsx  # Main dashboard container
+│   │   ├── SearchBar.tsx  # Search with voice assistant
+│   │   ├── QuickAccessPanel.tsx  # Quick action buttons
+│   │   └── index.ts       # Exports
+│   ├── icons/             # Icon system
+│   │   ├── Icon.tsx       # Reusable icon component
+│   │   └── index.ts       # Icon exports
 │   ├── LocationList.tsx   # Sample location list component  
 │   └── PlaceDetails.tsx   # Detailed place information component
 ├── hooks/
@@ -50,9 +58,12 @@ src/
 │   └── useBottomSheet.ts  # Bottom sheet state and gesture handling
 ├── lib/
 │   ├── mapgl/            # Map config & utilities
-│   └── config/           # Environment config
+│   ├── config/           # Environment config
+│   └── icons/            # Icon definitions and mappings
 └── __tests__/            # Component and hook tests
-    ├── components/bottom-sheet/  # BottomSheet test suite
+    ├── components/
+    │   ├── bottom-sheet/  # BottomSheet test suite
+    │   └── dashboard/     # Dashboard component tests
     └── hooks/            # Hook test suite
 ```
 
@@ -128,6 +139,73 @@ map.on('click', (e) => {
 // Remove markers
 removeMarker('marker-id');
 clearMarkers(); // Remove all markers
+```
+
+### Dashboard Component
+
+The main interface rendered inside the BottomSheet, providing search and quick access features.
+
+```typescript
+import { Dashboard } from '@/components/dashboard';
+
+// Usage in BottomSheet
+<BottomSheetWithDashboard snapPoints={[10, 50, 90]}>
+  <Dashboard />
+</BottomSheetWithDashboard>
+```
+
+**Components:**
+
+#### SearchBar
+- Integrated drag handle (6px from top edge)
+- Search input with icon
+- Voice assistant (Salut) button with actual Figma asset
+- Menu button
+- Bottom padding creates 16px gap to next component
+
+#### QuickAccessPanel  
+- Horizontally scrollable button row
+- Fade mask extends to edges (0px margins)
+- Content starts at 16px from left edge
+- Traffic indicators with color coding:
+  - 🔴 Red (#F5373C) - Heavy traffic
+  - 🟡 Yellow (#EFA701) - Moderate traffic
+  - 🟢 Green (#1BA136) - Light traffic
+
+### Icon System
+
+Centralized icon component and asset management system.
+
+```typescript
+import { Icon, ICONS, COLORS, IMAGES } from '@/components/icons';
+
+// Use Icon component
+<Icon name={ICONS.HOME} size={24} color={COLORS.TEXT_PRIMARY} />
+
+// Use image assets
+<Image src={IMAGES.SALUT_ASSISTANT} alt="Voice assistant" />
+
+// Use color tokens
+style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
+```
+
+**Available Icons:**
+- `ICONS.SEARCH` - Search magnifying glass
+- `ICONS.MENU` - Hamburger menu
+- `ICONS.HOME` - Home icon
+- `ICONS.WORK` - Briefcase/work icon  
+- `ICONS.BOOKMARK` - Bookmark icon
+- `ICONS.LOCATION` - Location pin
+
+**Design Tokens:**
+```typescript
+COLORS.TEXT_PRIMARY      // #141414
+COLORS.TEXT_SECONDARY    // #898989
+COLORS.TRAFFIC_HEAVY     // #F5373C (red)
+COLORS.TRAFFIC_MODERATE  // #EFA701 (yellow)
+COLORS.TRAFFIC_LIGHT     // #1BA136 (green)
+COLORS.BUTTON_SECONDARY_BG // rgba(20, 20, 20, 0.06)
+COLORS.DRAG_HANDLE       // rgba(137, 137, 137, 0.25)
 ```
 
 ### Bottom Sheet Component
@@ -274,6 +352,32 @@ jest.mock('@/hooks/useBottomSheet', () => ({
 - **playwright:** Visual testing and debugging
 - **github:** PR management and version control
 
+### Figma Integration
+
+Extract assets and design specs from Figma designs:
+
+```typescript
+// Extract component with assets
+mcp__figma-dev-mode-mcp-server__get_code({
+  nodeId: "189-220904",  // Figma node ID
+  dirForAssetWrites: "/path/to/public/assets",
+})
+```
+
+**Figma Node IDs:**
+- SearchBar: `189-220904`
+- QuickAccessPanel: `189-220977`
+- Stories Panel: [Pending]
+- Tips Block: [Pending]
+
+**Asset Workflow:**
+1. Extract assets using MCP tool with node ID
+2. Assets saved to `public/assets/`
+3. Add to icon/image constants in `src/lib/icons/`
+4. Use in components via Icon component or Image imports
+
+See `/docs/figma-asset-workflow.md` for detailed workflow documentation.
+
 ## Mobile Optimization
 
 - **Viewport:** `viewport-fit=cover` for notches
@@ -326,7 +430,15 @@ git add src/ && git commit -m "feat: implement marker clustering"
    - DOWN = EXPAND, UP = COLLAPSE (matches iOS/Android)
    - Implementation inverts deltaY values (-deltaY) for correct behavior
 
-## 🔧 Recent Gesture Fixes (Jan 2025)
+## 🔧 Recent Updates (Jan 2025)
+
+### Dashboard Implementation ✅
+- **SearchBar**: Search input with voice assistant and menu
+- **QuickAccessPanel**: Horizontally scrollable quick actions with traffic indicators
+- **Icon System**: Centralized icon component with Figma assets
+- **Design Tokens**: Colors, fonts, and spacing from Figma
+
+### Gesture Fixes ✅
 
 ### Position Jump & Flickering Issues - FIXED ✅
 **Problem**: Curtain jumped to extreme positions (10%/90%) on initial touch
