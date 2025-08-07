@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { SearchBar } from './SearchBar';
+import { QuickAccessPanel } from './QuickAccessPanel';
 
 interface DashboardProps {
   className?: string;
@@ -25,6 +26,10 @@ export function Dashboard({
     console.log('Voice assistant clicked');
   };
 
+  const handleQuickAction = (actionId: string) => {
+    console.log('Quick action clicked:', actionId);
+  };
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {/* Search Bar */}
@@ -34,15 +39,13 @@ export function Dashboard({
         onVoiceClick={handleVoiceClick}
       />
 
-      {/* Dashboard Content */}
-      <div className="flex-1 px-4 py-4 overflow-y-auto">
-        {/* Placeholder for Quick Access Panel */}
-        <div className="mb-4">
-          <div className="h-20 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-            Quick Access Panel (Coming Soon)
-          </div>
-        </div>
+      {/* Quick Access Panel */}
+      <div className="py-3">
+        <QuickAccessPanel onActionClick={handleQuickAction} />
+      </div>
 
+      {/* Dashboard Content */}
+      <div className="flex-1 px-4 py-2 overflow-y-auto">
         {/* Placeholder for Stories Panel */}
         <div className="mb-4">
           <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
