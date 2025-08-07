@@ -1,7 +1,7 @@
 ```markdown
 # 2GIS MapGL Mobile App
 
-Mobile-first map application with draggable bottom sheet overlay.
+Mobile-first map application with draggable bottom sheet overlay and dashboard interface.
 **Stack:** Next.js 15, TypeScript, 2GIS MapGL, React 19, Tailwind CSS
 
 ## Quick Start
@@ -38,11 +38,33 @@ npm run build && npm start
 ```
 src/
 ├── app/                    # Next.js app router
-│   ├── page.tsx           # Main app with MapProvider + BottomSheet
-│   └── layout.tsx         # Root layout with mobile optimization
+│   ├── page.tsx           # Main app with MapProvider + Dashboard
+│   ├── layout.tsx         # Root layout with mobile optimization
+│   ├── test-stories/      # Story components test page
+│   └── test-advice/       # Advice components test page
 ├── components/
 │   ├── map/               # MapContainer, MapProvider
 │   ├── bottom-sheet/      # BottomSheet, DragHandle, useBottomSheet
+│   ├── dashboard/         # Dashboard components
+│   │   ├── Dashboard.tsx  # Main dashboard container
+│   │   ├── SearchBar.tsx  # Search with voice assistant
+│   │   ├── QuickAccessPanel.tsx  # Quick action buttons
+│   │   ├── StoriesPanel.tsx  # Horizontal scrolling stories
+│   │   ├── StoryItem.tsx  # Individual story card
+│   │   ├── advice/        # Advice section components
+│   │   │   ├── AdviceSection.tsx  # Container with layout logic
+│   │   │   ├── MetaItem.tsx       # Category search cards
+│   │   │   ├── MetaItemAd.tsx     # Advertisement cards
+│   │   │   ├── Interesting.tsx    # Feature promotion cards
+│   │   │   ├── Cover.tsx          # Collection covers
+│   │   │   ├── RD.tsx             # Advertiser cards
+│   │   │   ├── types.ts           # TypeScript interfaces
+│   │   │   ├── mockData.ts        # Sample data
+│   │   │   └── index.ts           # Exports
+│   │   └── index.ts       # Dashboard exports
+│   ├── icons/             # Icon system
+│   │   ├── Icon.tsx       # Reusable icon component
+│   │   └── index.ts       # Icon exports
 │   ├── LocationList.tsx   # Sample location list component  
 │   └── PlaceDetails.tsx   # Detailed place information component
 ├── hooks/
@@ -50,9 +72,21 @@ src/
 │   └── useBottomSheet.ts  # Bottom sheet state and gesture handling
 ├── lib/
 │   ├── mapgl/            # Map config & utilities
-│   └── config/           # Environment config
+│   ├── config/           # Environment config
+│   └── icons/            # Icon definitions and mappings
 └── __tests__/            # Component and hook tests
-    ├── components/bottom-sheet/  # BottomSheet test suite
+    ├── components/
+    │   ├── bottom-sheet/  # BottomSheet test suite
+    │   └── dashboard/     # Dashboard component tests
+    │       ├── advice/    # Advice component tests
+    │       │   ├── MetaItem.test.tsx
+    │       │   ├── MetaItemAd.test.tsx
+    │       │   ├── Interesting.test.tsx
+    │       │   └── AdviceSection.test.tsx
+    │       ├── SearchBar.test.tsx
+    │       ├── QuickAccessPanel.test.tsx
+    │       ├── StoryItem.test.tsx
+    │       └── StoriesPanel.test.tsx
     └── hooks/            # Hook test suite
 ```
 
@@ -128,6 +162,79 @@ map.on('click', (e) => {
 // Remove markers
 removeMarker('marker-id');
 clearMarkers(); // Remove all markers
+```
+
+### Dashboard Component
+
+The main interface rendered inside the BottomSheet, providing search and quick access features.
+
+```typescript
+import { Dashboard } from '@/components/dashboard';
+
+// Usage in BottomSheet
+<BottomSheetWithDashboard snapPoints={[10, 50, 90]}>
+  <Dashboard />
+</BottomSheetWithDashboard>
+```
+
+**Components:**
+
+#### SearchBar
+- Integrated drag handle (6px from top edge)
+- Search input with icon
+- Voice assistant (Salut) button with actual Figma asset
+- Menu button
+- Bottom padding creates 16px gap to next component
+
+#### QuickAccessPanel  
+- Horizontally scrollable button row
+- Fade mask extends to edges (0px margins)
+- Content starts at 16px from left edge
+- Traffic indicators with color coding:
+  - 🔴 Red (#F5373C) - Heavy traffic
+  - 🟡 Yellow (#EFA701) - Moderate traffic
+  - 🟢 Green (#1BA136) - Light traffic
+
+### Icon System
+
+Centralized icon component with exact SVG icons extracted from Figma designs.
+
+```typescript
+import { Icon, ICONS, COLORS, IMAGES } from '@/components/icons';
+
+// Use Icon component - icons maintain aspect ratio in 24x24 container
+<Icon name={ICONS.HOME} size={24} color={COLORS.TEXT_PRIMARY} />
+
+// Use image assets
+<Image src={IMAGES.SALUT_ASSISTANT} alt="Voice assistant" />
+
+// Use color tokens
+style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
+```
+
+**Available Icons (Exact Figma SVGs):**
+- `ICONS.SEARCH` - Search icon (19x19 natural size)
+- `ICONS.MENU` - Menu/hamburger icon (18x14 natural size)
+- `ICONS.HOME` - Home icon (22x19 natural size)
+- `ICONS.WORK` - Work/briefcase icon (20x18 natural size)  
+- `ICONS.BOOKMARK` - Bookmark icon (14x19 natural size)
+- `ICONS.LOCATION` - Location pin (generic placeholder)
+
+**Icon Implementation Details:**
+- Icons are NOT stretched to fill containers
+- Each icon maintains its original aspect ratio from Figma
+- Icons are centered within fixed-size containers (default 24x24)
+- Natural padding/margins are preserved from designs
+
+**Design Tokens:**
+```typescript
+COLORS.TEXT_PRIMARY      // #141414
+COLORS.TEXT_SECONDARY    // #898989
+COLORS.TRAFFIC_HEAVY     // #F5373C (red)
+COLORS.TRAFFIC_MODERATE  // #EFA701 (yellow)
+COLORS.TRAFFIC_LIGHT     // #1BA136 (green)
+COLORS.BUTTON_SECONDARY_BG // rgba(20, 20, 20, 0.06)
+COLORS.DRAG_HANDLE       // rgba(137, 137, 137, 0.25)
 ```
 
 ### Bottom Sheet Component
@@ -274,6 +381,55 @@ jest.mock('@/hooks/useBottomSheet', () => ({
 - **playwright:** Visual testing and debugging
 - **github:** PR management and version control
 
+### Figma Integration
+
+Extract assets and design specs from Figma designs:
+
+```typescript
+// Extract component with assets
+mcp__figma-dev-mode-mcp-server__get_code({
+  nodeId: "189-220904",  // Figma node ID
+  dirForAssetWrites: "/path/to/public/assets",
+})
+```
+
+**Figma Node IDs:**
+- SearchBar: `189-220904`
+- QuickAccessPanel: `189-220977`
+- StoryItem: `198-221026`
+- Interesting: `119-67257`
+- MetaItem: `119-67226`
+- MetaItemAd: `119-66974`
+- Cover: `119-66903` (Default) / `119-66910` (Big)
+- RD: `119-66916`
+- AdviceSection: `162-220899`
+
+**Extracted Icon SVG Files:**
+- Search: `/assets/icons/78b4aac2c15552b8c0acc3c49dc2805e66dfdcad.svg`
+- Menu: `/assets/icons/249a5dbcdbd61303a929f5a7b0ba6f76c269ea6d.svg`
+- Bookmark: `/assets/icons/cdbfaf6779ca116ea64c455e3fba67ccc5fd425f.svg`
+- Home: `/assets/icons/ced74e330ddca8cf8d1b420c665acef342483b60.svg`
+- Work: `/assets/icons/7cef2d29c06091060ec9aba55a777bbf0fa58460.svg`
+
+**Story Images Extracted:**
+- Multiple story background images in `/assets/stories/`
+- Images include various medical/health related visuals
+- All images properly sized for 96x112px display area
+
+**Advice Component Assets Extracted:**
+- Tourist illustration: `/assets/advice/e54c37b478c3fbeeadd3e7ff6c943f19ac03e375.png`
+- Ice rink icons: `/assets/advice/d09f29e90c1485808c9c5f19153fbd5bde35b060.svg`, `/assets/advice/18f5b1e0152b51de3ce4cf9f463c841f262c2a6a.svg`
+- Xiaomi logo: `/assets/advice/74f7e8baab90184b05499ea80dce96f157e67779.png`
+- Gradient masks: `/assets/advice/a81e514928dac622f5cd9e79d6ae0c85e8041eda.svg`, `/assets/advice/8a864d910be8ae51e64885c1673c28f86d3a82d6.svg`
+
+**Asset Workflow:**
+1. Extract assets using MCP tool with node ID
+2. Assets saved to `public/assets/`
+3. Add to icon/image constants in `src/lib/icons/`
+4. Use in components via Icon component or Image imports
+
+See `/docs/figma-asset-workflow.md` for detailed workflow documentation.
+
 ## Mobile Optimization
 
 - **Viewport:** `viewport-fit=cover` for notches
@@ -326,7 +482,53 @@ git add src/ && git commit -m "feat: implement marker clustering"
    - DOWN = EXPAND, UP = COLLAPSE (matches iOS/Android)
    - Implementation inverts deltaY values (-deltaY) for correct behavior
 
-## 🔧 Recent Gesture Fixes (Jan 2025)
+## 🔧 Recent Updates (Jan 2025)
+
+### Dashboard Implementation ✅
+- **SearchBar**: Search input with voice assistant and menu
+- **QuickAccessPanel**: Horizontally scrollable quick actions with traffic indicators
+- **StoriesPanel**: Horizontally scrollable story cards with viewed state
+- **StoryItem**: Individual story cards (96x112px) with image backgrounds and labels
+- **Icon System**: Exact SVG icons from Figma with proper aspect ratios
+- **Design Tokens**: Colors, fonts, and spacing from Figma
+- **AdviceSection**: Container for rendering advice cards in various layouts (single/double/triple/mixed)
+  - **MetaItem**: Category/rubric search cards with icon (116px height, Light/Dark themes)
+  - **MetaItemAd**: Advertisement cards with gradient mask and logo (Xiaomi example)
+  - **Interesting**: Feature promotion cards with illustration (Tourist layer example)
+  - **Cover**: Featured collection covers (placeholder)
+  - **RD**: Advertiser cards (placeholder)
+
+### Icon Positioning Fix ✅
+**Problem**: Icons were stretching to fill 24x24 containers
+**Solution**: Icons maintain natural aspect ratios and padding
+- Each icon uses its exact viewBox from Figma (e.g., 19x19 for search)
+- Icons wrapped in fixed-size container divs
+- Container centers icons using flexbox
+- Original padding/margins preserved from designs
+
+### Story Components Implementation ✅
+**StoryItem Component**:
+- Exact Figma dimensions: 96x112px content with 4px padding
+- Background image with gradient overlay for text readability
+- White text label (11px, semibold, -0.176px tracking)
+- Viewed state: 2px green border (#1BA136)
+- Active state: Scale transform animation (95%)
+
+**StoriesPanel Component**:
+- Horizontal scrolling with hidden scrollbar
+- Fade gradients on left/right edges
+- 8px gap between stories
+- 16px padding from container edges
+
+### Double Border Fix ✅
+**Problem**: Clicking stories created overlapping focus rings and borders
+**Solution**: Consolidated border styling using inset box-shadow
+- Removed separate border div element
+- Used `focus-visible` for keyboard-only focus indication
+- Viewed state uses `box-shadow: inset 0 0 0 2px #1BA136` for inside border
+- Clean visual hierarchy without conflicts
+
+### Gesture Fixes ✅
 
 ### Position Jump & Flickering Issues - FIXED ✅
 **Problem**: Curtain jumped to extreme positions (10%/90%) on initial touch
@@ -347,6 +549,34 @@ let newPosition = gestureState.current.startPosition + deltaPercent;
 ### Gesture State Corruption - FIXED ✅
 **Problem**: Rapid gestures caused unresponsive or stuck states
 **Solution**: Improved state synchronization and cleanup
+
+### Advice Section Implementation ✅
+**Complete Advice Section Layout** (from Figma node 162-220899):
+- Title: "Советы к месту" (19px Semibold, -0.38px tracking)
+- Background: #F1F1F1
+- Two-column grid layout with 12px gap
+- Components have white backgrounds
+
+**All 5 Components Completed**:
+- **MetaItem**: Category cards with 116px height, icon in circle, Light/Dark themes
+- **MetaItemAd**: Advertisement cards with gradient mask effect, "Реклама" label
+- **Interesting**: Feature promotion cards with illustration (Default: 160px, Big: 244px height)
+- **Cover**: Collection covers with gradient overlay (Default: 142px, Big: 200px height)
+- **RD**: Advertiser cards with gallery and ratings (116px standard, 244px with gallery)
+
+**Component Heights**:
+- Standard: 116px (MetaItem, MetaItemAd, RD without gallery)
+- Cover Default: 142px
+- Interesting Default: 160px min
+- Cover Big: 200px
+- Interesting/RD with gallery: 244px
+
+**Design Specifications**:
+- Border radius: 12px (rounded-xl) for all components
+- Typography: 16px Medium for titles, 13-14px for subtitles
+- Theme support: Light and Dark variants for all components
+- Active states: scale-95 transform on press
+- Mixed layout: Smart arrangement based on component types and states
 
 ## 🚨 Critical Debugging - Gesture Issues
 
