@@ -65,18 +65,29 @@ export function useSheetScrollDirect({
         const atTop = scrollableContent.scrollTop === 0;
         const atBottom = scrollableContent.scrollTop >= scrollableContent.scrollHeight - scrollableContent.clientHeight - 1;
         
-        // Let content scroll if:
-        // - Scrolling up (deltaY < 0) and not at bottom
-        // - Scrolling down (deltaY > 0) and not at top
-        if ((e.deltaY < 0 && !atBottom) || (e.deltaY > 0 && !atTop)) {
+        // Check if we should let content scroll
+        const shouldContentScroll = 
+          (e.deltaY < 0 && !atBottom) || // Scrolling up and not at bottom
+          (e.deltaY > 0 && !atTop);      // Scrolling down and not at top
+        
+        if (shouldContentScroll) {
+          // Clear any existing timer to prevent unwanted snapping
+          clearTimeout(scrollTimer.current);
+          isScrolling.current = false;
+          accumulatedDelta.current = 0;
           return; // Let the content handle scrolling
         }
         
-        // Only move sheet if at content boundaries
-        if ((e.deltaY > 0 && atTop) || (e.deltaY < 0 && atBottom)) {
+        // At this point, we're at a boundary and should consider collapsing
+        if (e.deltaY > 0 && atTop) {
+          // Scrolling down at top - collapse the sheet
           // Fall through to sheet movement
         } else {
-          return; // Let content scroll
+          // Any other boundary case - let content handle it
+          clearTimeout(scrollTimer.current);
+          isScrolling.current = false;
+          accumulatedDelta.current = 0;
+          return;
         }
       }
     }
