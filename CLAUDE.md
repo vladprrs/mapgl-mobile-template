@@ -81,13 +81,106 @@ npm run format
 
 ## 2GIS MapGL Integration
 
-### Environment Setup
+### Environment Setup & Security
 
-1. Get API key from https://docs.2gis.com/en/mapgl/overview#how-to-get-an-api-key
-2. Add to `.env.local`:
+#### Initial Setup
+
+1. **Get your API key** from https://docs.2gis.com/en/mapgl/overview#how-to-get-an-api-key
+2. **Copy the environment template**:
+   ```bash
+   cp .env.example .env.local
+   ```
+3. **Add your API key** to `.env.local`:
+   ```env
+   NEXT_PUBLIC_2GIS_API_KEY=your_actual_api_key_here
+   ```
+
+#### Security Best Practices
+
+**⚠️ CRITICAL: Never commit API keys to version control**
+
+1. **Local Development**
+   - Store keys in `.env.local` (automatically gitignored)
+   - Never commit `.env.local` to git
+   - Use `.env.example` as a template for team members
+
+2. **API Key Management**
+   - The API key is validated at runtime using `src/lib/config/env.ts`
+   - Access the key through the config module, not directly from `process.env`
+   - The app will show helpful error messages if the key is missing or invalid
+
+3. **Type Safety**
+   - Environment variables are typed in `src/types/env.d.ts`
+   - TypeScript will warn about missing variables during development
+
+4. **Configuration Module Usage**
+   ```typescript
+   import { config } from '@/lib/config/env';
+   
+   // Safe access with validation
+   const apiKey = config.mapgl.apiKey;
+   ```
+
+#### Environment-Specific Configuration
+
+**Development** (`.env.local`):
 ```env
-NEXT_PUBLIC_2GIS_API_KEY=your_api_key_here
+NEXT_PUBLIC_2GIS_API_KEY=your_dev_api_key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Production** (set in hosting platform):
+```env
+NEXT_PUBLIC_2GIS_API_KEY=your_production_api_key
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+```
+
+#### Deployment Configuration
+
+**Vercel**:
+1. Go to Project Settings → Environment Variables
+2. Add `NEXT_PUBLIC_2GIS_API_KEY` with your production key
+3. Select which environments should use this key (Production/Preview/Development)
+
+**Other Platforms**:
+- **Netlify**: Site Settings → Environment Variables
+- **Railway**: Variables tab in project settings
+- **Render**: Environment tab in service settings
+- **AWS Amplify**: App Settings → Environment Variables
+
+#### API Key Rotation
+
+1. **Regular Rotation Schedule**
+   - Rotate production keys every 90 days
+   - Keep track of key expiration dates
+   - Update keys during low-traffic periods
+
+2. **Emergency Rotation**
+   - If a key is compromised, rotate immediately
+   - Update all deployment environments
+   - Clear CDN caches after rotation
+
+3. **Monitoring**
+   - Monitor API usage in 2GIS dashboard
+   - Set up alerts for unusual activity
+   - Track which keys are used in which environments
+
+#### Troubleshooting
+
+**Error: "2GIS MapGL API key is not configured properly"**
+- Check that `.env.local` exists and contains the key
+- Ensure the key name is exactly `NEXT_PUBLIC_2GIS_API_KEY`
+- Restart the development server after changing `.env.local`
+
+**Error: "Missing required environment variables"**
+- Run `cp .env.example .env.local` to create the file
+- Add your API key to the new file
+- Check that all required variables are set
+
+**Map not loading in production**
+- Verify the environment variable is set in your hosting platform
+- Check that the production API key is valid and not expired
+- Ensure the domain is whitelisted in 2GIS API settings
 
 ### Map Initialization Pattern
 

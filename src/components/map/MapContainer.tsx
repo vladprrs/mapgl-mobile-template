@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { MAP_CONFIG } from '@/lib/mapgl/config';
+import { config, ConfigError } from '@/lib/config/env';
 
 interface MapContainerProps {
   className?: string;
@@ -19,8 +20,14 @@ export function MapContainer({ className = '' }: MapContainerProps) {
         const { load } = await import('@2gis/mapgl');
         const mapgl = await load();
 
-        if (!process.env.NEXT_PUBLIC_2GIS_API_KEY) {
-          console.error('2GIS API key is not set');
+        let apiKey: string;
+        try {
+          apiKey = config.mapgl.apiKey;
+        } catch (error) {
+          if (error instanceof ConfigError) {
+            console.error('Configuration Error:', error.message);
+            // You could also show a user-friendly error message in the UI
+          }
           return;
         }
 
@@ -28,7 +35,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
           container: containerRef.current!,
           center: MAP_CONFIG.defaultCenter,
           zoom: MAP_CONFIG.defaultZoom,
-          key: process.env.NEXT_PUBLIC_2GIS_API_KEY,
+          key: apiKey,
           style: MAP_CONFIG.defaultStyle,
           ...MAP_CONFIG.mobileSettings,
           fitBoundsOptions: MAP_CONFIG.fitBoundsOptions,
