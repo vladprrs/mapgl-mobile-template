@@ -359,24 +359,7 @@ export function useBottomSheet({
     gestureState.current.isActive = false;
   }, [state.isDragging, state.snapPoint, snapPoints, snapTo, handleDragEnd]);
 
-  // Handle touch events on the drag handle (always moves sheet)
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    handleDragStart(e.touches[0].clientY, 'touch');
-  }, [handleDragStart]);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    // Handle drag move for drag handle only
-    handleDragMove(e.touches[0].clientY);
-  }, [handleDragMove]);
-
-  const handleTouchEnd = useCallback(() => {
-    handleDragEnd();
-  }, [handleDragEnd]);
-
-  // Mouse event handlers for desktop support (handle only)
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    handleDragStart(e.clientY, 'drag');
-  }, [handleDragStart]);
+  // Mouse event handlers for desktop support
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (state.isDragging && gestureState.current.type === 'drag') {
@@ -448,11 +431,10 @@ export function useBottomSheet({
     // Actions
     snapTo,
     
-    // Event handlers for drag handle
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-    handleMouseDown,
+    // Base drag functions for external use
+    handleDragStart,
+    handleDragMove, 
+    handleDragEnd,
     
     // Refs
     sheetRef,

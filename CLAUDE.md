@@ -173,11 +173,10 @@ const {
   snapTo,
   sheetRef,
   contentRef,
-  // Handle handlers for drag handle
-  handleTouchStart,
-  handleTouchMove,
-  handleTouchEnd,
-  handleMouseDown,
+  // Base drag functions
+  handleDragStart,
+  handleDragMove,
+  handleDragEnd,
   // Content handlers for scroll behavior
   handleContentTouchStart,
   handleContentTouchMove,
@@ -226,10 +225,9 @@ jest.mock('@/hooks/useBottomSheet', () => ({
     position: 10,
     isDragging: false,
     isExpanded: false,
-    handleTouchStart: jest.fn(),
-    handleTouchMove: jest.fn(),
-    handleTouchEnd: jest.fn(),
-    handleMouseDown: jest.fn(),
+    handleDragStart: jest.fn(),
+    handleDragMove: jest.fn(),
+    handleDragEnd: jest.fn(),
     sheetRef: { current: null },
   })),
 }));

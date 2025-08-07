@@ -20,10 +20,9 @@ export function BottomSheet({
     isDragging,
     isExpanded,
     currentSheetState,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-    handleMouseDown,
+    handleDragStart,
+    handleDragMove,
+    handleDragEnd,
     sheetRef,
     contentRef,
   } = useBottomSheet({ snapPoints, onSnapChange });
@@ -51,10 +50,10 @@ export function BottomSheet({
     >
       {/* Drag Handle */}
       <DragHandle
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleMouseDown}
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientY, 'touch')}
+        onTouchMove={(e) => handleDragMove(e.touches[0].clientY)}
+        onTouchEnd={handleDragEnd}
+        onMouseDown={(e) => handleDragStart(e.clientY, 'drag')}
         isDragging={isDragging}
       />
 
