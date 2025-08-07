@@ -104,54 +104,91 @@ export function useBottomSheet({
     const hasScrollableContent = scrollHeight > clientHeight;
     if (!hasScrollableContent) return false;
     
+    // More robust boundary detection with proper thresholds
+    const scrollBuffer = 3; // Increased buffer for better touch precision
+    const maxScrollTop = scrollHeight - clientHeight;
+    
     if (direction === 'up') {
-      return scrollTop < scrollHeight - clientHeight - 1; // -1 for rounding errors
+      // Can scroll up if not at the bottom
+      return scrollTop < maxScrollTop - scrollBuffer;
     } else {
-      return scrollTop > 1; // Small threshold for touch precision
+      // Can scroll down if not at the top
+      return scrollTop > scrollBuffer;
     }
   }, [currentSheetState]);
 
   // Handle scroll gestures (wheel and touch scroll)
-  const handleScrollGesture = useCallback((deltaY: number, gestureType: SheetGestureType) => {
+  const handleScrollGesture = useCallback((deltaY: number, gestureType: SheetGestureType, velocity: number = 0) => {
     const scrollDirection = deltaY > 0 ? 'down' : 'up';
     const isExpanded = currentSheetState === 'expanded';
     const isHalf = currentSheetState === 'half';
     const isCollapsed = currentSheetState === 'collapsed';
 
     // Apply threshold to prevent tiny movements
-    const threshold = gestureType === 'wheel' ? 10 : 5;
+    const threshold = gestureType === 'wheel' ? 10 : 8; // Slightly higher for touch
     if (Math.abs(deltaY) < threshold) return 'ignore';
 
-    // In expanded state, check if we should scroll content or move sheet
+    // In expanded state, prioritize content scrolling over sheet movement
     if (isExpanded) {
       const content = contentRef.current;
       if (!content) return 'sheet';
 
-      const { scrollHeight, clientHeight } = content;
+      const { scrollHeight, clientHeight, scrollTop } = content;
       const hasScrollableContent = scrollHeight > clientHeight;
 
-      // Edge case: Short content - always move sheet
+      // Edge case: Short content - only move sheet with significant movement
       if (!hasScrollableContent) {
-        if (scrollDirection === 'down') {
+        // Require more deliberate gesture for sheet movement with short content
+        const significantMovement = Math.abs(deltaY) > 25;
+        if (scrollDirection === 'down' && significantMovement) {
           snapTo(snapPoints[1]); // Collapse to half
           return 'sheet';
         }
-        return 'sheet'; // Can't scroll up further
+        return 'ignore'; // Don't move sheet for small movements
       }
 
-      // Normal scrollable content
-      if (scrollDirection === 'up' && canContentScroll('up')) {
-        return 'content'; // Let content scroll
-      }
-      
-      if (scrollDirection === 'down' && canContentScroll('down')) {
-        return 'content'; // Let content scroll
-      }
-      
-      // If scrolling down and at top of content, collapse to half
-      if (scrollDirection === 'down' && !canContentScroll('down')) {
-        snapTo(snapPoints[1]); // Collapse to half
-        return 'sheet';
+      // For touch gestures, be more conservative about sheet movement
+      if (gestureType === 'touch') {
+        // Only move sheet if it's a fast deliberate gesture or at clear scroll boundaries
+        const isFastDeliberateGesture = velocity > 2 && Math.abs(deltaY) > 50;
+        
+        // Check if we're clearly at scroll boundaries
+        const scrollBuffer = 5;
+        const atTop = scrollTop <= scrollBuffer;
+        
+        if (scrollDirection === 'up' && canContentScroll('up') && !isFastDeliberateGesture) {
+          return 'content'; // Let content scroll normally
+        }
+        
+        if (scrollDirection === 'down' && canContentScroll('down') && !isFastDeliberateGesture) {
+          return 'content'; // Let content scroll normally
+        }
+        
+        // Only collapse sheet if we're clearly at the top and it's a deliberate down gesture
+        if (scrollDirection === 'down' && atTop && (isFastDeliberateGesture || Math.abs(deltaY) > 20)) {
+          snapTo(snapPoints[1]); // Collapse to half
+          return 'sheet';
+        }
+        
+        // If we can scroll content, prioritize that over sheet movement
+        if (canContentScroll(scrollDirection)) {
+          return 'content';
+        }
+      } else {
+        // Wheel events can be more responsive
+        if (scrollDirection === 'up' && canContentScroll('up')) {
+          return 'content';
+        }
+        
+        if (scrollDirection === 'down' && canContentScroll('down')) {
+          return 'content';
+        }
+        
+        // If scrolling down and at top of content, collapse to half
+        if (scrollDirection === 'down' && !canContentScroll('down')) {
+          snapTo(snapPoints[1]);
+          return 'sheet';
+        }
       }
     }
 
@@ -172,7 +209,6 @@ export function useBottomSheet({
         snapTo(snapPoints[1]); // Expand to half
         return 'sheet';
       }
-      // Can't go lower than collapsed - but add rubber band effect
       return 'sheet';
     }
 
@@ -292,13 +328,10 @@ export function useBottomSheet({
     const timeDelta = now - gestureState.current.startTime;
     const velocity = timeDelta > 0 ? Math.abs(deltaY) / timeDelta : 0;
     
-    // Fast gesture threshold for quick swipes
-    const isFastGesture = velocity > 1 && Math.abs(deltaY) > 30;
+    // Determine if this should be a scroll gesture - pass velocity for better detection
+    const result = handleScrollGesture(deltaY, 'touch', velocity);
     
-    // Determine if this should be a scroll gesture
-    const result = handleScrollGesture(deltaY, 'touch');
-    
-    if (result === 'sheet' || isFastGesture) {
+    if (result === 'sheet') {
       // Prevent default to handle sheet movement
       e.preventDefault();
       
@@ -396,7 +429,7 @@ export function useBottomSheet({
     const handleWheel = (e: WheelEvent) => {
       // Check if we should handle this wheel event
       // INVERTED: Invert wheel deltaY for natural scroll direction
-      const result = handleScrollGesture(-e.deltaY, 'wheel');
+      const result = handleScrollGesture(-e.deltaY, 'wheel', 0);
       if (result === 'sheet') {
         e.preventDefault();
       }
