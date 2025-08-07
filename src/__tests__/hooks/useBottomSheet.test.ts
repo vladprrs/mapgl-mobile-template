@@ -107,13 +107,12 @@ describe('useBottomSheet', () => {
   });
 
   describe('Native Event Handling', () => {
-    it('provides drag handle event handlers', () => {
+    it('provides base drag functions', () => {
       const { result } = renderHook(() => useBottomSheet());
 
-      expect(typeof result.current.handleTouchStart).toBe('function');
-      expect(typeof result.current.handleTouchMove).toBe('function');
-      expect(typeof result.current.handleTouchEnd).toBe('function');
-      expect(typeof result.current.handleMouseDown).toBe('function');
+      expect(typeof result.current.handleDragStart).toBe('function');
+      expect(typeof result.current.handleDragMove).toBe('function');
+      expect(typeof result.current.handleDragEnd).toBe('function');
     });
 
     it('provides refs for native event listener attachment', () => {
@@ -219,10 +218,10 @@ describe('useBottomSheet', () => {
       expect(result.current.sheetRef).toBeDefined();
     });
 
-    it('cleans up timeouts on unmount', () => {
+    it('cleans up resources on unmount', () => {
       const { unmount } = renderHook(() => useBottomSheet());
       
-      // Should not throw on unmount
+      // Should not throw on unmount (event listeners cleanup)
       expect(() => unmount()).not.toThrow();
     });
   });

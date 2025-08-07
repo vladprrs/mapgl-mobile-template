@@ -3,12 +3,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
 
-// Mock the hook with new functionality
+// Mock the hook with base functions
 const mockHandlers = {
-  handleTouchStart: jest.fn(),
-  handleTouchMove: jest.fn(),
-  handleTouchEnd: jest.fn(),
-  handleMouseDown: jest.fn(),
+  handleDragStart: jest.fn(),
+  handleDragMove: jest.fn(),
+  handleDragEnd: jest.fn(),
   handleContentTouchStart: jest.fn(),
   handleContentTouchMove: jest.fn(),
   handleContentTouchEnd: jest.fn(),

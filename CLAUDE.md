@@ -173,11 +173,10 @@ const {
   snapTo,
   sheetRef,
   contentRef,
-  // Handle handlers for drag handle
-  handleTouchStart,
-  handleTouchMove,
-  handleTouchEnd,
-  handleMouseDown,
+  // Base drag functions
+  handleDragStart,
+  handleDragMove,
+  handleDragEnd,
   // Content handlers for scroll behavior
   handleContentTouchStart,
   handleContentTouchMove,
@@ -226,10 +225,9 @@ jest.mock('@/hooks/useBottomSheet', () => ({
     position: 10,
     isDragging: false,
     isExpanded: false,
-    handleTouchStart: jest.fn(),
-    handleTouchMove: jest.fn(),
-    handleTouchEnd: jest.fn(),
-    handleMouseDown: jest.fn(),
+    handleDragStart: jest.fn(),
+    handleDragMove: jest.fn(),
+    handleDragEnd: jest.fn(),
     sheetRef: { current: null },
   })),
 }));
@@ -327,6 +325,67 @@ git add src/ && git commit -m "feat: implement marker clustering"
 5. **REMEMBER**: Scroll direction is INVERTED for natural feel:
    - DOWN = EXPAND, UP = COLLAPSE (matches iOS/Android)
    - Implementation inverts deltaY values (-deltaY) for correct behavior
+
+## 🔧 Recent Gesture Fixes (Jan 2025)
+
+### Position Jump & Flickering Issues - FIXED ✅
+**Problem**: Curtain jumped to extreme positions (10%/90%) on initial touch
+**Root Cause**: Position calculation used `snapPoint` instead of actual visual position
+**Solution**: Added `startPosition` tracking in gesture state
+
+```typescript
+// FIXED: Track actual position when gesture starts
+gestureState.current.startPosition = state.position; // Not snapPoint!
+let newPosition = gestureState.current.startPosition + deltaPercent;
+```
+
+### Direction Inversion Conflict - FIXED ✅
+**Problem**: Upward drag caused flickering, downward drag locked to 90%
+**Root Cause**: `handleScrollGesture` logic conflicted with direct drag gestures
+**Solution**: Replaced scroll gesture logic with direct drag control for content touches
+
+### Gesture State Corruption - FIXED ✅
+**Problem**: Rapid gestures caused unresponsive or stuck states
+**Solution**: Improved state synchronization and cleanup
+
+## 🚨 Critical Debugging - Gesture Issues
+
+### Position Jumps
+```javascript
+// Check if startPosition is tracked correctly
+console.log('Gesture start:', gestureState.current.startPosition, 'vs snap:', state.snapPoint)
+
+// Verify smooth position progression  
+console.log('Position delta:', newPosition - gestureState.current.startPosition)
+```
+
+### Direction Issues
+```javascript
+// Verify drag direction matches intent
+const deltaY = gestureState.current.startY - touch.clientY;
+console.log('Delta:', deltaY, 'Direction:', deltaY > 0 ? 'UP/EXPAND' : 'DOWN/COLLAPSE')
+```
+
+### Flickering/Unresponsive
+```javascript
+// Check for state conflicts
+console.log('isDragging:', state.isDragging, 'isActive:', gestureState.current.isActive)
+
+// Verify content scroll priority
+console.log('Expanded:', isExpanded, 'Can scroll:', canContentScroll(scrollDirection))
+```
+
+### Testing Gesture Fixes
+```bash
+# Run gesture-specific tests
+npm test -- gesture-position-fixes.test.tsx
+
+# Check gesture performance
+npm test -- --testNamePattern="maintains 60fps"
+
+# Verify no regressions
+npm test -- __tests__/components/bottom-sheet/
+```
 
 # Marker errors?
 1. Don't pass unsupported options like 'label' to 2GIS markers

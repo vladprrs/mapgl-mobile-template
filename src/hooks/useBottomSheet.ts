@@ -7,7 +7,6 @@ interface SheetState {
   snapPoint: SnapPoint;
   isDragging: boolean;
   velocity: number;
-  isContentScrolling: boolean;
 }
 
 interface UseBottomSheetOptions {
@@ -35,7 +34,6 @@ export function useBottomSheet({
     snapPoint: snapPoints[1], // Start at middle snap point (50% by default)
     isDragging: false,
     velocity: 0,
-    isContentScrolling: false,
   });
 
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -48,8 +46,6 @@ export function useBottomSheet({
     isActive: false,
     startPosition: snapPoints[1], // Initialize with middle snap point
   });
-  const wheelAccumulator = useRef<number>(0);
-  const wheelTimeoutId = useRef<NodeJS.Timeout | null>(null);
 
   const snapTo = useCallback((targetSnap: SnapPoint) => {
     if (!snapPoints.includes(targetSnap)) return;
@@ -65,15 +61,11 @@ export function useBottomSheet({
     onSnapChange?.(targetSnap);
   }, [snapPoints, onSnapChange]);
 
-  // Determine sheet state based on snap point
-  const getSheetState = useCallback((snapPoint: SnapPoint) => {
-    const [collapsed, half] = snapPoints;
-    if (snapPoint <= collapsed) return 'collapsed';
-    if (snapPoint <= half) return 'half';
-    return 'expanded';
-  }, [snapPoints]);
-
-  const currentSheetState = getSheetState(state.snapPoint);
+  // Determine current sheet state based on snap point
+  const [collapsed, half] = snapPoints;
+  const currentSheetState = 
+    state.snapPoint <= collapsed ? 'collapsed' :
+    state.snapPoint <= half ? 'half' : 'expanded';
 
   const findNearestSnapPoint = useCallback((position: number, velocity: number): SnapPoint => {
     const velocityThreshold = 0.5;
@@ -221,26 +213,17 @@ export function useBottomSheet({
     }));
   }, [state.position]);
 
-  // Handle wheel events for desktop scroll with momentum handling
+  // Handle wheel events for desktop scroll
   const handleWheelGesture = useCallback((event: WheelEvent) => {
-    // Clear previous timeout to prevent accumulation issues
-    if (wheelTimeoutId.current) {
-      clearTimeout(wheelTimeoutId.current);
-      wheelTimeoutId.current = null;
-    }
-    
     // INVERTED: Direct handling with inverted deltaY for natural scroll direction
     const delta = -event.deltaY;
     
-    // CRITICAL FIX: Process wheel events immediately to prevent erratic behavior
+    // Process wheel events immediately to prevent erratic behavior
     const result = handleScrollGesture(delta, 'wheel');
     
-    if (result === 'sheet') {
+    if (result === 'sheet' && event.cancelable) {
       event.preventDefault();
     }
-    
-    // Reset accumulator to prevent stale values
-    wheelAccumulator.current = 0;
   }, [handleScrollGesture]);
 
   const handleDragMove = useCallback((clientY: number) => {
@@ -332,7 +315,9 @@ export function useBottomSheet({
     }
     
     // CRITICAL FIX: Handle as direct drag gesture, bypassing problematic scroll gesture logic
-    e.preventDefault(); // Prevent default to handle sheet movement
+    if (e.cancelable) {
+      e.preventDefault(); // Prevent default to handle sheet movement only if cancelable
+    }
     
     // Start dragging if not already
     if (!state.isDragging) {
@@ -376,28 +361,13 @@ export function useBottomSheet({
     gestureState.current.isActive = false;
   }, [state.isDragging, state.snapPoint, snapPoints, snapTo, handleDragEnd]);
 
-  // Handle touch events on the drag handle (always moves sheet)
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    handleDragStart(e.touches[0].clientY, 'touch');
-  }, [handleDragStart]);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    // Handle drag move for drag handle only
-    handleDragMove(e.touches[0].clientY);
-  }, [handleDragMove]);
-
-  const handleTouchEnd = useCallback(() => {
-    handleDragEnd();
-  }, [handleDragEnd]);
-
-  // Mouse event handlers for desktop support (handle only)
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    handleDragStart(e.clientY, 'drag');
-  }, [handleDragStart]);
+  // Mouse event handlers for desktop support
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (state.isDragging && gestureState.current.type === 'drag') {
-      e.preventDefault();
+      if (e.cancelable) {
+        e.preventDefault();
+      }
       handleDragMove(e.clientY);
     }
   }, [state.isDragging, handleDragMove]);
@@ -427,7 +397,6 @@ export function useBottomSheet({
     if (!element) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // CRITICAL FIX: Use simplified wheel handling to prevent double processing
       handleWheelGesture(e);
     };
 
@@ -435,20 +404,9 @@ export function useBottomSheet({
 
     return () => {
       element.removeEventListener('wheel', handleWheel);
-      if (wheelTimeoutId.current) {
-        clearTimeout(wheelTimeoutId.current);
-      }
     };
   }, [handleWheelGesture]);
 
-  // Cleanup timeouts on unmount
-  useEffect(() => {
-    return () => {
-      if (wheelTimeoutId.current) {
-        clearTimeout(wheelTimeoutId.current);
-      }
-    };
-  }, []);
 
   // Add native touch event listeners with proper passive configuration
   useEffect(() => {
@@ -477,11 +435,10 @@ export function useBottomSheet({
     // Actions
     snapTo,
     
-    // Event handlers for drag handle
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-    handleMouseDown,
+    // Base drag functions for external use
+    handleDragStart,
+    handleDragMove, 
+    handleDragEnd,
     
     // Refs
     sheetRef,
