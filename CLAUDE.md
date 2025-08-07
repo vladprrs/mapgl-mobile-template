@@ -47,6 +47,8 @@ src/
 │   │   ├── Dashboard.tsx  # Main dashboard container
 │   │   ├── SearchBar.tsx  # Search with voice assistant
 │   │   ├── QuickAccessPanel.tsx  # Quick action buttons
+│   │   ├── StoriesPanel.tsx  # Horizontal scrolling stories
+│   │   ├── StoryItem.tsx  # Individual story card
 │   │   └── index.ts       # Exports
 │   ├── icons/             # Icon system
 │   │   ├── Icon.tsx       # Reusable icon component
@@ -373,7 +375,7 @@ mcp__figma-dev-mode-mcp-server__get_code({
 **Figma Node IDs:**
 - SearchBar: `189-220904`
 - QuickAccessPanel: `189-220977`
-- Stories Panel: [Pending]
+- StoryItem: `198-221026`
 - Tips Block: [Pending]
 
 **Extracted Icon SVG Files:**
@@ -382,6 +384,11 @@ mcp__figma-dev-mode-mcp-server__get_code({
 - Bookmark: `/assets/icons/cdbfaf6779ca116ea64c455e3fba67ccc5fd425f.svg`
 - Home: `/assets/icons/ced74e330ddca8cf8d1b420c665acef342483b60.svg`
 - Work: `/assets/icons/7cef2d29c06091060ec9aba55a777bbf0fa58460.svg`
+
+**Story Images Extracted:**
+- Multiple story background images in `/assets/stories/`
+- Images include various medical/health related visuals
+- All images properly sized for 96x112px display area
 
 **Asset Workflow:**
 1. Extract assets using MCP tool with node ID
@@ -448,6 +455,8 @@ git add src/ && git commit -m "feat: implement marker clustering"
 ### Dashboard Implementation ✅
 - **SearchBar**: Search input with voice assistant and menu
 - **QuickAccessPanel**: Horizontally scrollable quick actions with traffic indicators
+- **StoriesPanel**: Horizontally scrollable story cards with viewed state
+- **StoryItem**: Individual story cards (96x112px) with image backgrounds and labels
 - **Icon System**: Exact SVG icons from Figma with proper aspect ratios
 - **Design Tokens**: Colors, fonts, and spacing from Figma
 
@@ -458,6 +467,28 @@ git add src/ && git commit -m "feat: implement marker clustering"
 - Icons wrapped in fixed-size container divs
 - Container centers icons using flexbox
 - Original padding/margins preserved from designs
+
+### Story Components Implementation ✅
+**StoryItem Component**:
+- Exact Figma dimensions: 96x112px content with 4px padding
+- Background image with gradient overlay for text readability
+- White text label (11px, semibold, -0.176px tracking)
+- Viewed state: 2px green border (#1BA136)
+- Active state: Scale transform animation (95%)
+
+**StoriesPanel Component**:
+- Horizontal scrolling with hidden scrollbar
+- Fade gradients on left/right edges
+- 8px gap between stories
+- 16px padding from container edges
+
+### Double Border Fix ✅
+**Problem**: Clicking stories created overlapping focus rings and borders
+**Solution**: Consolidated border styling using Tailwind ring utilities
+- Removed separate border div element
+- Used `focus-visible` for keyboard-only focus indication
+- Viewed state uses `ring-2 ring-[#1BA136]` directly on button
+- Clean visual hierarchy without conflicts
 
 ### Gesture Fixes ✅
 
