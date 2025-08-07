@@ -124,11 +124,11 @@ export function useBottomSheet({
     const isHalf = currentSheetState === 'half';
     const isCollapsed = currentSheetState === 'collapsed';
 
-    // Apply threshold to prevent tiny movements
-    const threshold = gestureType === 'wheel' ? 10 : 8; // Slightly higher for touch
+    // Apply consistent threshold for all gesture types
+    const threshold = 12;
     if (Math.abs(deltaY) < threshold) return 'ignore';
 
-    // In expanded state, prioritize content scrolling over sheet movement
+    // CRITICAL FIX: In expanded state, ALWAYS prioritize content scrolling first
     if (isExpanded) {
       const content = contentRef.current;
       if (!content) return 'sheet';
@@ -136,78 +136,65 @@ export function useBottomSheet({
       const { scrollHeight, clientHeight, scrollTop } = content;
       const hasScrollableContent = scrollHeight > clientHeight;
 
-      // Edge case: Short content - only move sheet with significant movement
+      // For short content that doesn't scroll, only allow sheet movement with very deliberate gestures
       if (!hasScrollableContent) {
-        // Require more deliberate gesture for sheet movement with short content
-        const significantMovement = Math.abs(deltaY) > 25;
-        if (scrollDirection === 'down' && significantMovement) {
+        const veryDeliberateMovement = Math.abs(deltaY) > 40 && (velocity > 1.5 || gestureType === 'wheel');
+        if (scrollDirection === 'down' && veryDeliberateMovement) {
           snapTo(snapPoints[1]); // Collapse to half
           return 'sheet';
         }
-        return 'ignore'; // Don't move sheet for small movements
+        return 'ignore';
       }
 
-      // For touch gestures, be more conservative about sheet movement
+      // CRITICAL: Check scroll boundaries with proper buffering
+      const scrollBuffer = 8;
+      const atTop = scrollTop <= scrollBuffer;
+      const atBottom = scrollTop >= (scrollHeight - clientHeight - scrollBuffer);
+
+      // For content that can scroll, be VERY conservative about sheet movement
       if (gestureType === 'touch') {
-        // Only move sheet if it's a fast deliberate gesture or at clear scroll boundaries
-        const isFastDeliberateGesture = velocity > 2 && Math.abs(deltaY) > 50;
-        
-        // Check if we're clearly at scroll boundaries
-        const scrollBuffer = 5;
-        const atTop = scrollTop <= scrollBuffer;
-        
-        if (scrollDirection === 'up' && canContentScroll('up') && !isFastDeliberateGesture) {
-          return 'content'; // Let content scroll normally
-        }
-        
-        if (scrollDirection === 'down' && canContentScroll('down') && !isFastDeliberateGesture) {
-          return 'content'; // Let content scroll normally
-        }
-        
-        // Only collapse sheet if we're clearly at the top and it's a deliberate down gesture
-        if (scrollDirection === 'down' && atTop && (isFastDeliberateGesture || Math.abs(deltaY) > 20)) {
+        // Only move sheet if at clear boundaries AND significant gesture
+        if (scrollDirection === 'down' && atTop && Math.abs(deltaY) > 30 && velocity > 1.0) {
           snapTo(snapPoints[1]); // Collapse to half
           return 'sheet';
         }
         
-        // If we can scroll content, prioritize that over sheet movement
+        // Otherwise, always let content handle scrolling
         if (canContentScroll(scrollDirection)) {
           return 'content';
         }
       } else {
-        // Wheel events can be more responsive
-        if (scrollDirection === 'up' && canContentScroll('up')) {
-          return 'content';
-        }
-        
-        if (scrollDirection === 'down' && canContentScroll('down')) {
-          return 'content';
-        }
-        
-        // If scrolling down and at top of content, collapse to half
-        if (scrollDirection === 'down' && !canContentScroll('down')) {
+        // Wheel events: only move sheet when at clear scroll boundaries
+        if (scrollDirection === 'down' && atTop && !canContentScroll('down')) {
           snapTo(snapPoints[1]);
           return 'sheet';
         }
+        
+        if (scrollDirection === 'up' && atBottom && !canContentScroll('up')) {
+          // Allow content to handle upward scroll in expanded state
+          return 'content';
+        }
+        
+        // Let content scroll if it can
+        if (canContentScroll(scrollDirection)) {
+          return 'content';
+        }
       }
     }
 
-    // In half state
+    // Non-expanded states: simple sheet movement
     if (isHalf) {
       if (scrollDirection === 'up') {
         snapTo(snapPoints[2]); // Expand to full
-        return 'sheet';
       } else {
         snapTo(snapPoints[0]); // Collapse
-        return 'sheet';
       }
+      return 'sheet';
     }
 
-    // In collapsed state
     if (isCollapsed) {
       if (scrollDirection === 'up') {
         snapTo(snapPoints[1]); // Expand to half
-        return 'sheet';
       }
       return 'sheet';
     }
@@ -233,31 +220,24 @@ export function useBottomSheet({
 
   // Handle wheel events for desktop scroll with momentum handling
   const handleWheelGesture = useCallback((event: WheelEvent) => {
-    // INVERTED: Accumulate inverted wheel delta for natural scroll direction
-    wheelAccumulator.current += -event.deltaY;
-    
-    // Clear previous timeout
+    // Clear previous timeout to prevent accumulation issues
     if (wheelTimeoutId.current) {
       clearTimeout(wheelTimeoutId.current);
+      wheelTimeoutId.current = null;
     }
     
-    // Set timeout with different delays based on scroll speed
-    const scrollSpeed = Math.abs(event.deltaY);
-    const delay = scrollSpeed > 50 ? 25 : 50; // Faster response for rapid scrolling
+    // INVERTED: Direct handling with inverted deltaY for natural scroll direction
+    const delta = -event.deltaY;
     
-    wheelTimeoutId.current = setTimeout(() => {
-      const delta = wheelAccumulator.current;
-      wheelAccumulator.current = 0;
-      
-      // Handle momentum - larger deltas get processed even if accumulated
-      if (Math.abs(delta) > 5) {
-        const result = handleScrollGesture(delta, 'wheel');
-        
-        if (result === 'sheet') {
-          event.preventDefault();
-        }
-      }
-    }, delay);
+    // CRITICAL FIX: Process wheel events immediately to prevent erratic behavior
+    const result = handleScrollGesture(delta, 'wheel');
+    
+    if (result === 'sheet') {
+      event.preventDefault();
+    }
+    
+    // Reset accumulator to prevent stale values
+    wheelAccumulator.current = 0;
   }, [handleScrollGesture]);
 
   const handleDragMove = useCallback((clientY: number) => {
@@ -328,6 +308,10 @@ export function useBottomSheet({
     const timeDelta = now - gestureState.current.startTime;
     const velocity = timeDelta > 0 ? Math.abs(deltaY) / timeDelta : 0;
     
+    // CRITICAL FIX: Only check gesture handling every few pixels to prevent rapid state changes
+    const movementThreshold = 8;
+    if (Math.abs(deltaY) < movementThreshold) return;
+    
     // Determine if this should be a scroll gesture - pass velocity for better detection
     const result = handleScrollGesture(deltaY, 'touch', velocity);
     
@@ -345,7 +329,7 @@ export function useBottomSheet({
       // Ignore tiny movements to prevent jitter
       return;
     }
-    // If result === 'content', let the natural scroll happen
+    // If result === 'content', let the natural scroll happen (DO NOT preventDefault)
   }, [handleScrollGesture, state.isDragging, handleDragMove]);
 
   const handleContentTouchEnd = useCallback(() => {
@@ -427,13 +411,7 @@ export function useBottomSheet({
     if (!element) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // Check if we should handle this wheel event
-      // INVERTED: Invert wheel deltaY for natural scroll direction
-      const result = handleScrollGesture(-e.deltaY, 'wheel', 0);
-      if (result === 'sheet') {
-        e.preventDefault();
-      }
-      
+      // CRITICAL FIX: Use simplified wheel handling to prevent double processing
       handleWheelGesture(e);
     };
 
@@ -445,7 +423,7 @@ export function useBottomSheet({
         clearTimeout(wheelTimeoutId.current);
       }
     };
-  }, [handleWheelGesture, handleScrollGesture]);
+  }, [handleWheelGesture]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
