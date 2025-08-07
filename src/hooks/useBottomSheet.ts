@@ -7,7 +7,6 @@ interface SheetState {
   snapPoint: SnapPoint;
   isDragging: boolean;
   velocity: number;
-  isContentScrolling: boolean;
 }
 
 interface UseBottomSheetOptions {
@@ -35,7 +34,6 @@ export function useBottomSheet({
     snapPoint: snapPoints[1], // Start at middle snap point (50% by default)
     isDragging: false,
     velocity: 0,
-    isContentScrolling: false,
   });
 
   const sheetRef = useRef<HTMLDivElement>(null);
