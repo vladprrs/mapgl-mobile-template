@@ -54,26 +54,29 @@ export function useSheetScrollDirect({
     // Check if we're at full expansion (index 2 = 90% expanded)
     const isFullyExpanded = currentSnapIndex === snapPoints.length - 1;
     
-    // If fully expanded, let content scroll normally
+    // If fully expanded, check if we should let content scroll
     if (isFullyExpanded) {
-      // Find the scrollable content container
-      const container = containerRef.current;
-      const contentEl = container?.querySelector('.overflow-y-auto') as HTMLElement;
+      // Check if the event target is within scrollable content
+      const target = e.target as HTMLElement;
+      const scrollableContent = target.closest('.overflow-y-auto') as HTMLElement;
       
-      if (contentEl && contentEl.scrollHeight > contentEl.clientHeight) {
+      if (scrollableContent && scrollableContent.scrollHeight > scrollableContent.clientHeight) {
         // Content is scrollable
-        if (contentEl.scrollTop > 0 && e.deltaY < 0) {
-          // Scrolling up while not at top - let content scroll
-          return;
+        const atTop = scrollableContent.scrollTop === 0;
+        const atBottom = scrollableContent.scrollTop >= scrollableContent.scrollHeight - scrollableContent.clientHeight - 1;
+        
+        // Let content scroll if:
+        // - Scrolling up (deltaY < 0) and not at bottom
+        // - Scrolling down (deltaY > 0) and not at top
+        if ((e.deltaY < 0 && !atBottom) || (e.deltaY > 0 && !atTop)) {
+          return; // Let the content handle scrolling
         }
-        if (contentEl.scrollTop < contentEl.scrollHeight - contentEl.clientHeight && e.deltaY > 0) {
-          // Scrolling down while not at bottom - let content scroll
-          return;
-        }
-        // At boundaries - only collapse if scrolling down at top
-        if (contentEl.scrollTop === 0 && e.deltaY < 0) {
-          // At top, scrolling up - let content handle it
-          return;
+        
+        // Only move sheet if at content boundaries
+        if ((e.deltaY > 0 && atTop) || (e.deltaY < 0 && atBottom)) {
+          // Fall through to sheet movement
+        } else {
+          return; // Let content scroll
         }
       }
     }
@@ -196,17 +199,17 @@ export function useSheetScrollDirect({
     const container = containerRef.current;
     if (!container) return;
 
-    // Add event listeners
-    container.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-    container.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
-    container.addEventListener('touchend', handleTouchEnd, { passive: true, capture: true });
+    // Add event listeners - don't use capture when expanded to allow content scrolling
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      container.removeEventListener('wheel', handleWheel, { capture: true });
-      container.removeEventListener('touchstart', handleTouchStart, { capture: true });
-      container.removeEventListener('touchmove', handleTouchMove, { capture: true });
-      container.removeEventListener('touchend', handleTouchEnd, { capture: true });
+      container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
       
       if (scrollTimer.current) {
         clearTimeout(scrollTimer.current);
