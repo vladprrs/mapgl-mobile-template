@@ -109,7 +109,7 @@ describe('SearchBar', () => {
 
   it('applies focus styles when input is focused', async () => {
     const user = userEvent.setup();
-    const { container } = render(<SearchBar />);
+    render(<SearchBar />);
     
     const input = screen.getByPlaceholderText('Поиск в Москве');
     const inputContainer = input.closest('.bg-gray-900\\/\\[0\\.06\\]');
