@@ -1,0 +1,69 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["@context7/mcp-server"],
+      "description": "Fetch documentation and examples from URLs",
+      "env": {}
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["@figma/mcp-server"],
+      "description": "Connect to Figma designs and extract components",
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp-server"],
+      "description": "Browser automation for visual testing",
+      "env": {}
+    },
+    "github": {
+      "command": "npx",
+      "args": ["@github/mcp-server"],
+      "description": "GitHub integration for version control",
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  },
+  "defaultServer": "context7",
+  "documentation": {
+    "2gis": {
+      "baseUrl": "https://docs.2gis.com/ru/mapgl",
+      "sections": [
+        "/start/react",
+        "/examples",
+        "/reference",
+        "/changelog"
+      ]
+    }
+  },
+  "testing": {
+    "viewports": {
+      "mobile": {
+        "width": 375,
+        "height": 812,
+        "deviceScaleFactor": 3,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "tablet": {
+        "width": 768,
+        "height": 1024,
+        "deviceScaleFactor": 2,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "desktop": {
+        "width": 1920,
+        "height": 1080,
+        "deviceScaleFactor": 1,
+        "isMobile": false,
+        "hasTouch": false
+      }
+    }
+  }
+}
