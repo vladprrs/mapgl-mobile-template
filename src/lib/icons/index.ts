@@ -35,6 +35,15 @@ export const IMAGES = {
   // TIP_ILLUSTRATION_2: '/assets/...',
 } as const;
 
+// SVG Icon files from Figma (if you want to use them directly)
+export const ICON_SVGS = {
+  SEARCH: '/assets/icons/78b4aac2c15552b8c0acc3c49dc2805e66dfdcad.svg',
+  MENU: '/assets/icons/249a5dbcdbd61303a929f5a7b0ba6f76c269ea6d.svg',
+  BOOKMARK: '/assets/icons/cdbfaf6779ca116ea64c455e3fba67ccc5fd425f.svg',
+  HOME: '/assets/icons/ced74e330ddca8cf8d1b420c665acef342483b60.svg',
+  WORK: '/assets/icons/7cef2d29c06091060ec9aba55a777bbf0fa58460.svg',
+} as const;
+
 // Color tokens from Figma design system
 export const COLORS = {
   // Surface colors

@@ -119,9 +119,9 @@ export function QuickAccessPanel({
             "
             aria-label={action.label || action.id}
           >
-            {/* Icon */}
+            {/* Icon - fixed 24x24 container */}
             {action.icon && (
-              <div className="flex items-center justify-center w-6 h-5 text-gray-900">
+              <div className="flex items-center justify-center w-6 h-6 text-gray-900">
                 {action.icon}
               </div>
             )}

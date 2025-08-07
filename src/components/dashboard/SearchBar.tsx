@@ -57,9 +57,9 @@ export function SearchBar({
                 ${isFocused ? 'ring-2 ring-gray-900/20' : ''}
               `}
             >
-              {/* Search Icon */}
+              {/* Search Icon - fixed 24x24 container */}
               <div className="flex items-center justify-center w-6 h-6 shrink-0">
-                <Icon name={ICONS.SEARCH} size={20} color={COLORS.TEXT_SECONDARY} />
+                <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />
               </div>
 
               {/* Input Field */}
@@ -113,7 +113,7 @@ export function SearchBar({
           style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
           aria-label="Menu"
         >
-          <Icon name={ICONS.MENU} size={20} color={COLORS.TEXT_PRIMARY} />
+          <Icon name={ICONS.MENU} size={24} color={COLORS.TEXT_PRIMARY} />
         </button>
       </div>
     </div>

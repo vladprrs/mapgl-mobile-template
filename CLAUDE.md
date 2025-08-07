@@ -174,12 +174,12 @@ import { Dashboard } from '@/components/dashboard';
 
 ### Icon System
 
-Centralized icon component and asset management system.
+Centralized icon component with exact SVG icons extracted from Figma designs.
 
 ```typescript
 import { Icon, ICONS, COLORS, IMAGES } from '@/components/icons';
 
-// Use Icon component
+// Use Icon component - icons maintain aspect ratio in 24x24 container
 <Icon name={ICONS.HOME} size={24} color={COLORS.TEXT_PRIMARY} />
 
 // Use image assets
@@ -189,13 +189,19 @@ import { Icon, ICONS, COLORS, IMAGES } from '@/components/icons';
 style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
 ```
 
-**Available Icons:**
-- `ICONS.SEARCH` - Search magnifying glass
-- `ICONS.MENU` - Hamburger menu
-- `ICONS.HOME` - Home icon
-- `ICONS.WORK` - Briefcase/work icon  
-- `ICONS.BOOKMARK` - Bookmark icon
-- `ICONS.LOCATION` - Location pin
+**Available Icons (Exact Figma SVGs):**
+- `ICONS.SEARCH` - Search icon (19x19 natural size)
+- `ICONS.MENU` - Menu/hamburger icon (18x14 natural size)
+- `ICONS.HOME` - Home icon (22x19 natural size)
+- `ICONS.WORK` - Work/briefcase icon (20x18 natural size)  
+- `ICONS.BOOKMARK` - Bookmark icon (14x19 natural size)
+- `ICONS.LOCATION` - Location pin (generic placeholder)
+
+**Icon Implementation Details:**
+- Icons are NOT stretched to fill containers
+- Each icon maintains its original aspect ratio from Figma
+- Icons are centered within fixed-size containers (default 24x24)
+- Natural padding/margins are preserved from designs
 
 **Design Tokens:**
 ```typescript
@@ -370,6 +376,13 @@ mcp__figma-dev-mode-mcp-server__get_code({
 - Stories Panel: [Pending]
 - Tips Block: [Pending]
 
+**Extracted Icon SVG Files:**
+- Search: `/assets/icons/78b4aac2c15552b8c0acc3c49dc2805e66dfdcad.svg`
+- Menu: `/assets/icons/249a5dbcdbd61303a929f5a7b0ba6f76c269ea6d.svg`
+- Bookmark: `/assets/icons/cdbfaf6779ca116ea64c455e3fba67ccc5fd425f.svg`
+- Home: `/assets/icons/ced74e330ddca8cf8d1b420c665acef342483b60.svg`
+- Work: `/assets/icons/7cef2d29c06091060ec9aba55a777bbf0fa58460.svg`
+
 **Asset Workflow:**
 1. Extract assets using MCP tool with node ID
 2. Assets saved to `public/assets/`
@@ -435,8 +448,16 @@ git add src/ && git commit -m "feat: implement marker clustering"
 ### Dashboard Implementation ✅
 - **SearchBar**: Search input with voice assistant and menu
 - **QuickAccessPanel**: Horizontally scrollable quick actions with traffic indicators
-- **Icon System**: Centralized icon component with Figma assets
+- **Icon System**: Exact SVG icons from Figma with proper aspect ratios
 - **Design Tokens**: Colors, fonts, and spacing from Figma
+
+### Icon Positioning Fix ✅
+**Problem**: Icons were stretching to fill 24x24 containers
+**Solution**: Icons maintain natural aspect ratios and padding
+- Each icon uses its exact viewBox from Figma (e.g., 19x19 for search)
+- Icons wrapped in fixed-size container divs
+- Container centers icons using flexbox
+- Original padding/margins preserved from designs
 
 ### Gesture Fixes ✅
 
