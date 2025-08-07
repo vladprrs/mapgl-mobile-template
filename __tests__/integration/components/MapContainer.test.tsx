@@ -129,16 +129,14 @@ describe('MapContainer', () => {
   })
 
   describe('Mobile Controls', () => {
-    it('should add zoom controls for mobile', async () => {
+    it('should let 2GIS handle controls automatically', async () => {
       const { load } = require('@2gis/mapgl')
-      const mockZoomControl = jest.fn()
+      const mockMap = {
+        on: jest.fn(),
+        destroy: jest.fn(),
+      }
       load.mockResolvedValue({
-        Map: jest.fn().mockImplementation(() => ({
-          on: jest.fn(),
-          destroy: jest.fn(),
-        })),
-        ZoomControl: mockZoomControl,
-        GeoControl: jest.fn(),
+        Map: jest.fn().mockImplementation(() => mockMap),
       })
 
       render(
@@ -148,24 +146,22 @@ describe('MapContainer', () => {
       )
 
       await waitFor(() => {
-        expect(mockZoomControl).toHaveBeenCalledWith(
-          expect.any(Object),
-          expect.objectContaining({
-            position: 'topRight',
-          })
-        )
+        // Map should be created without manual control additions
+        expect(load).toHaveBeenCalled()
+        // No manual control creation should occur
       })
     })
 
-    it('should add geolocation control for mobile', async () => {
+    it('should not manually add any controls', async () => {
       const { load } = require('@2gis/mapgl')
+      const mockZoomControl = jest.fn()
       const mockGeoControl = jest.fn()
       load.mockResolvedValue({
         Map: jest.fn().mockImplementation(() => ({
           on: jest.fn(),
           destroy: jest.fn(),
         })),
-        ZoomControl: jest.fn(),
+        ZoomControl: mockZoomControl,
         GeoControl: mockGeoControl,
       })
 
@@ -176,12 +172,9 @@ describe('MapContainer', () => {
       )
 
       await waitFor(() => {
-        expect(mockGeoControl).toHaveBeenCalledWith(
-          expect.any(Object),
-          expect.objectContaining({
-            position: 'topRight',
-          })
-        )
+        // Controls should not be manually created
+        expect(mockZoomControl).not.toHaveBeenCalled()
+        expect(mockGeoControl).not.toHaveBeenCalled()
       })
     })
   })

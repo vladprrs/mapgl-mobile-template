@@ -39,7 +39,7 @@ npm run build && npm start
 src/
 ├── app/                    # Next.js app router
 ├── components/
-│   ├── map/               # MapContainer, MapProvider, GeolocationControl
+│   ├── map/               # MapContainer, MapProvider
 │   └── bottom-sheet/      # BottomSheet with snap points
 ├── hooks/                 # useMapGL, useBottomSheet
 └── lib/
@@ -49,7 +49,7 @@ src/
 
 ## Critical Patterns
 
-### Map Initialization (Always with Cleanup!)
+### Map Initialization (Simplified - Let 2GIS Handle Controls!)
 
 ```typescript
 useEffect(() => {
@@ -58,29 +58,25 @@ useEffect(() => {
       key: process.env.NEXT_PUBLIC_2GIS_API_KEY,
       center: [37.618423, 55.751244],
       zoom: 13,
-      zoomControl: false, // ⚠️ IMPORTANT: Prevent duplicate controls
+      // Let 2GIS handle all controls automatically
+      // No manual control management needed!
     });
     
     mapRef.current = map;
-    
-    // Add controls manually
-    const zoomControl = new mapgl.ZoomControl(map, {
-      position: 'topRight'
-    });
-    zoomControlRef.current = zoomControl;
   });
   
   return () => {
-    zoomControlRef.current?.destroy?.();
     mapRef.current?.destroy(); // ⚠️ CRITICAL: Always cleanup
   };
 }, []); // Empty deps array!
 ```
 
-### Available 2GIS Controls
+### 2GIS Default Controls
 
-✅ **Exists:** `ZoomControl`, `TrafficControl`, `ScaleControl`, `FloorControl`  
-❌ **Doesn't Exist:** `GeoControl`, `GeolocationControl` (use our custom component)
+The map automatically includes zoom controls. Let 2GIS handle all control logic to prevent duplicates.
+
+✅ **Built-in:** Zoom controls are added by default  
+❌ **Not available:** Geolocation control (would need custom implementation if required)
 
 ### SSR Hydration Fix
 
@@ -144,11 +140,11 @@ jest.mock('@2gis/mapgl', () => ({
 
 | Problem | Solution |
 |---------|----------|
-| **Duplicate zoom controls** | Set `zoomControl: false` in map init options |
-| **GeoControl is not a constructor** | Use custom `GeolocationControl` component |
+| **Duplicate zoom controls** | Let 2GIS handle controls automatically - don't add manually |
+| **GeoControl is not a constructor** | Geolocation not available in 2GIS by default |
 | **Hydration mismatch errors** | Use `isClient` pattern for browser-only values |
 | **Map not cleaning up** | Always call `map.destroy()` in useEffect cleanup |
-| **Controls added multiple times** | Store control refs and destroy in cleanup |
+| **Controls added multiple times** | Don't add controls manually - use 2GIS defaults |
 
 ## MCP Servers
 
@@ -217,8 +213,8 @@ git add src/ && git commit -m "feat: implement marker clustering"
 3. Look for CSP errors in console
 
 # Duplicate controls?
-1. Check `zoomControl: false` in map options
-2. Verify cleanup in useEffect
+1. Don't add controls manually - let 2GIS handle them
+2. Verify cleanup in useEffect 
 3. Check React StrictMode (dev only)
 ```
 ```
