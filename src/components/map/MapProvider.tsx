@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { MapContext } from '@/hooks/useMapGL';
 import type { Map, Marker } from '@2gis/mapgl/global';
 import { MAP_CONFIG } from '@/lib/mapgl/config';
+import { isTestHooksEnabled } from '@/lib/config/env';
 
 interface MapProviderProps {
   children: React.ReactNode;
@@ -43,7 +44,7 @@ export function MapProvider({ children }: MapProviderProps) {
       markersRef.current.set(id, marker);
       
       // Instrumentation: track marker counts in E2E
-      if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+      if (isTestHooksEnabled()) {
         try {
           const w = window as unknown as { __markerCount?: number };
           w.__markerCount = markersRef.current.size;
@@ -59,7 +60,7 @@ export function MapProvider({ children }: MapProviderProps) {
     if (marker) {
       marker.destroy();
       markersRef.current.delete(id);
-      if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+      if (isTestHooksEnabled()) {
         try {
           const w = window as unknown as { __markerCount?: number };
           w.__markerCount = markersRef.current.size;
@@ -71,7 +72,7 @@ export function MapProvider({ children }: MapProviderProps) {
   const clearMarkers = useCallback(() => {
     markersRef.current.forEach((marker: Marker) => marker.destroy());
     markersRef.current.clear();
-    if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+    if (isTestHooksEnabled()) {
       try {
         const w = window as unknown as { __markerCount?: number };
         w.__markerCount = 0;

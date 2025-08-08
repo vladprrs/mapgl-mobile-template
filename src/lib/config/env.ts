@@ -10,6 +10,7 @@ interface EnvConfig {
   app: {
     url: string;
     env: 'development' | 'production' | 'test';
+    testHooksEnabled: boolean;
   };
 }
 
@@ -86,6 +87,15 @@ export function getAppUrl(): string {
 }
 
 /**
+ * Determine whether E2E test hooks are enabled
+ * Controlled via NEXT_PUBLIC_ENABLE_TEST_HOOKS. Intended for test instrumentation only.
+ * @returns {boolean} True when test hooks are explicitly enabled
+ */
+export function isTestHooksEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true';
+}
+
+/**
  * Main configuration object
  * Access this for all environment-based configuration
  */
@@ -101,6 +111,12 @@ export const config: EnvConfig = {
     },
     get env() {
       return getEnvironment();
+    },
+    /**
+     * Whether E2E test hooks are enabled
+     */
+    get testHooksEnabled() {
+      return isTestHooksEnabled();
     }
   }
 };

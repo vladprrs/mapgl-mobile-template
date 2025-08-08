@@ -9,6 +9,9 @@ declare namespace NodeJS {
     // Application Configuration (optional)
     NEXT_PUBLIC_APP_URL?: string;
     
+    // Test instrumentation flag (optional; defaults to false)
+    NEXT_PUBLIC_ENABLE_TEST_HOOKS?: 'true' | 'false';
+    
     // Node Environment
     NODE_ENV: 'development' | 'production' | 'test';
     

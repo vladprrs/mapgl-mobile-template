@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { MAP_CONFIG } from '@/lib/mapgl/config';
-import { config, ConfigError } from '@/lib/config/env';
+import { config, ConfigError, isTestHooksEnabled } from '@/lib/config/env';
 
 interface MapContainerProps {
   className?: string;
@@ -59,7 +59,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
         mapInstanceRef.current = map;
 
         // Test instrumentation: expose stable hooks in E2E when enabled
-        if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+        if (isTestHooksEnabled()) {
           try {
             (window as unknown as {
               __mapInstance?: unknown;
@@ -80,7 +80,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
             const mapEvent = event as { lngLat: [number, number] };
             console.log('Map clicked at:', mapEvent.lngLat);
             // Instrument click counter for tests if enabled
-            if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+            if (isTestHooksEnabled()) {
               try {
                 const w = window as unknown as { __mapClickCount?: number };
                 w.__mapClickCount = (w.__mapClickCount ?? 0) + 1;
