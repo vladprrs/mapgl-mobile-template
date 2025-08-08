@@ -79,8 +79,7 @@ src/
     dashboard/         # Dashboard and blocks (advice, stories, search, quick actions)
     icons/             # Icon system
     map/               # MapProvider + MapContainer
-    LocationList.tsx   # Example content
-    PlaceDetails.tsx   # Example content
+    // Example content components removed (were dev-only): LocationList.tsx, PlaceDetails.tsx
   hooks/
     useBottomSheet.ts  # Gesture and snap logic for the sheet
     useMapGL.ts        # Map context hook + types

@@ -50,8 +50,8 @@ This document captures duplication, unused code/assets, and development artifact
 
 ### 4) Unused Code and Components
 
-- **Likely unused runtime components**:
-  - `LocationList` and `PlaceDetails` are referenced in docs/tests but not rendered in the main app. Evaluate removal or move to examples.
+- **Removed unused runtime components**:
+  - `LocationList` and `PlaceDetails` were referenced only in docs/tests and have been deleted.
 
 - **Dev-only pages** (ship-blockers unless guarded):
   - `src/app/test-advice/page.tsx`
@@ -139,8 +139,8 @@ This document captures duplication, unused code/assets, and development artifact
      - Replace repeated literals in `MapContainer`, `MapProvider`.
    - Acceptance: single source of truth for test hook gating.
 
-9. Evaluate `LocationList` and `PlaceDetails`
-   - If only for documentation/examples, move to `docs/examples` or delete.
+9. (Done) Remove `LocationList` and `PlaceDetails`
+   - Deleted files and cleaned up documentation references.
    - Acceptance: no unused exports in production bundle path.
 
 10. Re-enable or remove skipped test
@@ -169,7 +169,7 @@ This document captures duplication, unused code/assets, and development artifact
 - [ ] Implement asset usage scanner; prune unreferenced files
 - [ ] Extract `advice/primitives/*`; refactor card components
 - [ ] Add `isTestHooksEnabled()` helper; use in map components
-- [ ] Decide fate of `LocationList` and `PlaceDetails`
+- [x] Decide fate of `LocationList` and `PlaceDetails`
 - [ ] Unskip or remove `map-sheet-sync.test.tsx.skip`
 
 ---
