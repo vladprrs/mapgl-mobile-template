@@ -155,7 +155,7 @@ export function AdviceSection({
   };
 
   return (
-    <div className={`w-full ${className}`} style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
+    <div className={`w-full ${className}`} style={{ backgroundColor: 'var(--bg-muted)' }}>
       {/* Section title - exact Figma specs */}
       <div className="px-4 pb-3">
         <h2 className="font-semibold text-[19px] leading-6 tracking-[-0.38px] text-[#141414]">

@@ -73,14 +73,13 @@ src/
   app/                 # Next.js App Router entrypoints
     layout.tsx         # Global layout/viewport
     page.tsx           # Home: Map + BottomSheet + Dashboard
-    test-*/page.tsx    # Dev/test demonstration pages
+    (removed) test-*/page.tsx    # Former dev/test demonstration pages
   components/
     bottom-sheet/      # BottomSheet components
     dashboard/         # Dashboard and blocks (advice, stories, search, quick actions)
     icons/             # Icon system
     map/               # MapProvider + MapContainer
-    LocationList.tsx   # Example content
-    PlaceDetails.tsx   # Example content
+    // Example content components removed (were dev-only): LocationList.tsx, PlaceDetails.tsx
   hooks/
     useBottomSheet.ts  # Gesture and snap logic for the sheet
     useMapGL.ts        # Map context hook + types
@@ -159,10 +158,10 @@ npm run test:coverage
 Key config: `jest.config.js`
 - DOM mocks: `jest.setup.js` (IntersectionObserver, ResizeObserver, matchMedia, geolocation)
 - 2GIS MapGL is mocked for deterministic tests
-- Coverage thresholds:
-  - Global: 80%
-  - `src/components/map/`: 100%
-  - `src/hooks/`: 90%
+- Coverage thresholds (current):
+  - Global: 30%
+  - `src/components/map/`: 30%
+  - `src/hooks/`: 30%
 
 ### End-to-end (Playwright)
 
@@ -210,7 +209,7 @@ import { Dashboard } from '@/components/dashboard'
 <Dashboard onSearch={(q) => console.log('search:', q)} />
 ```
 
-See `src/app/test-*` routes for rich component demos.
+Example demos were previously under `src/app/test-*` routes but have been removed for production readiness.
 
 ## Accessibility, performance, and styling
 

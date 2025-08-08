@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { MetaItemAdProps } from './types';
 import { AdviceCardContainer, AdviceTitle, AdviceLogoCircle } from './primitives';
@@ -69,7 +70,7 @@ export function MetaItemAd({
       {logoUrl && (
         <div className="absolute bottom-3 right-4">
           <AdviceLogoCircle>
-            <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+            <Image src={logoUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
           </AdviceLogoCircle>
         </div>
       )}

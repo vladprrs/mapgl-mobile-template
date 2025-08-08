@@ -1,6 +1,8 @@
 ## Codebase Cleanup and Improvement Plan
 
-This document captures duplication, unused code/assets, and development artifacts found in the repository, plus a prioritized, actionable plan to address them.
+This document tracks cleanup items, their current status, completion notes, and next steps. It reflects the repository state as of 2025-08-08 and preserves the original intent while updating priorities.
+
+Legend: ✅ Done · 🔄 In Progress · ⏳ Pending · ❌ Blocked
 
 ### Scope
 - App: `src/app/*`
@@ -12,7 +14,7 @@ This document captures duplication, unused code/assets, and development artifact
 
 ---
 
-## Findings
+## Findings (unchanged context)
 
 ### 1) Code Duplication
 
@@ -50,14 +52,14 @@ This document captures duplication, unused code/assets, and development artifact
 
 ### 4) Unused Code and Components
 
-- **Likely unused runtime components**:
-  - `LocationList` and `PlaceDetails` are referenced in docs/tests but not rendered in the main app. Evaluate removal or move to examples.
+- **Removed unused runtime components**:
+  - `LocationList` and `PlaceDetails` were referenced only in docs/tests and have been deleted.
 
-- **Dev-only pages** (ship-blockers unless guarded):
+- **Dev-only pages** (removed):
   - `src/app/test-advice/page.tsx`
   - `src/app/test-icons/page.tsx`
   - `src/app/test-stories/page.tsx`
-  - Keep only when `NEXT_PUBLIC_ENABLE_DEV_PAGES === 'true'` or remove.
+  - Deleted for production readiness.
 
 - **Unused icon mappings**:
   - `ICON_SVGS` exported but not used by `Icon`.
@@ -88,7 +90,52 @@ This document captures duplication, unused code/assets, and development artifact
 
 ---
 
-## Prioritized Action Plan
+## Status Overview (as of 2025-08-08)
+
+### ✅ Done
+- Remove dev-only pages (`src/app/test-*`) — 2025-08-08 (commit: 6bba7b1)
+  - Removed `test-advice`, `test-icons`, `test-stories`; verified clean type-check and production build.
+- Remove unused components and skipped test — 2025-08-08 (commit: 42d4965)
+  - Deleted `LocationList`, `PlaceDetails` and removed the skipped map-sheet test.
+- DRY test-hooks helper — 2025-08-08 (commit: 52beedb)
+  - Introduced `isTestHooksEnabled()` and replaced inline checks in `MapContainer`/`MapProvider`.
+- Asset usage analysis and pruning — 2025-08-08 (commits: cc89d85, 4e4c5e9, 2dec3f5, 0a4252e)
+  - Stories: pruned to 4 used; Advice: kept 10 used files; Icons: kept only `ICON_SVGS`-mapped; restored one mis-moved asset.
+- Icon system alignment — 2025-08-08 (commits: 093a2ed, 2dec3f5)
+  - `Icon.tsx` renders canonical inline SVGs with `ICON_SVGS` fallback; dead assets removed.
+- Advice UI primitives extracted — 2025-08-08 (commit: 093a2ed)
+  - `src/components/dashboard/advice/primitives/*` created and adopted.
+- Map lifecycle safe cleanup — 2025-08-08 (commit: 6f5f9df)
+  - Introduced `safeDestroyMap` in `src/lib/mapgl/lifecycle.ts` and integrated in `MapContainer`.
+
+### 🔄 In Progress
+- Centralize colors/tokens for muted backgrounds
+  - Status: `--bg-muted` variable added; component replacements completed; follow-up to mirror tokens into Tailwind theme utilities.
+
+### ⏳ Pending / Backlog
+- Add CI checks (unit/integration, TS, ESLint) via GitHub Actions
+  - Accept: basic CI green run on PRs and default branch.
+- Bundle guard/log stripping
+  - Current: `debugLog` disabled in production via env helper; finalize by removing remaining `console.log` in runtime code.
+- Tailwind design tokens
+  - Mirror `COLORS` into Tailwind config for class-based usage.
+- Map instance wiring (optional)
+  - Replace `window.__setMapInstance` with context/event emitter if feasible.
+- E2E reintroduction
+  - Scripts currently no-op; follow `docs/e2e-testing-strategy.md` when reinstating.
+
+### New cleanup opportunities (not in original plan)
+- Define `--bg-muted` CSS variable in `globals.css` and replace raw `#F1F1F1` usages (including Tailwind arbitrary colors) with the variable or Tailwind token.
+- Align README coverage statements with current Jest thresholds (presently set to 30% in `jest.config.js`).
+- Commit staged asset deletions observed in working tree (root-level `public/assets/*` duplicates) and keep `docs/unused-assets-analysis.md` updated.
+
+Notes/Lessons learned
+- Gating logs via `config.app.debugLoggingEnabled` keeps production clean while enabling dev observability.
+- Asset pruning is safest when driven by a generated usage list with conservative restores.
+
+---
+
+## Updated Prioritized Action Plan
 
 ### Phase 0 — Safety net
 - **Add CI checks**: run unit + integration + e2e; TypeScript; ESLint.
@@ -97,8 +144,7 @@ This document captures duplication, unused code/assets, and development artifact
 ### Phase 1 — High-impact, low-risk
 
 1. Remove or guard dev-only pages
-   - Path: `src/app/test-advice/page.tsx`, `src/app/test-icons/page.tsx`, `src/app/test-stories/page.tsx`.
-   - Option A: delete; Option B: export only when `NEXT_PUBLIC_ENABLE_DEV_PAGES === 'true'`.
+   - Deleted: `src/app/test-advice/page.tsx`, `src/app/test-icons/page.tsx`, `src/app/test-stories/page.tsx`.
    - Acceptance: no routes exposed in production.
 
 2. Replace console.* in runtime code
@@ -139,8 +185,8 @@ This document captures duplication, unused code/assets, and development artifact
      - Replace repeated literals in `MapContainer`, `MapProvider`.
    - Acceptance: single source of truth for test hook gating.
 
-9. Evaluate `LocationList` and `PlaceDetails`
-   - If only for documentation/examples, move to `docs/examples` or delete.
+9. (Done) Remove `LocationList` and `PlaceDetails`
+   - Deleted files and cleaned up documentation references.
    - Acceptance: no unused exports in production bundle path.
 
 10. Re-enable or remove skipped test
@@ -161,16 +207,19 @@ This document captures duplication, unused code/assets, and development artifact
 
 ## Concrete Tasks Checklist
 
-- [ ] Guard or remove dev pages: `src/app/test-*`
-- [ ] Create `src/lib/log.ts` and replace raw console statements
-- [ ] Move `mockData.ts` to `src/__mocks__/advice/` and decouple `Dashboard` from mocks
-- [ ] Decide on icon strategy; align `ICONS` names and actual renders
-- [ ] Add Tailwind color tokens and replace hard-coded hexes
-- [ ] Implement asset usage scanner; prune unreferenced files
-- [ ] Extract `advice/primitives/*`; refactor card components
-- [ ] Add `isTestHooksEnabled()` helper; use in map components
-- [ ] Decide fate of `LocationList` and `PlaceDetails`
-- [ ] Unskip or remove `map-sheet-sync.test.tsx.skip`
+- [x] Guard or remove dev pages: `src/app/test-*` (6bba7b1, 2025-08-08)
+- [x] Replace raw `console.log` in runtime code with `debugLog` (MapContainer click handler) (2025-08-08)
+- [x] Move `mockData.ts` to `src/__mocks__/advice/` and decouple `Dashboard` from mocks (2025-08-08)
+- [x] Align Icon system and mappings (093a2ed, 2dec3f5)
+- [x] Add `--bg-muted` and replace hard-coded `#F1F1F1` in components (2025-08-08)
+- [x] Implement asset usage analysis and prune unreferenced files (cc89d85, 4e4c5e9, 2dec3f5, 0a4252e)
+- [x] Extract `advice/primitives/*`; refactor card components (093a2ed)
+- [x] Add `isTestHooksEnabled()` helper; use in map components (52beedb)
+- [x] Remove `LocationList` and `PlaceDetails` (42d4965)
+- [x] Remove skipped test (42d4965)
+- [x] Add CI (TS, ESLint, unit+integration) workflows (2025-08-08)
+- [x] Align README coverage docs with current Jest thresholds (2025-08-08)
+- [ ] Finalize and commit remaining staged asset deletions under `public/assets/`
 
 ---
 
@@ -182,9 +231,9 @@ This document captures duplication, unused code/assets, and development artifact
              console.log('Map clicked at:', mapEvent.lngLat);
 ```
 
-```21:44:src/components/dashboard/Dashboard.tsx
+```21:24:src/components/dashboard/Dashboard.tsx
   const handleSearch = (query: string) => {
-    console.log('Search query:', query);
+    debugLog('Search query:', query);
     onSearch?.(query);
   };
 ```
@@ -205,8 +254,8 @@ export const ICON_SVGS = {
 
 ## Rollout Notes
 
-- Tackle Phase 1 in a single PR to reduce churn and risk.
-- Schedule Phase 2 refactors after a tag/release; ensure visual regressions are covered by screenshot tests.
-- Document deprecated exports in `CHANGELOG.md` if any public APIs change.
+- Phase 1 items can be completed with small PRs: logging cleanup (MapContainer), mock decoupling, color token introduction.
+- Schedule Phase 2 and Phase 3 after a tag/release; ensure visual regressions are covered by tests.
+- Keep `docs/unused-assets-analysis.md` in sync when removing assets.
 
 

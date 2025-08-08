@@ -6,17 +6,18 @@ import { SearchBar } from './SearchBar';
 import { QuickAccessPanel } from './QuickAccessPanel';
 import { StoriesPanel } from './StoriesPanel';
 import { AdviceSection } from './advice';
-import { mockAdviceItems } from './advice/mockData';
 import type { AdviceItem } from './advice/types';
 
 interface DashboardProps {
   className?: string;
   onSearch?: (query: string) => void;
+  items?: AdviceItem[];
 }
 
 export function Dashboard({ 
   className = '',
-  onSearch 
+  onSearch,
+  items,
 }: DashboardProps) {
   const handleSearch = (query: string) => {
     debugLog('Search query:', query);
@@ -61,7 +62,7 @@ export function Dashboard({
       </div>
 
       {/* Stories Panel and subsequent blocks on muted background */}
-      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
+      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-muted)' }}>
         {/* Stories Panel */}
         <div className="pt-4 pb-4">
           <StoriesPanel onStoryClick={handleStoryClick} />
@@ -70,7 +71,7 @@ export function Dashboard({
         {/* Advice Section */}
         <div className="pb-4">
           <AdviceSection 
-            items={mockAdviceItems}
+            items={items ?? []}
             layout="mixed"
             onItemClick={handleAdviceClick}
           />

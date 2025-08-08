@@ -21,11 +21,9 @@ npm run test:coverage       # Check coverage
 npm run build && npm start
 ```
 
-## Test Pages
+## Test Pages (removed for production)
 
-- `/test-stories` - Story components preview
-- `/test-advice` - Advice section components with Figma layout
-
+- Former: `/test-stories`, `/test-advice`
 
 ## Commands
 
@@ -70,8 +68,8 @@ src/
 │   ├── icons/             # Icon system
 │   │   ├── Icon.tsx       # Reusable icon component
 │   │   └── index.ts       # Icon exports
-│   ├── LocationList.tsx   # Sample location list component  
-│   └── PlaceDetails.tsx   # Detailed place information component
+│   ├── (removed) LocationList.tsx   # Former sample component
+│   └── (removed) PlaceDetails.tsx   # Former sample component
 ├── hooks/
 │   ├── useMapGL.ts        # Map context and operations
 │   └── useBottomSheet.ts  # Bottom sheet state and gesture handling
@@ -249,14 +247,13 @@ Mobile-optimized draggable overlay for displaying content over the map.
 ```typescript
 import { BottomSheet } from '@/components/bottom-sheet';
 
-// Basic usage
-<BottomSheet>
-  <LocationList />
-</BottomSheet>
+// Basic usage (example-only component removed)
+<BottomSheet>{/* your content */}</BottomSheet>
 
 // With custom snap points
 <BottomSheet snapPoints={[15, 60, 95]} onSnapChange={(snap) => console.log(snap)}>
-  <PlaceDetails />
+  {/* your content */}
+  {/* Example-only component PlaceDetails has been removed */}
 </BottomSheet>
 ```
 

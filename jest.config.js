@@ -28,8 +28,6 @@ const customJestConfig = {
     '!src/app/page.tsx',
     // Exclude demo/dev routes and demo-only components from coverage to avoid skewing thresholds
     '!src/app/test-**/*',
-    '!src/components/LocationList.tsx',
-    '!src/components/PlaceDetails.tsx',
     '!src/components/bottom-sheet/BottomSheetWithDashboard.tsx',
   ],
   

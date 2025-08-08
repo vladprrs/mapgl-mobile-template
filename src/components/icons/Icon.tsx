@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { ICON_SVGS } from '@/lib/icons';
 
 interface IconProps {
@@ -181,7 +182,16 @@ export function Icon({
         const normalized = name.toUpperCase().replace(/-/g, '_');
         const path = (ICON_SVGS as Record<string, string>)[normalized];
         if (path) {
-          return <img src={path} alt="" style={{ display: 'block', width: '100%', height: '100%' }} />;
+          return (
+            <Image
+              src={path}
+              alt=""
+              width={size}
+              height={size}
+              className="w-full h-full object-contain"
+              unoptimized
+            />
+          );
         }
         return null;
       })()}

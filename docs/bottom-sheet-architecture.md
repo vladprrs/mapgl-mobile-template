@@ -25,7 +25,7 @@ interface BottomSheetProps {
 
 // Usage
 <BottomSheet snapPoints={[10, 50, 90]}>
-  <LocationList />
+  {/* Your content goes here */}
 </BottomSheet>
 ```
 

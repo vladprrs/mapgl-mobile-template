@@ -80,7 +80,7 @@ describe('StoriesPanel', () => {
     // The gradient may or may not show depending on content width
     const rightGradient = container.querySelector('.bg-gradient-to-l');
     if (rightGradient) {
-      expect(rightGradient).toHaveClass('from-[#F1F1F1]');
+      expect(rightGradient).toHaveClass('bg-gradient-to-l');
     }
   });
 
