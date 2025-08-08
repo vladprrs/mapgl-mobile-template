@@ -11,7 +11,11 @@ export default function Home() {
   const [devItems, setDevItems] = useState<AdviceItem[] | undefined>(undefined);
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
+    const shouldLoadDemoAdvice =
+      process.env.NODE_ENV !== 'production' ||
+      process.env.NEXT_PUBLIC_ENABLE_DEMO_ADVICE === 'true';
+
+    if (shouldLoadDemoAdvice) {
       import('@/__mocks__/advice/mockData').then((mod) => {
         setDevItems(mod.mockAdviceItems);
       });
