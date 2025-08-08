@@ -12,12 +12,14 @@ interface DashboardProps {
   className?: string;
   onSearch?: (query: string) => void;
   items?: AdviceItem[];
+  showSearchBar?: boolean;
 }
 
 export function Dashboard({ 
   className = '',
   onSearch,
   items,
+  showSearchBar = true,
 }: DashboardProps) {
   const handleSearch = (query: string) => {
     debugLog('Search query:', query);
@@ -47,14 +49,16 @@ export function Dashboard({
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {/* Sticky Search Bar (fixed within sheet scroll container) */}
-      <div className="sticky top-0 z-20 bg-white">
-        <SearchBar
-          onSearch={handleSearch}
-          onMenuClick={handleMenuClick}
-          onVoiceClick={handleVoiceClick}
-          noTopRadius
-        />
-      </div>
+      {showSearchBar && (
+        <div className="sticky top-0 z-20 bg-white">
+          <SearchBar
+            onSearch={handleSearch}
+            onMenuClick={handleMenuClick}
+            onVoiceClick={handleVoiceClick}
+            noTopRadius
+          />
+        </div>
+      )}
 
       {/* Quick Access Panel on white background, scrolls under the sticky search bar */}
       <div className="bg-white pt-1 pb-4">
