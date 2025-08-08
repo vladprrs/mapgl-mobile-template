@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { MetaItemProps } from './types';
 import { AdviceCardContainer, AdviceIconCircle, AdviceTitle, AdviceSubtitle } from './primitives';
@@ -58,7 +59,7 @@ export function MetaItem({
       {iconUrl && (
         <div className="flex justify-end">
           <AdviceIconCircle isLight={isLight}>
-            <img src={iconUrl} alt="" className="w-8 h-8" />
+            <Image src={iconUrl} alt="" width={32} height={32} className="w-8 h-8" unoptimized />
           </AdviceIconCircle>
         </div>
       )}

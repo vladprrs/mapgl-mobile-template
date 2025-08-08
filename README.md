@@ -158,10 +158,10 @@ npm run test:coverage
 Key config: `jest.config.js`
 - DOM mocks: `jest.setup.js` (IntersectionObserver, ResizeObserver, matchMedia, geolocation)
 - 2GIS MapGL is mocked for deterministic tests
-- Coverage thresholds:
-  - Global: 80%
-  - `src/components/map/`: 100%
-  - `src/hooks/`: 90%
+- Coverage thresholds (current):
+  - Global: 30%
+  - `src/components/map/`: 30%
+  - `src/hooks/`: 30%
 
 ### End-to-end (Playwright)
 

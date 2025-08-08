@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { RDProps } from './types';
 import { AdviceCardContainer, AdviceBodyText, AdviceTitle } from './primitives';
@@ -80,10 +81,13 @@ export function RD({
           {/* First image - takes remaining space */}
           {displayImages[0] && (
             <div className="flex-1 relative rounded-l-lg overflow-hidden">
-              <img 
-                src={displayImages[0]} 
-                alt="" 
-                className="w-full h-full object-cover"
+              <Image
+                src={displayImages[0]}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 50vw, 33vw"
+                className="object-cover"
+                unoptimized
               />
               <div className="absolute inset-0 border-[0.5px] border-[rgba(137,137,137,0.3)] rounded-l-lg pointer-events-none" />
             </div>
@@ -92,10 +96,13 @@ export function RD({
           {/* Second image or counter */}
           {displayImages[1] && (
             <div className="w-12 h-[100px] relative rounded-r-lg overflow-hidden">
-              <img 
-                src={displayImages[1]} 
-                alt="" 
-                className="w-full h-full object-cover"
+              <Image
+                src={displayImages[1]}
+                alt=""
+                fill
+                sizes="48px"
+                className="object-cover"
+                unoptimized
               />
               {remainingCount > 0 && (
                 <>

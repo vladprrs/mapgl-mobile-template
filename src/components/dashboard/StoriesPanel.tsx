@@ -78,10 +78,10 @@ export function StoriesPanel({
     <div className={`relative w-full ${className}`}>
       {/* Fade gradients - extend to edges for visual effect */}
       {showLeftGradient && (
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#F1F1F1] via-[#F1F1F1]/50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[var(--bg-muted)] via-[color-mix(in_srgb,var(--bg-muted)_50%,transparent)] to-transparent z-10 pointer-events-none" />
       )}
       {showRightGradient && (
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#F1F1F1] via-[#F1F1F1]/50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--bg-muted)] via-[color-mix(in_srgb,var(--bg-muted)_50%,transparent)] to-transparent z-10 pointer-events-none" />
       )}
 
       {/* Scrollable container */}

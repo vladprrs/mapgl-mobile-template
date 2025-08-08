@@ -109,14 +109,10 @@ Legend: ✅ Done · 🔄 In Progress · ⏳ Pending · ❌ Blocked
   - Introduced `safeDestroyMap` in `src/lib/mapgl/lifecycle.ts` and integrated in `MapContainer`.
 
 ### 🔄 In Progress
-- Replace raw console.* in runtime code with `debugLog` (gated)
-  - Status: Partially adopted in `Dashboard`; remaining `console.log` in `MapContainer` click handler; `console.error` retained for error paths.
 - Centralize colors/tokens for muted backgrounds
-  - Status: `COLORS.BACKGROUND_MUTED` exists; components still use raw `#F1F1F1` and inline var fallback.
+  - Status: `--bg-muted` variable added; component replacements completed; follow-up to mirror tokens into Tailwind theme utilities.
 
 ### ⏳ Pending / Backlog
-- Move `mockData.ts` to `src/__mocks__/advice/` and decouple `Dashboard` from mocks
-  - Accept: pass `items` via props; avoid prod imports of mocks.
 - Add CI checks (unit/integration, TS, ESLint) via GitHub Actions
   - Accept: basic CI green run on PRs and default branch.
 - Bundle guard/log stripping
@@ -212,17 +208,17 @@ Notes/Lessons learned
 ## Concrete Tasks Checklist
 
 - [x] Guard or remove dev pages: `src/app/test-*` (6bba7b1, 2025-08-08)
-- [ ] Replace raw `console.log` in runtime code with `debugLog` (MapContainer click handler)
-- [ ] Move `mockData.ts` to `src/__mocks__/advice/` and decouple `Dashboard` from mocks
+- [x] Replace raw `console.log` in runtime code with `debugLog` (MapContainer click handler) (2025-08-08)
+- [x] Move `mockData.ts` to `src/__mocks__/advice/` and decouple `Dashboard` from mocks (2025-08-08)
 - [x] Align Icon system and mappings (093a2ed, 2dec3f5)
-- [ ] Add Tailwind color tokens / `--bg-muted`; replace hard-coded `#F1F1F1`
+- [x] Add `--bg-muted` and replace hard-coded `#F1F1F1` in components (2025-08-08)
 - [x] Implement asset usage analysis and prune unreferenced files (cc89d85, 4e4c5e9, 2dec3f5, 0a4252e)
 - [x] Extract `advice/primitives/*`; refactor card components (093a2ed)
 - [x] Add `isTestHooksEnabled()` helper; use in map components (52beedb)
 - [x] Remove `LocationList` and `PlaceDetails` (42d4965)
 - [x] Remove skipped test (42d4965)
-- [ ] Add CI (TS, ESLint, unit+integration) workflows
-- [ ] Align README coverage docs with current Jest thresholds
+- [x] Add CI (TS, ESLint, unit+integration) workflows (2025-08-08)
+- [x] Align README coverage docs with current Jest thresholds (2025-08-08)
 - [ ] Finalize and commit remaining staged asset deletions under `public/assets/`
 
 ---

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { MAP_CONFIG } from '@/lib/mapgl/config';
 import { safeDestroyMap } from '@/lib/mapgl/lifecycle';
+import { debugLog } from '@/lib/logging';
 import { config, ConfigError, isTestHooksEnabled } from '@/lib/config/env';
 
 interface MapContainerProps {
@@ -73,7 +74,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
         if (map && typeof map.on === 'function') {
           map.on('click', (event: unknown) => {
             const mapEvent = event as { lngLat: [number, number] };
-            console.log('Map clicked at:', mapEvent.lngLat);
+            debugLog('Map clicked at:', mapEvent.lngLat);
             // Instrument click counter for tests if enabled
             if (isTestHooksEnabled()) {
               try {
