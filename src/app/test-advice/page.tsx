@@ -84,7 +84,7 @@ export default function TestAdvicePage() {
           {/* Light theme */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Light Theme</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="grid grid-cols-2 gap-3 max-w-md">
                 <MetaItem
                   id="meta-light-1"
@@ -149,7 +149,7 @@ export default function TestAdvicePage() {
           {/* Light theme */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Light Theme</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="grid grid-cols-2 gap-3 max-w-md">
                 <MetaItemAd
                   id="ad-light-1"
@@ -217,7 +217,7 @@ export default function TestAdvicePage() {
           {/* Light theme */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Light Theme</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="grid grid-cols-2 gap-3 max-w-md">
                 <Interesting
                   id="light-1"
@@ -280,7 +280,7 @@ export default function TestAdvicePage() {
           {/* Light theme */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Light Theme</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="grid grid-cols-2 gap-3 max-w-md">
                 <RD
                   id="rd-light-1"
@@ -356,7 +356,7 @@ export default function TestAdvicePage() {
           {/* With many images showing counter */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">With Image Counter</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="max-w-[220px]">
                 <RD
                   id="rd-counter"
@@ -385,7 +385,7 @@ export default function TestAdvicePage() {
           {/* Default state */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Default State (142px height)</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="max-w-md">
                 <Cover
                   id="cover-default-1"
@@ -405,7 +405,7 @@ export default function TestAdvicePage() {
           {/* Big state */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Big State (200px height)</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="max-w-md">
                 <Cover
                   id="cover-big-1"
@@ -425,7 +425,7 @@ export default function TestAdvicePage() {
           {/* Minimal content */}
           <div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Minimal Content</h3>
-            <div className="bg-[#F1F1F1] p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
               <div className="max-w-md">
                 <Cover
                   id="cover-minimal"
@@ -479,7 +479,7 @@ export default function TestAdvicePage() {
       {/* Full Advice Section */}
       <section>
         <h2 className="text-lg font-semibold mb-4">Full Advice Section</h2>
-        <div className="bg-[#F1F1F1] p-4 rounded-lg">
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
           <AdviceSection
             items={[
               interestingLight,

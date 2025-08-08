@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { RDProps } from './types';
+import { AdviceCardContainer, AdviceBodyText, AdviceTitle } from './primitives';
 
 /**
  * RD (РекламоДатель/Advertiser) Component
@@ -63,15 +64,11 @@ export function RD({
   ) : null;
 
   return (
-    <button
+    <AdviceCardContainer
       onClick={handleClick}
-      className={`
-        relative w-full h-[244px]
-        rounded-xl overflow-hidden
-        transition-transform active:scale-95
-        ${isLight ? 'bg-white' : 'bg-white/[0.06]'}
-        ${className}
-      `}
+      className={`${className}`}
+      heightClassName="h-[244px]"
+      theme={theme}
       aria-label={`Advertiser: ${advertiserName}`}
       data-organization-id={organizationId}
       data-item-id={id}
@@ -124,20 +121,15 @@ export function RD({
         <div className="flex-1 flex flex-col">
           {/* Title with verified badge */}
           <div className="flex items-center">
-            <h3 className={`
-              font-semibold text-[16px] leading-5 tracking-[-0.24px]
-              ${isLight ? 'text-[#141414]' : 'text-white'}
-            `}>
+            <AdviceTitle theme={theme} className="font-semibold">
               {advertiserName}
-            </h3>
+            </AdviceTitle>
             {crownIcon}
           </div>
           
           {/* Subtitle */}
           {subtitle && (
-            <p className="text-[14px] leading-[18px] tracking-[-0.28px] text-[#898989] mt-0.5">
-              {subtitle}
-            </p>
+            <AdviceBodyText className="mt-0.5">{subtitle}</AdviceBodyText>
           )}
 
           {/* Rating and distance row */}
@@ -155,9 +147,7 @@ export function RD({
                 </div>
               )}
               {distance && (
-                <span className="font-medium text-[14px] leading-[18px] tracking-[-0.28px] text-[#898989]">
-                  {distance}
-                </span>
+                <span className="font-medium text-[14px] leading-[18px] tracking-[-0.28px] text-[#898989]">{distance}</span>
               )}
             </div>
           )}
@@ -165,9 +155,7 @@ export function RD({
 
         {/* Address at bottom */}
         {address && (
-          <p className="text-[14px] leading-[18px] tracking-[-0.28px] text-[#898989]">
-            {address}
-          </p>
+          <AdviceBodyText>{address}</AdviceBodyText>
         )}
       </div>
 
@@ -179,6 +167,6 @@ export function RD({
         `}
         aria-hidden="true"
       />
-    </button>
+    </AdviceCardContainer>
   );
 }

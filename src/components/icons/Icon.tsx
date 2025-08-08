@@ -1,6 +1,8 @@
+
 'use client';
 
 import React from 'react';
+import { ICON_SVGS } from '@/lib/icons';
 
 interface IconProps {
   name: string;
@@ -154,12 +156,35 @@ export function Icon({
         />
       </svg>
     ),
+    // Traffic icons (simple circle indicators)
+    'traffic-heavy': (
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ display: 'block' }}>
+        <circle cx="6" cy="6" r="5" fill={color} />
+      </svg>
+    ),
+    'traffic-moderate': (
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ display: 'block' }}>
+        <circle cx="6" cy="6" r="5" fill={color} />
+      </svg>
+    ),
+    'traffic-light': (
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ display: 'block' }}>
+        <circle cx="6" cy="6" r="5" fill={color} />
+      </svg>
+    ),
   };
 
   // Wrap icon in container div with fixed dimensions
   return (
     <div style={containerStyle} className={className}>
-      {icons[name] || null}
+      {icons[name] ?? (() => {
+        const normalized = name.toUpperCase().replace(/-/g, '_');
+        const path = (ICON_SVGS as Record<string, string>)[normalized];
+        if (path) {
+          return <img src={path} alt="" style={{ display: 'block', width: '100%', height: '100%' }} />;
+        }
+        return null;
+      })()}
     </div>
   );
 }
