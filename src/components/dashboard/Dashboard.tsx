@@ -13,6 +13,7 @@ interface DashboardProps {
   onSearch?: (query: string) => void;
   items?: AdviceItem[];
   showSearchBar?: boolean;
+  showQuickAccess?: boolean;
 }
 
 export function Dashboard({ 
@@ -20,6 +21,7 @@ export function Dashboard({
   onSearch,
   items,
   showSearchBar = true,
+  showQuickAccess = true,
 }: DashboardProps) {
   const handleSearch = (query: string) => {
     debugLog('Search query:', query);
@@ -61,9 +63,11 @@ export function Dashboard({
       )}
 
       {/* Quick Access Panel on white background, scrolls under the sticky search bar */}
-      <div className="bg-white pt-1 pb-4">
-        <QuickAccessPanel onActionClick={handleQuickAction} />
-      </div>
+      {showQuickAccess && (
+        <div className="bg-white pt-1 pb-4">
+          <QuickAccessPanel onActionClick={handleQuickAction} />
+        </div>
+      )}
 
       {/* Stories Panel and subsequent blocks on muted background */}
       <div style={{ backgroundColor: 'var(--bg-muted)' }}>

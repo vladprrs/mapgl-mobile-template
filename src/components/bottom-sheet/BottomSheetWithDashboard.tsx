@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useBottomSheet, type UseBottomSheetOptions } from '@/hooks/useBottomSheet';
-import { SearchBar } from '@/components/dashboard';
+import { SearchBar, QuickAccessPanel } from '@/components/dashboard';
 
 interface BottomSheetWithDashboardProps extends UseBottomSheetOptions {
   children: React.ReactNode;
@@ -48,7 +48,7 @@ export function BottomSheetWithDashboard({
       data-testid="bottom-sheet"
       data-sheet-state={currentSheetState}
     >
-      {/* Unified header: SearchBar contains the drag handle; keep it outside scroll area */}
+      {/* Unified header: drag handle + search bar + (now) Quick Access Panel together */}
       <div
         className="bg-white"
         onTouchStart={(e) => {
@@ -73,6 +73,10 @@ export function BottomSheetWithDashboard({
         }}
       >
         <SearchBar noTopRadius />
+        {/* Render only the QuickAccessPanel directly under search to keep header unified */}
+        <div className="pt-1 pb-4">
+          <QuickAccessPanel />
+        </div>
       </div>
 
       {/* Scrollable content area beneath the unified header */}
