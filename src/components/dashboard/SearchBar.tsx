@@ -10,6 +10,7 @@ interface SearchBarProps {
   onMenuClick?: () => void;
   onVoiceClick?: () => void;
   className?: string;
+  noTopRadius?: boolean;
 }
 
 export function SearchBar({
@@ -18,6 +19,7 @@ export function SearchBar({
   onMenuClick,
   onVoiceClick,
   className = '',
+  noTopRadius = false,
 }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -35,7 +37,7 @@ export function SearchBar({
   };
 
   return (
-    <div className={`bg-white rounded-t-2xl ${className}`}>
+    <div className={`bg-white ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
       {/* Drag Handle */}
       <div 
         className="flex items-center justify-center w-full pt-1.5 pb-1.5 cursor-grab active:cursor-grabbing"
