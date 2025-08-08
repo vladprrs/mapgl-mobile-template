@@ -46,23 +46,22 @@ export function Dashboard({
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      {/* Search Bar and Quick Access Panel on white background */}
-      <div className="bg-white">
-        {/* Search Bar */}
+      {/* Sticky Search Bar (fixed within sheet scroll container) */}
+      <div className="sticky top-0 z-20 bg-white">
         <SearchBar
           onSearch={handleSearch}
           onMenuClick={handleMenuClick}
           onVoiceClick={handleVoiceClick}
         />
+      </div>
 
-        {/* Quick Access Panel - No top padding (SearchBar pb-3 + 4px = 16px total) */}
-        <div className="pt-1 pb-4">
-          <QuickAccessPanel onActionClick={handleQuickAction} />
-        </div>
+      {/* Quick Access Panel on white background, scrolls under the sticky search bar */}
+      <div className="bg-white pt-1 pb-4">
+        <QuickAccessPanel onActionClick={handleQuickAction} />
       </div>
 
       {/* Stories Panel and subsequent blocks on muted background */}
-      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-muted)' }}>
+      <div style={{ backgroundColor: 'var(--bg-muted)' }}>
         {/* Stories Panel */}
         <div className="pt-4 pb-4">
           <StoriesPanel onStoryClick={handleStoryClick} />
