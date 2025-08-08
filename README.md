@@ -166,16 +166,11 @@ Key config: `jest.config.js`
 
 ### End-to-end (Playwright)
 
-```bash
-npm run test:e2e
-# or
-npm run test:e2e:ui
-```
+E2E tests are temporarily removed while we redesign them for mobile map + gesture scenarios.
 
-Config: `playwright.config.ts`
-- Multiple mobile device profiles (iPhone/Pixel/Galaxy), tablets, and desktop
-- HTML reporter, traces/videos on retry/failure
-- Starts the dev server automatically on `http://localhost:3000`
+- Current status: disabled scripts (`test:e2e*`) return a no-op message
+- Config: `playwright.config.ts` is retained as a template
+- Strategy doc: see `docs/e2e-testing-strategy.md`
 
 ## Usage examples
 
