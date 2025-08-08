@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { debugLog } from '@/lib/logging';
 import { RDProps } from './types';
 import { AdviceCardContainer, AdviceBodyText, AdviceTitle } from './primitives';
 
@@ -38,7 +39,7 @@ export function RD({
   className = '',
 }: RDProps) {
   const handleClick = () => {
-    console.log('RD clicked:', { organizationId, establishmentIds });
+    debugLog('RD clicked:', { organizationId, establishmentIds });
     onClick?.();
   };
 

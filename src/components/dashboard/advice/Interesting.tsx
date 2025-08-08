@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { debugLog } from '@/lib/logging';
 import { InterestingProps } from './types';
 import { AdviceCardContainer, AdviceTitle, AdviceBodyText, AdviceBadge } from './primitives';
 
@@ -31,7 +32,7 @@ export function Interesting({
   className = '',
 }: InterestingProps) {
   const handleClick = () => {
-    console.log('Interesting clicked:', { featureId });
+    debugLog('Interesting clicked:', { featureId });
     onClick?.();
   };
 

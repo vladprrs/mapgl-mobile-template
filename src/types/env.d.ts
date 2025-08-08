@@ -12,6 +12,9 @@ declare namespace NodeJS {
     // Test instrumentation flag (optional; defaults to false)
     NEXT_PUBLIC_ENABLE_TEST_HOOKS?: 'true' | 'false';
     
+    // Debug logging flag (optional; defaults to true in development, false otherwise)
+    NEXT_PUBLIC_ENABLE_DEBUG_LOGS?: 'true' | 'false';
+    
     // Node Environment
     NODE_ENV: 'development' | 'production' | 'test';
     

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { debugLog } from '@/lib/logging';
 import { MetaItemProps } from './types';
 import { AdviceCardContainer, AdviceIconCircle, AdviceTitle, AdviceSubtitle } from './primitives';
 
@@ -29,7 +30,7 @@ export function MetaItem({
   className = '',
 }: MetaItemProps) {
   const handleClick = () => {
-    console.log('MetaItem clicked:', { categoryId, searchQuery });
+    debugLog('MetaItem clicked:', { categoryId, searchQuery });
     onClick?.();
   };
 

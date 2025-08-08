@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { debugLog } from '@/lib/logging';
 import { SearchBar } from './SearchBar';
 import { QuickAccessPanel } from './QuickAccessPanel';
 import { StoriesPanel } from './StoriesPanel';
@@ -18,28 +19,28 @@ export function Dashboard({
   onSearch 
 }: DashboardProps) {
   const handleSearch = (query: string) => {
-    console.log('Search query:', query);
+    debugLog('Search query:', query);
     onSearch?.(query);
   };
 
   const handleMenuClick = () => {
-    console.log('Menu clicked');
+    debugLog('Menu clicked');
   };
 
   const handleVoiceClick = () => {
-    console.log('Voice assistant clicked');
+    debugLog('Voice assistant clicked');
   };
 
   const handleQuickAction = (actionId: string) => {
-    console.log('Quick action clicked:', actionId);
+    debugLog('Quick action clicked:', actionId);
   };
 
   const handleStoryClick = (storyId: string) => {
-    console.log('Story clicked:', storyId);
+    debugLog('Story clicked:', storyId);
   };
 
   const handleAdviceClick = (item: AdviceItem) => {
-    console.log('Advice item clicked:', item);
+    debugLog('Advice item clicked:', item);
   };
 
   return (

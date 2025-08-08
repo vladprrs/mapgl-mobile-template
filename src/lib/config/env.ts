@@ -11,6 +11,7 @@ interface EnvConfig {
     url: string;
     env: 'development' | 'production' | 'test';
     testHooksEnabled: boolean;
+    debugLoggingEnabled: boolean;
   };
 }
 
@@ -96,6 +97,25 @@ export function isTestHooksEnabled(): boolean {
 }
 
 /**
+ * Determine whether debug logging is enabled
+ * Defaults to enabled in development, disabled in test and production
+ * Can be explicitly disabled/enabled via NEXT_PUBLIC_ENABLE_DEBUG_LOGS
+ * Note: Production always disables debug logs regardless of flag
+ * @returns {boolean}
+ */
+export function isDebugLoggingEnabled(): boolean {
+  const env = getEnvironment();
+  if (env === 'production') return false;
+
+  const flag = process.env.NEXT_PUBLIC_ENABLE_DEBUG_LOGS;
+  if (flag === 'true') return true;
+  if (flag === 'false') return false;
+
+  // Default behavior: enabled in development, disabled in test
+  return env === 'development';
+}
+
+/**
  * Main configuration object
  * Access this for all environment-based configuration
  */
@@ -117,6 +137,12 @@ export const config: EnvConfig = {
      */
     get testHooksEnabled() {
       return isTestHooksEnabled();
+    },
+    /**
+     * Whether debug logging is enabled (never in production)
+     */
+    get debugLoggingEnabled() {
+      return isDebugLoggingEnabled();
     }
   }
 };

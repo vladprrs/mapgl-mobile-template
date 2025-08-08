@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { debugLog } from '@/lib/logging';
 import { AdviceSection } from '@/components/dashboard/advice';
 import { Interesting } from '@/components/dashboard/advice/Interesting';
 import { MetaItem } from '@/components/dashboard/advice/MetaItem';
@@ -55,7 +56,7 @@ export default function TestAdvicePage() {
               items={mockAdviceItems}
               layout="mixed"
               title="Советы к месту"
-              onItemClick={(item) => console.log('Figma layout item clicked:', item)}
+              onItemClick={(item) => debugLog('Figma layout item clicked:', item)}
             />
           </div>
         </div>
@@ -70,7 +71,7 @@ export default function TestAdvicePage() {
               items={mockAdviceItems}
               layout="mixed"
               title="Советы к месту"
-              onItemClick={(item) => console.log('Responsive item clicked:', item)}
+              onItemClick={(item) => debugLog('Responsive item clicked:', item)}
             />
           </div>
         </div>
@@ -94,7 +95,7 @@ export default function TestAdvicePage() {
                   categoryId="ice-rinks"
                   searchQuery="катки"
                   theme="Light"
-                  onClick={() => console.log('MetaItem Light clicked')}
+                  onClick={() => debugLog('MetaItem Light clicked')}
                 />
                 <MetaItem
                   id="meta-light-2"
@@ -104,7 +105,7 @@ export default function TestAdvicePage() {
                   categoryId="pharmacy"
                   searchQuery="аптека"
                   theme="Light"
-                  onClick={() => console.log('MetaItem Light 2 clicked')}
+                  onClick={() => debugLog('MetaItem Light 2 clicked')}
                 />
               </div>
             </div>
@@ -123,7 +124,7 @@ export default function TestAdvicePage() {
                   categoryId="ice-rinks"
                   searchQuery="катки"
                   theme="Dark"
-                  onClick={() => console.log('MetaItem Dark clicked')}
+                  onClick={() => debugLog('MetaItem Dark clicked')}
                 />
                 <MetaItem
                   id="meta-dark-2"
@@ -133,7 +134,7 @@ export default function TestAdvicePage() {
                   categoryId="pharmacy"
                   searchQuery="аптека"
                   theme="Dark"
-                  onClick={() => console.log('MetaItem Dark 2 clicked')}
+                  onClick={() => debugLog('MetaItem Dark 2 clicked')}
                 />
               </div>
             </div>
@@ -160,7 +161,7 @@ export default function TestAdvicePage() {
                   searchPhrase="xiaomi"
                   advertiserId="xiaomi"
                   theme="Light"
-                  onClick={() => console.log('MetaItemAd Light clicked')}
+                  onClick={() => debugLog('MetaItemAd Light clicked')}
                 />
                 <MetaItemAd
                   id="ad-light-2"
@@ -170,7 +171,7 @@ export default function TestAdvicePage() {
                   searchPhrase="samsung"
                   advertiserId="samsung"
                   theme="Light"
-                  onClick={() => console.log('MetaItemAd Light 2 clicked')}
+                  onClick={() => debugLog('MetaItemAd Light 2 clicked')}
                 />
               </div>
             </div>
@@ -190,7 +191,7 @@ export default function TestAdvicePage() {
                   searchPhrase="xiaomi"
                   advertiserId="xiaomi"
                   theme="Dark"
-                  onClick={() => console.log('MetaItemAd Dark clicked')}
+                  onClick={() => debugLog('MetaItemAd Dark clicked')}
                 />
                 <MetaItemAd
                   id="ad-dark-2"
@@ -201,7 +202,7 @@ export default function TestAdvicePage() {
                   advertiserId="apple"
                   theme="Dark"
                   isSponsored={false}
-                  onClick={() => console.log('MetaItemAd Dark 2 clicked')}
+                  onClick={() => debugLog('MetaItemAd Dark 2 clicked')}
                 />
               </div>
             </div>
@@ -226,7 +227,7 @@ export default function TestAdvicePage() {
                   imageUrl="/assets/advice/e54c37b478c3fbeeadd3e7ff6c943f19ac03e375.png"
                   featureId="tourist-layer"
                   theme="Light"
-                  onClick={() => console.log('Light theme clicked')}
+                  onClick={() => debugLog('Light theme clicked')}
                 />
                 <Interesting
                   id="light-2"
@@ -236,7 +237,7 @@ export default function TestAdvicePage() {
                   featureId="tourist-layer"
                   theme="Light"
                   badge="NEW"
-                  onClick={() => console.log('Light with badge clicked')}
+                  onClick={() => debugLog('Light with badge clicked')}
                 />
               </div>
             </div>
@@ -254,7 +255,7 @@ export default function TestAdvicePage() {
                   imageUrl="/assets/advice/e54c37b478c3fbeeadd3e7ff6c943f19ac03e375.png"
                   featureId="tourist-layer"
                   theme="Dark"
-                  onClick={() => console.log('Dark theme clicked')}
+                  onClick={() => debugLog('Dark theme clicked')}
                 />
                 <Interesting
                   id="dark-2"
@@ -264,7 +265,7 @@ export default function TestAdvicePage() {
                   featureId="tourist-layer"
                   theme="Dark"
                   badge="HOT"
-                  onClick={() => console.log('Dark with badge clicked')}
+                  onClick={() => debugLog('Dark with badge clicked')}
                 />
               </div>
             </div>
@@ -299,7 +300,7 @@ export default function TestAdvicePage() {
                   establishmentIds={['est-1', 'est-2', 'est-3']}
                   theme="Light"
                   isVerified={true}
-                  onClick={() => console.log('RD Light clicked')}
+                  onClick={() => debugLog('RD Light clicked')}
                 />
                 <RD
                   id="rd-light-2"
@@ -310,7 +311,7 @@ export default function TestAdvicePage() {
                   address="Пушкинская 15"
                   organizationId="reaktor"
                   theme="Light"
-                  onClick={() => console.log('RD Light 2 clicked')}
+                  onClick={() => debugLog('RD Light 2 clicked')}
                 />
               </div>
             </div>
@@ -336,7 +337,7 @@ export default function TestAdvicePage() {
                   establishmentIds={['est-1', 'est-2', 'est-3', 'est-4', 'est-5']}
                   theme="Dark"
                   isVerified={true}
-                  onClick={() => console.log('RD Dark clicked')}
+                  onClick={() => debugLog('RD Dark clicked')}
                 />
                 <RD
                   id="rd-dark-2"
@@ -347,7 +348,7 @@ export default function TestAdvicePage() {
                   address="Ленинградский проспект 35"
                   organizationId="burgerking"
                   theme="Dark"
-                  onClick={() => console.log('RD Dark 2 clicked')}
+                  onClick={() => debugLog('RD Dark 2 clicked')}
                 />
               </div>
             </div>
@@ -369,7 +370,7 @@ export default function TestAdvicePage() {
                   organizationId="geraldine"
                   theme="Light"
                   isVerified={true}
-                  onClick={() => console.log('RD with counter clicked')}
+                  onClick={() => debugLog('RD with counter clicked')}
                 />
               </div>
             </div>
@@ -396,7 +397,7 @@ export default function TestAdvicePage() {
                   itemCount={25}
                   author="2GIS"
                   state="Default"
-                  onClick={() => console.log('Cover Default clicked')}
+                  onClick={() => debugLog('Cover Default clicked')}
                 />
               </div>
             </div>
@@ -416,7 +417,7 @@ export default function TestAdvicePage() {
                   itemCount={42}
                   author="Редакция 2GIS"
                   state="Big"
-                  onClick={() => console.log('Cover Big clicked')}
+                  onClick={() => debugLog('Cover Big clicked')}
                 />
               </div>
             </div>
@@ -432,7 +433,7 @@ export default function TestAdvicePage() {
                   title="Новые места"
                   imageUrl="/assets/stories/d8d5249851401c81411a441573fe467750b6e049.png"
                   collectionId="new-places"
-                  onClick={() => console.log('Cover Minimal clicked')}
+                  onClick={() => debugLog('Cover Minimal clicked')}
                 />
               </div>
             </div>
@@ -449,7 +450,7 @@ export default function TestAdvicePage() {
                   itemCount={18}
                   imageUrl="/assets/stories/b6cf4c456a85f7e948e7ac6ab6ddc6e6efe96e76.png"
                   collectionId="vegan"
-                  onClick={() => console.log('Cover Vegan clicked')}
+                  onClick={() => debugLog('Cover Vegan clicked')}
                 />
                 <Cover
                   id="cover-var-2"
@@ -457,7 +458,7 @@ export default function TestAdvicePage() {
                   subtitle="Работают 24/7"
                   imageUrl="/assets/stories/f4e2c0e3f51acee018dd3f5c72d9b1a2b46bc227.png"
                   collectionId="24h-pharmacy"
-                  onClick={() => console.log('Cover Pharmacy clicked')}
+                  onClick={() => debugLog('Cover Pharmacy clicked')}
                 />
                 <Cover
                   id="cover-var-3"
@@ -468,7 +469,7 @@ export default function TestAdvicePage() {
                   imageUrl="/assets/stories/e5a6e067f14eefc08013c9c9e866cd30e6e74baf.png"
                   collectionId="kids-entertainment"
                   state="Big"
-                  onClick={() => console.log('Cover Kids clicked')}
+                  onClick={() => debugLog('Cover Kids clicked')}
                 />
               </div>
             </div>
@@ -521,7 +522,7 @@ export default function TestAdvicePage() {
               },
             ]}
             layout="mixed"
-            onItemClick={(item) => console.log('Item clicked:', item)}
+            onItemClick={(item) => debugLog('Item clicked:', item)}
           />
         </div>
       </section>

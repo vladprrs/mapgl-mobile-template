@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { debugLog } from '@/lib/logging';
 import { MetaItemAdProps } from './types';
 import { AdviceCardContainer, AdviceTitle, AdviceLogoCircle } from './primitives';
 
@@ -32,7 +33,7 @@ export function MetaItemAd({
   className = '',
 }: MetaItemAdProps) {
   const handleClick = () => {
-    console.log('MetaItemAd clicked:', { searchPhrase, advertiserId });
+    debugLog('MetaItemAd clicked:', { searchPhrase, advertiserId });
     onClick?.();
   };
 
