@@ -1,3 +1,2 @@
-export { BottomSheet, type BottomSheetProps } from './BottomSheet';
-export { DragHandle } from './DragHandle';
-export { useBottomSheet, type UseBottomSheetOptions, type SnapPoint } from '@/hooks/useBottomSheet';
+export { SimpleBottomSheet, type SimpleBottomSheetProps } from './SimpleBottomSheet';
+export type { SimpleSheetOptions, SnapPoint } from './simpleTypes';

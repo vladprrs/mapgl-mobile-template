@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
+import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet';
 
 // Mock the hook with base functions
 const mockHandlers = {
@@ -13,17 +13,7 @@ const mockHandlers = {
   handleContentTouchEnd: jest.fn(),
 };
 
-jest.mock('@/hooks/useBottomSheet', () => ({
-  useBottomSheet: jest.fn(() => ({
-    position: 50, // New default starting position
-    isDragging: false,
-    isExpanded: false,
-    currentSheetState: 'half', // New default state
-    ...mockHandlers,
-    sheetRef: { current: null },
-    contentRef: { current: null },
-  })),
-}));
+// No hook mocking for the simplified component
 
 describe('BottomSheet', () => {
   it('renders children content', () => {
@@ -73,7 +63,6 @@ describe('BottomSheet', () => {
 
   it('calls onSnapChange when provided', () => {
     const mockOnSnapChange = jest.fn();
-    const mockUseBottomSheet = require('@/hooks/useBottomSheet').useBottomSheet;
 
     render(
       <BottomSheet onSnapChange={mockOnSnapChange}>
@@ -81,26 +70,19 @@ describe('BottomSheet', () => {
       </BottomSheet>
     );
 
-    expect(mockUseBottomSheet).toHaveBeenCalledWith({
-      snapPoints: [10, 50, 90],
-      onSnapChange: mockOnSnapChange,
-    });
+    // onSnapChange is called on snap; initial mount should not call it
+    expect(mockOnSnapChange).not.toHaveBeenCalled();
   });
 
-  it('passes custom snap points to hook', () => {
+  it('accepts custom snap points', () => {
     const customSnapPoints: [10, 60, 90] = [10, 60, 90];
-    const mockUseBottomSheet = require('@/hooks/useBottomSheet').useBottomSheet;
-
-    render(
+    const { container } = render(
       <BottomSheet snapPoints={customSnapPoints}>
         <div>Content</div>
       </BottomSheet>
     );
-
-    expect(mockUseBottomSheet).toHaveBeenCalledWith({
-      snapPoints: customSnapPoints,
-      onSnapChange: undefined,
-    });
+    const sheet = container.querySelector('.fixed') as HTMLElement;
+    expect(sheet).toBeInTheDocument();
   });
 
   describe('Content Scroll Functionality', () => {
@@ -179,23 +161,11 @@ describe('BottomSheet', () => {
 
   describe('State-specific behavior', () => {
     it('renders correctly in half state', () => {
-      const mockUseBottomSheet = require('@/hooks/useBottomSheet').useBottomSheet;
-      mockUseBottomSheet.mockReturnValueOnce({
-        position: 50,
-        isDragging: false,
-        isExpanded: false,
-        currentSheetState: 'half',
-        ...mockHandlers,
-        sheetRef: { current: null },
-        contentRef: { current: null },
-      });
-
       const { container } = render(
         <BottomSheet>
           <div>Content</div>
         </BottomSheet>
       );
-
       const sheet = container.firstChild as HTMLElement;
       expect(sheet).toHaveAttribute('data-sheet-state', 'half');
     });

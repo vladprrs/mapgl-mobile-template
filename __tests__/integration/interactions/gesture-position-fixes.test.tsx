@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, act, fireEvent } from '@testing-library/react'
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
+// NOTE: This test exercises the hook directly; bottom sheet component import not required
 import { useBottomSheet } from '@/hooks/useBottomSheet'
 
 // Mock component to test gesture behavior

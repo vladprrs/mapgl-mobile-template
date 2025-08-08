@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
+import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet';
 import '@testing-library/jest-dom';
 
 // Mock hooks

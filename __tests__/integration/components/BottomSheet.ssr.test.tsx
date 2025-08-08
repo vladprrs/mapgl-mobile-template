@@ -3,7 +3,7 @@
  */
 import React from 'react'
 import { renderToString } from 'react-dom/server'
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
+import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet'
 
 describe('BottomSheet SSR', () => {
   describe('Server-side rendering', () => {

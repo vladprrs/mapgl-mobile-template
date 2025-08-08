@@ -90,7 +90,6 @@ export function StoriesPanel({
         className="
           flex flex-row gap-2 
           overflow-x-auto
-          scroll-smooth
           px-4
           [&::-webkit-scrollbar]:hidden
           [-ms-overflow-style:none]
@@ -98,6 +97,8 @@ export function StoriesPanel({
         "
         style={{
           WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-x',
+          scrollBehavior: 'auto',
         }}
       >
         {/* Story items */}

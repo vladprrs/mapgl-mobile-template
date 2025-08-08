@@ -194,7 +194,7 @@ const Demo = () => {
 ### Bottom sheet
 
 ```tsx
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
+import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet'
 
 <BottomSheet snapPoints={[10, 50, 90]} onSnapChange={(s) => console.log(s)}>
   {/* your content */}

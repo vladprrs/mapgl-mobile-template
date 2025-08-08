@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
+import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet'
 
 describe('BottomSheet', () => {
   const mockOnSnapChange = jest.fn()
@@ -68,9 +68,8 @@ describe('BottomSheet', () => {
 
       const sheet = container.querySelector('.fixed')
       // Default starts at middle snap point (50%), so transform should be translateY(50%)
-      expect(sheet).toHaveStyle({
-        transform: 'translateY(50%)',
-      })
+      const style = sheet?.getAttribute('style') || ''
+      expect(style.replace(/\s+/g, ' ')).toContain('transform: translateY(50%)')
     })
 
     it('should snap to defined positions', async () => {
@@ -89,9 +88,8 @@ describe('BottomSheet', () => {
       expect(mockOnSnapChange).not.toHaveBeenCalled()
       
       const sheet = container.querySelector('.fixed')
-      expect(sheet).toHaveStyle({
-        transform: 'translateY(50%)', // Starts at 50% snap point
-      })
+      const style2 = sheet?.getAttribute('style') || ''
+      expect(style2.replace(/\s+/g, ' ')).toContain('transform: translateY(50%)')
     })
 
     it('should respect custom snap points', () => {
@@ -105,9 +103,8 @@ describe('BottomSheet', () => {
 
       const sheet = container.querySelector('.fixed')
       // Should start at middle snap point (60%), so transform should be translateY(40%)
-      expect(sheet).toHaveStyle({
-        transform: 'translateY(40%)', // 100% - 60% = 40%
-      })
+      const style3 = sheet?.getAttribute('style') || ''
+      expect(style3.replace(/\s+/g, ' ')).toContain('transform: translateY(40%)')
     })
   })
 

@@ -14,6 +14,11 @@ interface DashboardProps {
   items?: AdviceItem[];
   showSearchBar?: boolean;
   showQuickAccess?: boolean;
+  /**
+   * When rendered inside BottomSheet/SheetLayout, header is provided by the sheet.
+   * In this mode, disable sticky positioning and hide header blocks by default.
+   */
+  withinSheet?: boolean;
 }
 
 export function Dashboard({ 
@@ -22,6 +27,7 @@ export function Dashboard({
   items,
   showSearchBar = true,
   showQuickAccess = true,
+  withinSheet = false,
 }: DashboardProps) {
   const handleSearch = (query: string) => {
     debugLog('Search query:', query);
@@ -48,11 +54,15 @@ export function Dashboard({
     debugLog('Advice item clicked:', item);
   };
 
+  // If used within the sheet, default to hiding header parts and remove sticky behavior
+  const effectiveShowSearchBar = withinSheet ? false : showSearchBar;
+  const effectiveShowQuickAccess = withinSheet ? false : showQuickAccess;
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      {/* Sticky Search Bar (fixed within sheet scroll container) */}
-      {showSearchBar && (
-        <div className="sticky top-0 z-20 bg-white">
+      {/* Search Bar: sticky only when not within sheet */}
+      {effectiveShowSearchBar && (
+        <div className={withinSheet ? 'bg-white' : 'sticky top-0 z-20 bg-white'}>
           <SearchBar
             onSearch={handleSearch}
             onMenuClick={handleMenuClick}
@@ -62,8 +72,8 @@ export function Dashboard({
         </div>
       )}
 
-      {/* Quick Access Panel on white background, scrolls under the sticky search bar */}
-      {showQuickAccess && (
+      {/* Quick Access Panel: remains inside content flow; hidden by default within sheet */}
+      {effectiveShowQuickAccess && (
         <div className="bg-white pt-1 pb-4">
           <QuickAccessPanel onActionClick={handleQuickAction} />
         </div>

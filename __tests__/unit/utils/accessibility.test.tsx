@@ -1,7 +1,7 @@
 /** @jest-environment jsdom */
 import React from 'react'
 import { render } from '@testing-library/react'
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
+import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet'
 import { Dashboard } from '@/components/dashboard'
 
 let axe: null | ((container: HTMLElement) => Promise<any>) = null
