@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import { MAP_CONFIG } from '@/lib/mapgl/config';
-import { config, ConfigError } from '@/lib/config/env';
+import { safeDestroyMap } from '@/lib/mapgl/lifecycle';
+import { config, ConfigError, isTestHooksEnabled } from '@/lib/config/env';
 
 interface MapContainerProps {
   className?: string;
@@ -34,14 +35,8 @@ export function MapContainer({ className = '' }: MapContainerProps) {
         }
 
         // Clean up any existing map instance first
-        if (mapInstanceRef.current && typeof mapInstanceRef.current.destroy === 'function') {
-          try {
-            mapInstanceRef.current.destroy();
-          } catch (error) {
-            console.warn('Failed to destroy existing map instance:', error);
-          }
-          mapInstanceRef.current = null;
-        }
+        safeDestroyMap(mapInstanceRef.current, 'Failed to destroy existing map instance');
+        mapInstanceRef.current = null;
 
         // Create map with default controls enabled
         const map = new mapgl.Map(containerRef.current!, {
@@ -59,7 +54,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
         mapInstanceRef.current = map;
 
         // Test instrumentation: expose stable hooks in E2E when enabled
-        if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+        if (isTestHooksEnabled()) {
           try {
             (window as unknown as {
               __mapInstance?: unknown;
@@ -80,7 +75,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
             const mapEvent = event as { lngLat: [number, number] };
             console.log('Map clicked at:', mapEvent.lngLat);
             // Instrument click counter for tests if enabled
-            if (process.env.NEXT_PUBLIC_ENABLE_TEST_HOOKS === 'true') {
+            if (isTestHooksEnabled()) {
               try {
                 const w = window as unknown as { __mapClickCount?: number };
                 w.__mapClickCount = (w.__mapClickCount ?? 0) + 1;
@@ -100,14 +95,8 @@ export function MapContainer({ className = '' }: MapContainerProps) {
 
     return () => {
       // Clean up map instance on unmount
-      if (mapInstanceRef.current && typeof mapInstanceRef.current.destroy === 'function') {
-        try {
-          mapInstanceRef.current.destroy();
-        } catch (error) {
-          console.warn('Failed to destroy map instance:', error);
-        }
-        mapInstanceRef.current = null;
-      }
+      safeDestroyMap(mapInstanceRef.current, 'Failed to destroy map instance');
+      mapInstanceRef.current = null;
     };
   }, []);
 

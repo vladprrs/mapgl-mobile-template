@@ -9,6 +9,9 @@ import { defineConfig, devices } from '@playwright/test'
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+// NOTE: E2E tests are currently removed. Keep this config as a template.
+// When reintroducing E2E tests, update projects, baseURL, and server settings
+// per docs/e2e-testing-strategy.md.
 export default defineConfig({
   testDir: './__tests__/e2e',
   /* Run tests in files in parallel */

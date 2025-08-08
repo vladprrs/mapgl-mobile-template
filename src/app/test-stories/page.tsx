@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { debugLog } from '@/lib/logging';
 import { StoryItem } from '@/components/dashboard/StoryItem';
 import { StoriesPanel } from '@/components/dashboard/StoriesPanel';
 
@@ -88,14 +89,14 @@ export default function TestStoriesPage() {
               imageUrl="/assets/stories/d8d5249851401c81411a441573fe467750b6e049.png"
               label="Tab to focus"
               isViewed={false}
-              onClick={() => console.log('Focus test 1')}
+              onClick={() => debugLog('Focus test 1')}
             />
             <StoryItem
               id="focus-2"
               imageUrl="/assets/stories/cd1a0d93b746871ac856345bbbf8054a55131586.png"
               label="Viewed + Focus"
               isViewed={true}
-              onClick={() => console.log('Focus test 2')}
+              onClick={() => debugLog('Focus test 2')}
             />
           </div>
           <p className="text-sm text-gray-600 mt-2">
@@ -109,7 +110,7 @@ export default function TestStoriesPage() {
             stories={testStories}
             onStoryClick={(id) => {
               setClickedStory(id);
-              console.log('Story clicked:', id);
+              debugLog('Story clicked:', id);
             }}
           />
           {clickedStory && (

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { debugLog } from '@/lib/logging';
 import { CoverProps } from './types';
 import { AdviceCardContainer } from './primitives';
 
@@ -32,7 +33,7 @@ export function Cover({
   className = '',
 }: CoverProps) {
   const handleClick = () => {
-    console.log('Cover clicked:', { collectionId });
+    debugLog('Cover clicked:', { collectionId });
     onClick?.();
   };
 
