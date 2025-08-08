@@ -21,11 +21,9 @@ npm run test:coverage       # Check coverage
 npm run build && npm start
 ```
 
-## Test Pages
+## Test Pages (removed for production)
 
-- `/test-stories` - Story components preview
-- `/test-advice` - Advice section components with Figma layout
-
+- Former: `/test-stories`, `/test-advice`
 
 ## Commands
 

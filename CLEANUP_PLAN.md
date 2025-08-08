@@ -53,11 +53,11 @@ This document captures duplication, unused code/assets, and development artifact
 - **Removed unused runtime components**:
   - `LocationList` and `PlaceDetails` were referenced only in docs/tests and have been deleted.
 
-- **Dev-only pages** (ship-blockers unless guarded):
+- **Dev-only pages** (removed):
   - `src/app/test-advice/page.tsx`
   - `src/app/test-icons/page.tsx`
   - `src/app/test-stories/page.tsx`
-  - Keep only when `NEXT_PUBLIC_ENABLE_DEV_PAGES === 'true'` or remove.
+  - Deleted for production readiness.
 
 - **Unused icon mappings**:
   - `ICON_SVGS` exported but not used by `Icon`.
@@ -97,8 +97,7 @@ This document captures duplication, unused code/assets, and development artifact
 ### Phase 1 — High-impact, low-risk
 
 1. Remove or guard dev-only pages
-   - Path: `src/app/test-advice/page.tsx`, `src/app/test-icons/page.tsx`, `src/app/test-stories/page.tsx`.
-   - Option A: delete; Option B: export only when `NEXT_PUBLIC_ENABLE_DEV_PAGES === 'true'`.
+   - Deleted: `src/app/test-advice/page.tsx`, `src/app/test-icons/page.tsx`, `src/app/test-stories/page.tsx`.
    - Acceptance: no routes exposed in production.
 
 2. Replace console.* in runtime code
@@ -161,7 +160,7 @@ This document captures duplication, unused code/assets, and development artifact
 
 ## Concrete Tasks Checklist
 
-- [ ] Guard or remove dev pages: `src/app/test-*`
+- [x] Guard or remove dev pages: `src/app/test-*`
 - [ ] Create `src/lib/log.ts` and replace raw console statements
 - [ ] Move `mockData.ts` to `src/__mocks__/advice/` and decouple `Dashboard` from mocks
 - [ ] Decide on icon strategy; align `ICONS` names and actual renders

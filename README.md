@@ -73,7 +73,7 @@ src/
   app/                 # Next.js App Router entrypoints
     layout.tsx         # Global layout/viewport
     page.tsx           # Home: Map + BottomSheet + Dashboard
-    test-*/page.tsx    # Dev/test demonstration pages
+    (removed) test-*/page.tsx    # Former dev/test demonstration pages
   components/
     bottom-sheet/      # BottomSheet components
     dashboard/         # Dashboard and blocks (advice, stories, search, quick actions)
@@ -209,7 +209,7 @@ import { Dashboard } from '@/components/dashboard'
 <Dashboard onSearch={(q) => console.log('search:', q)} />
 ```
 
-See `src/app/test-*` routes for rich component demos.
+Example demos were previously under `src/app/test-*` routes but have been removed for production readiness.
 
 ## Accessibility, performance, and styling
 
