@@ -23,6 +23,9 @@ interface GestureState {
   startTime: number;
   isActive: boolean;
   startPosition: number; // Track the actual sheet position when gesture started
+  // Boundary lock ensures we only start dragging the sheet AFTER content hits scroll boundary
+  boundaryLock: 'top' | 'bottom' | null;
+  boundaryLockY: number; // Touch Y when boundary was first reached
 }
 
 export function useBottomSheet({
@@ -45,6 +48,8 @@ export function useBottomSheet({
     startTime: 0,
     isActive: false,
     startPosition: snapPoints[1], // Initialize with middle snap point
+    boundaryLock: null,
+    boundaryLockY: 0,
   });
 
   const snapTo = useCallback((targetSnap: SnapPoint) => {
@@ -204,6 +209,8 @@ export function useBottomSheet({
       startTime: Date.now(),
       isActive: true,
       startPosition: state.position, // CRITICAL FIX: Use current visual position, not snapPoint
+      boundaryLock: null,
+      boundaryLockY: 0,
     };
     
     setState(prev => ({
@@ -281,6 +288,8 @@ export function useBottomSheet({
       startTime: Date.now(),
       isActive: true,
       startPosition: state.position, // CRITICAL FIX: Capture actual position at touch start
+      boundaryLock: null,
+      boundaryLockY: 0,
     };
   }, [state.position]);
 
@@ -305,13 +314,41 @@ export function useBottomSheet({
     if (shouldCheckContentScroll) {
       // Only in expanded state, check if content can scroll in the intended direction
       const scrollDirection = deltaY > 0 ? 'up' : 'down'; // Content scroll direction
+      const content = contentRef.current;
       
+      // Two-phase boundary lock to avoid premature sheet collapse
+      // Phase 1: As long as content can scroll, keep boundary lock cleared
       if (canContentScroll(scrollDirection)) {
-        // Let content handle the scroll naturally
-        return; // Don't preventDefault, allow natural scroll
+        gestureState.current.boundaryLock = null;
+        return; // Let content handle scroll
       }
-      
-      // If content can't scroll in this direction, fall through to sheet dragging
+
+      // Phase 2: Content cannot scroll further in this direction (at boundary)
+      // Only arm the boundary lock on the first boundary hit, and require additional movement to start dragging
+      if (scrollDirection === 'down') {
+        // At TOP boundary when trying to scroll further up (finger moves down)
+        if (gestureState.current.boundaryLock !== 'top') {
+          gestureState.current.boundaryLock = 'top';
+          gestureState.current.boundaryLockY = touch.clientY;
+          return; // Do not start dragging yet; allow user to settle at top first
+        }
+
+        // Already locked at top; require extra movement beyond threshold to start sheet drag
+        const postBoundaryDistance = touch.clientY - gestureState.current.boundaryLockY;
+        const postBoundaryThreshold = 12; // pixels
+        if (postBoundaryDistance < postBoundaryThreshold) {
+          return; // Still within buffer after hitting top; keep content at top, no sheet movement
+        }
+        // After sufficient continued gesture beyond top, proceed to start dragging sheet
+      } else if (scrollDirection === 'up') {
+        // At BOTTOM boundary; do not attempt to expand sheet further; keep boundary lock for consistency
+        if (gestureState.current.boundaryLock !== 'bottom') {
+          gestureState.current.boundaryLock = 'bottom';
+          gestureState.current.boundaryLockY = touch.clientY;
+        }
+        return; // Do not move sheet when at bottom while expanding gesture direction
+      }
+      // Fallthrough: we are at top and user continued swiping; start dragging the sheet
     }
     
     // CRITICAL FIX: Handle as direct drag gesture, bypassing problematic scroll gesture logic
@@ -359,6 +396,7 @@ export function useBottomSheet({
     }
     
     gestureState.current.isActive = false;
+    gestureState.current.boundaryLock = null;
   }, [state.isDragging, state.snapPoint, snapPoints, snapTo, handleDragEnd]);
 
   // Mouse event handlers for desktop support
