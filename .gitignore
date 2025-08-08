@@ -12,10 +12,15 @@
 
 # testing
 /coverage
+test-results/
 
 # next.js
 /.next/
 /out/
+
+# Playwright reports
+playwright-report/
+blob-report/
 
 # production
 /build
