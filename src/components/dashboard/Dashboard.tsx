@@ -59,8 +59,8 @@ export function Dashboard({
         </div>
       </div>
 
-      {/* Stories Panel and subsequent blocks on #F1F1F1 background */}
-      <div className="flex-1 bg-[#F1F1F1] overflow-y-auto">
+      {/* Stories Panel and subsequent blocks on muted background */}
+      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-muted, #F1F1F1)' }}>
         {/* Stories Panel */}
         <div className="pt-4 pb-4">
           <StoriesPanel onStoryClick={handleStoryClick} />

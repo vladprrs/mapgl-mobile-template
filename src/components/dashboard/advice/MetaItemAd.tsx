@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { MetaItemAdProps } from './types';
+import { AdviceCardContainer, AdviceTitle, AdviceLogoCircle } from './primitives';
 
 /**
  * MetaItemAd Component
@@ -38,20 +39,15 @@ export function MetaItemAd({
   const isLight = theme === 'Light';
 
   return (
-    <button
+    <AdviceCardContainer
       onClick={handleClick}
-      className={`
-        relative w-full h-[116px]
-        rounded-xl overflow-hidden
-        transition-transform active:scale-95
-        ${isLight ? 'bg-white' : 'bg-white/[0.06]'}
-        ${className}
-      `}
+      className={className}
+      heightClassName="h-[116px]"
+      theme={theme}
       aria-label={`Sponsored: ${title}`}
       data-advertiser-id={advertiserId}
       data-item-id={id}
     >
-      {/* Gradient background overlay with mask */}
       {gradientMaskUrl && (
         <div
           className="absolute inset-0"
@@ -69,51 +65,35 @@ export function MetaItemAd({
         />
       )}
 
-      {/* Logo in bottom-right */}
       {logoUrl && (
         <div className="absolute bottom-3 right-4">
-          <div className="w-12 h-12 bg-white rounded-full overflow-hidden border-[0.5px] border-[rgba(137,137,137,0.3)]">
-            <img 
-              src={logoUrl} 
-              alt="" 
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <AdviceLogoCircle>
+            <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+          </AdviceLogoCircle>
         </div>
       )}
 
-      {/* Text content */}
       <div className="absolute inset-0 px-4 pt-2.5 pb-[13px] flex flex-col justify-between">
-        <h3 
-          className={`
-            font-medium text-[16px] leading-5 tracking-[-0.24px] text-left
-            ${isLight ? 'text-[#141414]' : 'text-white'}
-          `}
-        >
+        <AdviceTitle theme={theme} className="text-left">
           {title}
-        </h3>
-        
-        {/* Advertisement label */}
+        </AdviceTitle>
         {isSponsored && (
-          <p 
-            className={`
-              text-[11px] leading-[14px] tracking-[-0.176px] text-left
-              ${isLight ? 'text-[rgba(20,20,20,0.3)]' : 'text-white/30'}
-            `}
+          <p
+            className={`text-[11px] leading-[14px] tracking-[-0.176px] text-left ${
+              isLight ? 'text-[rgba(20,20,20,0.3)]' : 'text-white/30'
+            }`}
           >
             Реклама
           </p>
         )}
       </div>
 
-      {/* Border */}
-      <div 
-        className={`
-          absolute inset-0 border rounded-xl pointer-events-none
-          ${isLight ? 'border-[rgba(20,20,20,0.06)]' : 'border-white/[0.06]'}
-        `}
+      <div
+        className={`absolute inset-0 border rounded-xl pointer-events-none ${
+          isLight ? 'border-[rgba(20,20,20,0.06)]' : 'border-white/[0.06]'
+        }`}
         aria-hidden="true"
       />
-    </button>
+    </AdviceCardContainer>
   );
 }

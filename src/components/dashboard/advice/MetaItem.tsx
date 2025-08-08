@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { MetaItemProps } from './types';
+import { AdviceCardContainer, AdviceIconCircle, AdviceTitle, AdviceSubtitle } from './primitives';
 
 /**
  * MetaItem Component
@@ -35,57 +36,31 @@ export function MetaItem({
   const isLight = theme === 'Light';
 
   return (
-    <button
+    <AdviceCardContainer
       onClick={handleClick}
-      className={`
-        relative w-full h-[116px]
-        rounded-xl
-        flex flex-col justify-between
-        px-4 pb-3 pt-2.5
-        transition-transform active:scale-95
-        ${isLight ? 'bg-white' : 'bg-white/[0.06]'}
-        ${className}
-      `}
+      className={`flex flex-col justify-between px-4 pb-3 pt-2.5 ${className}`}
+      heightClassName="h-[116px]"
+      theme={theme}
       aria-label={`Search in ${title}`}
       data-category-id={categoryId}
       data-item-id={id}
     >
-      {/* Text content */}
       <div className="flex flex-col items-start">
-        <h3 
-          className={`
-            font-medium text-[16px] leading-5 tracking-[-0.24px] text-left
-            line-clamp-2
-            ${isLight ? 'text-[#141414]' : 'text-white'}
-          `}
-        >
+        <AdviceTitle theme={theme} className="text-left line-clamp-2">
           {title}
-        </h3>
+        </AdviceTitle>
         {subtitle && (
-          <p className="text-[13px] leading-4 tracking-[-0.234px] text-[#898989] text-left mt-0.5">
-            {subtitle}
-          </p>
+          <AdviceSubtitle className="text-left mt-0.5">{subtitle}</AdviceSubtitle>
         )}
       </div>
-      
-      {/* Icon in bottom-right */}
+
       {iconUrl && (
         <div className="flex justify-end">
-          <div 
-            className={`
-              w-12 h-12 rounded-full
-              flex items-center justify-center
-              ${isLight ? 'bg-[rgba(20,20,20,0.06)]' : 'bg-white/[0.06]'}
-            `}
-          >
-            <img 
-              src={iconUrl} 
-              alt="" 
-              className="w-8 h-8"
-            />
-          </div>
+          <AdviceIconCircle isLight={isLight}>
+            <img src={iconUrl} alt="" className="w-8 h-8" />
+          </AdviceIconCircle>
         </div>
       )}
-    </button>
+    </AdviceCardContainer>
   );
 }

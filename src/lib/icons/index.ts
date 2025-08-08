@@ -53,6 +53,8 @@ export const COLORS = {
   // Background colors
   BACKGROUND_01: '#FFFFFF',
   BACKGROUND_02: '#FFFFFF',
+  // Muted background used for panels/sections
+  BACKGROUND_MUTED: '#F1F1F1',
   
   // Text colors
   TEXT_PRIMARY: '#141414',

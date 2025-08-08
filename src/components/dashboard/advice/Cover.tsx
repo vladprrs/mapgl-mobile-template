@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { CoverProps } from './types';
+import { AdviceCardContainer } from './primitives';
 
 /**
  * Cover Component
@@ -48,59 +49,36 @@ export function Cover({
   };
 
   return (
-    <button
+    <AdviceCardContainer
       onClick={handleClick}
-      className={`
-        relative w-full ${height}
-        rounded-xl overflow-hidden
-        transition-transform active:scale-95
-        bg-white
-        ${className}
-      `}
+      className={`${className}`}
+      heightClassName={height}
       aria-label={`Collection: ${title}`}
       data-collection-id={collectionId}
       data-item-id={id}
     >
-      {/* Background image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('${imageUrl}')` }}
-      />
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${imageUrl}')` }} />
 
-      {/* Overlay - different for Default vs Big state */}
       {isBig ? (
-        // Big state: simple dark overlay
         <div className="absolute inset-0 rounded-xl bg-black/40" />
       ) : (
-        // Default state: gradient overlay
-        <div 
+        <div
           className="absolute inset-0 rounded-xl"
           style={{
-            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.28) 42.336%, rgba(0, 0, 0, 0) 100%)',
+            background:
+              'linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.28) 42.336%, rgba(0, 0, 0, 0) 100%)',
           }}
         />
       )}
 
-      {/* Text content */}
       <div className="absolute inset-0 px-4 pt-2.5 pb-0 flex flex-col">
-        {/* Title */}
-        <h3 className="font-medium text-[16px] leading-5 tracking-[-0.24px] text-white text-left">
-          {title}
-        </h3>
-        
-        {/* Subtitle/metadata */}
+        <h3 className="font-medium text-[16px] leading-5 tracking-[-0.24px] text-white text-left">{title}</h3>
         {getSubtitleText() && (
-          <p className="text-[13px] leading-4 tracking-[-0.234px] text-white text-left mt-0.5">
-            {getSubtitleText()}
-          </p>
+          <p className="text-[13px] leading-4 tracking-[-0.234px] text-white text-left mt-0.5">{getSubtitleText()}</p>
         )}
       </div>
 
-      {/* Border */}
-      <div 
-        className="absolute inset-0 border-[0.5px] border-[rgba(137,137,137,0.3)] rounded-xl pointer-events-none"
-        aria-hidden="true"
-      />
-    </button>
+      <div className="absolute inset-0 border-[0.5px] border-[rgba(137,137,137,0.3)] rounded-xl pointer-events-none" aria-hidden="true" />
+    </AdviceCardContainer>
   );
 }
