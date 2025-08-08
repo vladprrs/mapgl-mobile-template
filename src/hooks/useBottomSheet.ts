@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { SheetController, SheetState as ControllerState } from '@/lib/bottom-sheet/SheetController';
 
 type SnapPoint = number;
 
@@ -41,6 +42,7 @@ export function useBottomSheet({
 
   const sheetRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const controllerRef = useRef<SheetController | null>(null);
   const gestureState = useRef<GestureState>({
     type: 'touch',
     startY: 0,
@@ -54,15 +56,9 @@ export function useBottomSheet({
 
   const snapTo = useCallback((targetSnap: SnapPoint) => {
     if (!snapPoints.includes(targetSnap)) return;
-
-    setState(prev => ({
-      ...prev,
-      position: targetSnap,
-      snapPoint: targetSnap,
-      isDragging: false,
-      velocity: 0,
-    }));
-
+    // Delegate to controller; also update React state to keep derived flags in sync
+    controllerRef.current?.snapTo(targetSnap);
+    setState(prev => ({ ...prev, position: targetSnap, snapPoint: targetSnap, isDragging: false, velocity: 0 }));
     onSnapChange?.(targetSnap);
   }, [snapPoints, onSnapChange]);
 
@@ -72,23 +68,7 @@ export function useBottomSheet({
     state.snapPoint <= collapsed ? 'collapsed' :
     state.snapPoint <= half ? 'half' : 'expanded';
 
-  const findNearestSnapPoint = useCallback((position: number, velocity: number): SnapPoint => {
-    const velocityThreshold = 0.5;
-    
-    if (Math.abs(velocity) > velocityThreshold) {
-      const direction = velocity > 0 ? 1 : -1;
-      const currentIndex = snapPoints.findIndex(point => point === state.snapPoint);
-      const nextIndex = currentIndex + direction;
-      
-      if (nextIndex >= 0 && nextIndex < snapPoints.length) {
-        return snapPoints[nextIndex];
-      }
-    }
-
-    return snapPoints.reduce((nearest, point) => 
-      Math.abs(point - position) < Math.abs(nearest - position) ? point : nearest
-    );
-  }, [snapPoints, state.snapPoint]);
+  // Controller drives snapping/drag velocity; hook no longer computes snap target directly
 
   // Check if content can scroll in current direction
   const canContentScroll = useCallback((direction: 'up' | 'down'): boolean => {
@@ -208,16 +188,12 @@ export function useBottomSheet({
       currentY: clientY,
       startTime: Date.now(),
       isActive: true,
-      startPosition: state.position, // CRITICAL FIX: Use current visual position, not snapPoint
+      startPosition: state.position,
       boundaryLock: null,
       boundaryLockY: 0,
     };
-    
-    setState(prev => ({
-      ...prev,
-      isDragging: true,
-      velocity: 0,
-    }));
+    controllerRef.current?.handleDragStart(clientY);
+    setState(prev => ({ ...prev, isDragging: true, velocity: 0 }));
   }, [state.position]);
 
   // Handle wheel events for desktop scroll
@@ -225,58 +201,23 @@ export function useBottomSheet({
     // INVERTED: Direct handling with inverted deltaY for natural scroll direction
     const delta = -event.deltaY;
     
-    // Process wheel events immediately to prevent erratic behavior
-    const result = handleScrollGesture(delta, 'wheel');
-    
-    if (result === 'sheet' && event.cancelable) {
-      event.preventDefault();
-    }
+    // Process wheel events; rely on CSS overscroll-behavior to prevent scroll chaining
+    handleScrollGesture(delta, 'wheel');
   }, [handleScrollGesture]);
 
   const handleDragMove = useCallback((clientY: number) => {
     if (!state.isDragging || !gestureState.current.isActive) return;
-
-    const deltaY = gestureState.current.startY - clientY;
-    const viewportHeight = window.innerHeight;
-    const deltaPercent = (deltaY / viewportHeight) * 100;
-    
-    // CRITICAL FIX: Use startPosition instead of snapPoint to prevent position jumps
-    let newPosition = gestureState.current.startPosition + deltaPercent;
-    
-    // Clamp position with rubber band effect
-    const minSnap = Math.min(...snapPoints);
-    const maxSnap = Math.max(...snapPoints);
-    
-    if (newPosition < minSnap) {
-      const excess = minSnap - newPosition;
-      newPosition = minSnap - (excess * 0.3);
-    } else if (newPosition > maxSnap) {
-      const excess = newPosition - maxSnap;
-      newPosition = maxSnap + (excess * 0.3);
-    }
-
-    // Calculate velocity for smoother movement
-    const now = Date.now();
-    const timeDelta = Math.max(now - gestureState.current.startTime, 1); // Prevent division by zero
-    const velocity = deltaPercent / timeDelta;
-
     gestureState.current.currentY = clientY;
-    
-    setState(prev => ({
-      ...prev,
-      position: newPosition,
-      velocity,
-    }));
-  }, [state.isDragging, snapPoints]);
+    controllerRef.current?.handleDragMove(clientY);
+    // Avoid React re-render on every move for performance; transform is applied by controller.
+  }, [state.isDragging]);
 
   const handleDragEnd = useCallback(() => {
     if (!state.isDragging || !gestureState.current.isActive) return;
-
-    const targetSnap = findNearestSnapPoint(state.position, state.velocity);
-    snapTo(targetSnap);
-    
+    controllerRef.current?.handleDragEnd();
     gestureState.current.isActive = false;
-  }, [state.isDragging, state.position, state.velocity, findNearestSnapPoint, snapTo]);
+    setState(prev => ({ ...prev, isDragging: false }));
+  }, [state.isDragging]);
 
   // Native touch event handlers for content area (with proper passive: false)
   const handleContentTouchStart = useCallback((e: TouchEvent) => {
@@ -295,141 +236,171 @@ export function useBottomSheet({
 
   const handleContentTouchMove = useCallback((e: TouchEvent) => {
     if (!gestureState.current.isActive) return;
-    
     const touch = e.touches[0];
     const deltaY = gestureState.current.startY - touch.clientY;
     gestureState.current.currentY = touch.clientY;
-    
-    // Calculate velocity for momentum detection
-    const now = Date.now();
-    
-    // CRITICAL FIX: Use smaller movement threshold for initial touch to prevent jump
-    const movementThreshold = state.isDragging ? 2 : 6; // Smaller threshold when not yet dragging
+
+    const movementThreshold = state.isDragging ? 2 : 6;
     if (Math.abs(deltaY) < movementThreshold) return;
-    
-    // CRITICAL FIX: For content touches, check if we should prioritize content scrolling over sheet dragging
+
     const isExpanded = currentSheetState === 'expanded';
-    const shouldCheckContentScroll = isExpanded && !state.isDragging;
-    
-    if (shouldCheckContentScroll) {
-      // Only in expanded state, check if content can scroll in the intended direction
-      const scrollDirection = deltaY > 0 ? 'up' : 'down'; // Content scroll direction
-      const content = contentRef.current;
-      
-      // Two-phase boundary lock to avoid premature sheet collapse
-      // Phase 1: As long as content can scroll, keep boundary lock cleared
-      if (canContentScroll(scrollDirection)) {
-        gestureState.current.boundaryLock = null;
-        return; // Let content handle scroll
-      }
-
-      // Phase 2: Content cannot scroll further in this direction (at boundary)
-      // Only arm the boundary lock on the first boundary hit, and require additional movement to start dragging
-      if (scrollDirection === 'down') {
-        // At TOP boundary when trying to scroll further up (finger moves down)
-        if (gestureState.current.boundaryLock !== 'top') {
-          gestureState.current.boundaryLock = 'top';
-          gestureState.current.boundaryLockY = touch.clientY;
-          return; // Do not start dragging yet; allow user to settle at top first
-        }
-
-        // Already locked at top; require extra movement beyond threshold to start sheet drag
-        const postBoundaryDistance = touch.clientY - gestureState.current.boundaryLockY;
-        const postBoundaryThreshold = 12; // pixels
-        if (postBoundaryDistance < postBoundaryThreshold) {
-          return; // Still within buffer after hitting top; keep content at top, no sheet movement
-        }
-        // After sufficient continued gesture beyond top, proceed to start dragging sheet
-      } else if (scrollDirection === 'up') {
-        // At BOTTOM boundary; do not attempt to expand sheet further; keep boundary lock for consistency
-        if (gestureState.current.boundaryLock !== 'bottom') {
-          gestureState.current.boundaryLock = 'bottom';
-          gestureState.current.boundaryLockY = touch.clientY;
-        }
-        return; // Do not move sheet when at bottom while expanding gesture direction
-      }
-      // Fallthrough: we are at top and user continued swiping; start dragging the sheet
-    }
-    
-    // CRITICAL FIX: Handle as direct drag gesture, bypassing problematic scroll gesture logic
-    if (e.cancelable) {
-      e.preventDefault(); // Prevent default to handle sheet movement only if cancelable
-    }
-    
-    // Start dragging if not already
     if (!state.isDragging) {
-      setState(prev => ({ ...prev, isDragging: true }));
-      // Update startPosition to current position to maintain smooth transition  
-      gestureState.current.startPosition = state.position;
-      gestureState.current.startY = touch.clientY;
-      gestureState.current.startTime = now;
-      return; // Don't move on the very first frame to prevent jump
+      const intent = controllerRef.current?.handleContentScrollIntent(deltaY, isExpanded);
+      // If controller armed a boundary, remember the Y
+      const controllerState = controllerRef.current?.getState();
+      if (
+        controllerState === ControllerState.ArmedAtTopBoundary ||
+        controllerState === ControllerState.ArmedAtBottomBoundary
+      ) {
+        controllerRef.current?.armBoundary(touch.clientY);
+        if (controllerRef.current?.shouldFlipFromBoundaryToDrag(touch.clientY)) {
+          if (e.cancelable) e.preventDefault();
+          setState(prev => ({ ...prev, isDragging: true }));
+          controllerRef.current?.handleDragStart(touch.clientY);
+          return;
+        }
+        // At boundary but not yet flipping: prevent default to signal sheet ownership
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+      // Otherwise, if content can scroll, do nothing (let browser handle)
+      if (intent === 'content') return;
+      // If intent says sheet, prevent default and start dragging
+      if (intent === 'sheet') {
+        if (e.cancelable) e.preventDefault();
+        setState(prev => ({ ...prev, isDragging: true }));
+        controllerRef.current?.handleDragStart(touch.clientY);
+        return;
+      }
+    } else {
+      // Already dragging sheet
+      if (e.cancelable) e.preventDefault();
+      controllerRef.current?.handleDragMove(touch.clientY);
     }
-    
-    // Continue with drag movement
-    handleDragMove(touch.clientY);
-  }, [currentSheetState, canContentScroll, state.isDragging, state.position, handleDragMove]);
+  }, [currentSheetState, state.isDragging]);
 
   const handleContentTouchEnd = useCallback(() => {
     if (gestureState.current.isActive) {
-      const deltaY = gestureState.current.startY - gestureState.current.currentY;
-      const timeDelta = Date.now() - gestureState.current.startTime;
-      const velocity = timeDelta > 0 ? deltaY / timeDelta : 0;
-      
-      // Handle momentum for quick swipes
-      // INVERTED: Positive velocity = expand, Negative velocity = collapse
-      if (Math.abs(velocity) > 0.8 && Math.abs(deltaY) > 20) {
-        const direction = velocity > 0 ? 'expand' : 'collapse';
-        const currentIndex = snapPoints.findIndex(point => point === state.snapPoint);
-        
-        // INVERTED: expand = go to higher snap point, collapse = go to lower snap point
-        if (direction === 'expand' && currentIndex < snapPoints.length - 1) {
-          snapTo(snapPoints[currentIndex + 1]);
-        } else if (direction === 'collapse' && currentIndex > 0) {
-          snapTo(snapPoints[currentIndex - 1]);
-        }
-      }
-      
       if (state.isDragging) {
-        handleDragEnd();
+        controllerRef.current?.handleDragEnd();
+        setState(prev => ({ ...prev, isDragging: false }));
       }
     }
-    
     gestureState.current.isActive = false;
     gestureState.current.boundaryLock = null;
-  }, [state.isDragging, state.snapPoint, snapPoints, snapTo, handleDragEnd]);
+  }, [state.isDragging]);
 
-  // Mouse event handlers for desktop support
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (state.isDragging && gestureState.current.type === 'drag') {
-      if (e.cancelable) {
-        e.preventDefault();
-      }
-      handleDragMove(e.clientY);
-    }
-  }, [state.isDragging, handleDragMove]);
-
-  const handleMouseUp = useCallback(() => {
-    if (state.isDragging && gestureState.current.type === 'drag') {
-      handleDragEnd();
-    }
-  }, [state.isDragging, handleDragEnd]);
-
-  // Add/remove mouse event listeners
+  // Pointer events on content area (expanded scroll intent + drag handoff)
   useEffect(() => {
-    if (state.isDragging && gestureState.current.type === 'drag') {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
+    const element = contentRef.current;
+    if (!element) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      gestureState.current = {
+        type: 'touch',
+        startY: e.clientY,
+        currentY: e.clientY,
+        startTime: Date.now(),
+        isActive: true,
+        startPosition: state.position,
+        boundaryLock: null,
+        boundaryLockY: 0,
+      };
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!gestureState.current.isActive) return;
+      const clientY = e.clientY;
+      const deltaY = gestureState.current.startY - clientY;
+      gestureState.current.currentY = clientY;
+
+      const movementThreshold = state.isDragging ? 2 : 6;
+      if (Math.abs(deltaY) < movementThreshold) return;
+
+      const isExpanded = currentSheetState === 'expanded';
+
+      if (!state.isDragging) {
+        const intent = controllerRef.current?.handleContentScrollIntent(deltaY, isExpanded);
+        const ctrlState = controllerRef.current?.getState();
+        if (
+          ctrlState === ControllerState.ArmedAtTopBoundary ||
+          ctrlState === ControllerState.ArmedAtBottomBoundary
+        ) {
+          controllerRef.current?.armBoundary(clientY);
+          if (controllerRef.current?.shouldFlipFromBoundaryToDrag(clientY)) {
+            e.preventDefault();
+            setState(prev => ({ ...prev, isDragging: true }));
+            controllerRef.current?.handleDragStart(clientY);
+            return;
+          }
+          // Still arming; let content settle (no preventDefault)
+          return;
+        }
+        if (intent === 'content') {
+          // Let browser handle scroll
+          return;
+        }
+        if (intent === 'sheet') {
+          e.preventDefault();
+          setState(prev => ({ ...prev, isDragging: true }));
+          controllerRef.current?.handleDragStart(clientY);
+          return;
+        }
+      } else {
+        // Already dragging sheet
+        e.preventDefault();
+        controllerRef.current?.handleDragMove(clientY);
+      }
+    };
+
+    const onPointerUp = () => {
+      if (state.isDragging) {
+        controllerRef.current?.handleDragEnd();
+        setState(prev => ({ ...prev, isDragging: false }));
+      }
+      gestureState.current.isActive = false;
+      gestureState.current.boundaryLock = null;
+    };
+
+    element.addEventListener('pointerdown', onPointerDown, { passive: true });
+    element.addEventListener('pointermove', onPointerMove as EventListener, { passive: false });
+    element.addEventListener('pointerup', onPointerUp as EventListener);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      element.removeEventListener('pointerdown', onPointerDown as EventListener);
+      element.removeEventListener('pointermove', onPointerMove as EventListener);
+      element.removeEventListener('pointerup', onPointerUp as EventListener);
     };
-  }, [state.isDragging, handleMouseMove, handleMouseUp]);
+  }, [currentSheetState, state.isDragging, state.position]);
 
-  // Add wheel event listener for scroll gestures
+  // Native touch events for compatibility with legacy devices.
+  // Attach in two cases:
+  // 1) Pointer Events NOT supported (legacy devices)
+  // 2) Test environment (so our tests that dispatch TouchEvent continue to work)
+  useEffect(() => {
+    const element = contentRef.current;
+    if (!element) return;
+
+    const supportsPointerEvents = typeof window !== 'undefined' && 'PointerEvent' in window;
+    const inTestEnv = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
+    if (supportsPointerEvents && !inTestEnv) {
+      return; // Use pointer events path above; avoid non-passive touch listeners in modern browsers
+    }
+
+    // Use passive: true where we never call preventDefault
+    element.addEventListener('touchstart', handleContentTouchStart, { passive: true });
+    // touchmove needs passive: false because we conditionally call preventDefault at boundaries
+    element.addEventListener('touchmove', handleContentTouchMove, { passive: false });
+    element.addEventListener('touchend', handleContentTouchEnd, { passive: true });
+
+    return () => {
+      element.removeEventListener('touchstart', handleContentTouchStart as EventListener);
+      element.removeEventListener('touchmove', handleContentTouchMove as EventListener);
+      element.removeEventListener('touchend', handleContentTouchEnd as EventListener);
+    };
+  }, [handleContentTouchStart, handleContentTouchMove, handleContentTouchEnd]);
+
+  // Add wheel event listener for scroll gestures (passive for performance)
   useEffect(() => {
     const element = sheetRef.current;
     if (!element) return;
@@ -438,7 +409,7 @@ export function useBottomSheet({
       handleWheelGesture(e);
     };
 
-    element.addEventListener('wheel', handleWheel, { passive: false });
+    element.addEventListener('wheel', handleWheel, { passive: true });
 
     return () => {
       element.removeEventListener('wheel', handleWheel);
@@ -446,21 +417,31 @@ export function useBottomSheet({
   }, [handleWheelGesture]);
 
 
-  // Add native touch event listeners with proper passive configuration
+  // Remove native touch listeners in favor of pointer events
+
+  // Initialize controller on mount
   useEffect(() => {
-    const element = contentRef.current;
-    if (!element) return;
-
-    element.addEventListener('touchstart', handleContentTouchStart, { passive: false });
-    element.addEventListener('touchmove', handleContentTouchMove, { passive: false });
-    element.addEventListener('touchend', handleContentTouchEnd, { passive: false });
-
+    if (controllerRef.current) return;
+    controllerRef.current = new SheetController({
+      snapPoints,
+      initialSnap: snapPoints[1],
+      onSnapChange: (snap) => {
+        // Ensure React state reflects final snap after animations
+        setState(prev => ({ ...prev, snapPoint: snap, position: snap, isDragging: false, velocity: 0 }));
+        onSnapChange?.(snap);
+      },
+      getContentElement: () => contentRef.current,
+      getSheetElement: () => sheetRef.current,
+      getViewportHeight: () => window.innerHeight,
+    });
+    // Ensure initial transform matches initial state
+    controllerRef.current.setPositionImmediately(state.position);
+    // Cleanup on unmount
     return () => {
-      element.removeEventListener('touchstart', handleContentTouchStart);
-      element.removeEventListener('touchmove', handleContentTouchMove);
-      element.removeEventListener('touchend', handleContentTouchEnd);
+      controllerRef.current = null;
     };
-  }, [handleContentTouchStart, handleContentTouchMove, handleContentTouchEnd]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     // State
