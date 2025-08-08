@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useBottomSheet, type UseBottomSheetOptions } from '@/hooks/useBottomSheet';
+import { SearchBar } from '@/components/dashboard';
 
 interface BottomSheetWithDashboardProps extends UseBottomSheetOptions {
   children: React.ReactNode;
@@ -47,19 +48,31 @@ export function BottomSheetWithDashboard({
       data-testid="bottom-sheet"
       data-sheet-state={currentSheetState}
     >
-      {/* Unified header: Drag handle + SearchBar container area must move together */}
-      <div className="px-4">
-        {/* Drag handle placement aligned with SearchBar top edge */}
-        <div
-          data-drag-handle
-          className="pt-1.5 pb-1.5 flex items-center justify-center cursor-grab active:cursor-grabbing"
-          onTouchStart={(e) => handleDragStart(e.touches[0].clientY, 'touch')}
-          onTouchMove={(e) => handleDragMove(e.touches[0].clientY)}
-          onTouchEnd={handleDragEnd}
-          onMouseDown={(e) => handleDragStart(e.clientY, 'drag')}
-        >
-          <div className="w-10 h-1 rounded-md pointer-events-none" style={{ backgroundColor: '#D1D5DB' }} />
-        </div>
+      {/* Unified header: SearchBar contains the drag handle; keep it outside scroll area */}
+      <div
+        className="bg-white"
+        onTouchStart={(e) => {
+          const target = e.target as HTMLElement;
+          const isDragHandle = target.closest('[data-drag-handle]');
+          if (isDragHandle) {
+            handleDragStart(e.touches[0].clientY, 'touch');
+          }
+        }}
+        onTouchMove={(e) => {
+          if (isDragging) {
+            handleDragMove(e.touches[0].clientY);
+          }
+        }}
+        onTouchEnd={handleDragEnd}
+        onMouseDown={(e) => {
+          const target = e.target as HTMLElement;
+          const isDragHandle = target.closest('[data-drag-handle]');
+          if (isDragHandle) {
+            handleDragStart(e.clientY, 'drag');
+          }
+        }}
+      >
+        <SearchBar noTopRadius />
       </div>
 
       {/* Scrollable content area beneath the unified header */}
