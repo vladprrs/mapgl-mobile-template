@@ -27,7 +27,7 @@ export default function Home() {
       <main className="relative w-full h-screen">
         <MapContainer />
         <BottomSheetWithDashboard snapPoints={[10, 50, 90]}>
-          <Dashboard items={devItems} showSearchBar={false} />
+          <Dashboard items={devItems} showSearchBar={false} showQuickAccess={false} />
         </BottomSheetWithDashboard>
       </main>
     </MapProvider>
