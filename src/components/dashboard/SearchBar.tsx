@@ -9,6 +9,10 @@ interface SearchBarProps {
   onSearch?: (query: string) => void;
   onMenuClick?: () => void;
   onVoiceClick?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onChange?: (value: string) => void;
+  value?: string;
   className?: string;
   noTopRadius?: boolean;
 }
@@ -18,11 +22,18 @@ export function SearchBar({
   onSearch,
   onMenuClick,
   onVoiceClick,
+  onFocus,
+  onBlur,
+  onChange,
+  value: controlledValue,
   className = '',
   noTopRadius = false,
 }: SearchBarProps) {
-  const [query, setQuery] = useState('');
+  const [internalValue, setInternalValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  
+  // Use controlled value if provided, otherwise use internal state
+  const query = controlledValue !== undefined ? controlledValue : internalValue;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,19 +46,29 @@ export function SearchBar({
       onSearch?.(query);
     }
   };
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (controlledValue === undefined) {
+      setInternalValue(newValue);
+    }
+    onChange?.(newValue);
+  };
+  
+  const handleFocus = () => {
+    setIsFocused(true);
+    onFocus?.();
+  };
+  
+  const handleBlur = () => {
+    setIsFocused(false);
+    onBlur?.();
+  };
 
   return (
     <div className={`bg-white ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
-      {/* Drag Handle */}
-      <div 
-        className="flex items-center justify-center w-full pt-1.5 pb-1.5 cursor-grab active:cursor-grabbing"
-        data-drag-handle="true"
-      >
-        <div className="w-10 h-1 rounded-md pointer-events-none" style={{ backgroundColor: COLORS.DRAG_HANDLE }} />
-      </div>
-
-      {/* Search Bar Container */}
-      <div className="flex flex-row items-start gap-3 px-4 pb-3">
+      {/* Search Bar Container - 8px bottom padding for spacing to next element */}
+      <div className="flex flex-row items-start gap-3 px-4 pb-2">
         {/* Search Input */}
         <div className="flex-1 min-w-0">
           <form onSubmit={handleSubmit}>
@@ -68,9 +89,9 @@ export function SearchBar({
               <input
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
                 className="

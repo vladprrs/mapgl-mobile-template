@@ -2,7 +2,7 @@
 # 2GIS MapGL Mobile App
 
 Mobile-first map application with draggable bottom sheet overlay and dashboard interface.
-**Stack:** Next.js 15, TypeScript, 2GIS MapGL, React 19, Tailwind CSS
+**Stack:** Next.js 15, TypeScript, 2GIS MapGL, React 19, Tailwind CSS, react-modal-sheet
 
 ## Quick Start
 
@@ -47,7 +47,7 @@ src/
 │   └── test-advice/       # Advice components test page
 ├── components/
 │   ├── map/               # MapContainer, MapProvider
-│   ├── bottom-sheet/      # BottomSheet, DragHandle, useBottomSheet
+│   ├── bottom-sheet/      # BottomSheet (react-modal-sheet), BottomSheetClient
 │   ├── dashboard/         # Dashboard components
 │   │   ├── Dashboard.tsx  # Main dashboard container
 │   │   ├── SearchBar.tsx  # Search with voice assistant
@@ -72,7 +72,7 @@ src/
 │   └── (removed) PlaceDetails.tsx   # Former sample component
 ├── hooks/
 │   ├── useMapGL.ts        # Map context and operations
-│   └── useBottomSheet.ts  # Bottom sheet state and gesture handling
+│   └── useBottomSheet.ts  # Minimal stub for backward compatibility (not used)
 ├── lib/
 │   ├── mapgl/            # Map config & utilities
 │   ├── config/           # Environment config
@@ -240,69 +240,52 @@ COLORS.BUTTON_SECONDARY_BG // rgba(20, 20, 20, 0.06)
 COLORS.DRAG_HANDLE       // rgba(137, 137, 137, 0.25)
 ```
 
-### Bottom Sheet Component
+### Bottom Sheet Component (react-modal-sheet)
 
-Mobile-optimized draggable overlay for displaying content over the map.
+Mobile-optimized draggable overlay using react-modal-sheet for smooth gesture handling.
 
 ```typescript
 import { BottomSheet } from '@/components/bottom-sheet';
 
-// Basic usage (example-only component removed)
+// Basic usage
 <BottomSheet>{/* your content */}</BottomSheet>
 
 // With custom snap points
 <BottomSheet snapPoints={[15, 60, 95]} onSnapChange={(snap) => console.log(snap)}>
   {/* your content */}
-  {/* Example-only component PlaceDetails has been removed */}
 </BottomSheet>
+
+// For dynamic import (prevents SSR issues)
+import { BottomSheetClient } from '@/components/bottom-sheet';
+<BottomSheetClient>{/* your content */}</BottomSheetClient>
 ```
 
 **Key Features:**
 - **Snap Points**: Default [10%, 50%, 90%] positions (starts at 50%)
-- **Multi-Modal Gestures**: Touch, mouse wheel, drag handle
+- **react-modal-sheet**: Production-ready gesture handling library
 - **Smart Scrolling**: Content scrolling only when fully expanded (90%)
-- **Performance**: 60fps animations with CSS transforms
-- **Mobile-First**: Touch-optimized with proper passive event handling
+- **Performance**: Hardware-accelerated 60fps animations
+- **SSR Safe**: Includes hydration guards and client-only wrapper
 
-**CRITICAL: SCROLL DIRECTION (INVERTED - CORRECT BEHAVIOR)**
-- **Scroll DOWN / Mouse wheel DOWN / Swipe DOWN** = EXPAND sheet (natural push-down gesture)
-- **Scroll UP / Mouse wheel UP / Swipe UP** = COLLAPSE sheet (natural pull-up gesture)
-- This matches native iOS/Android bottom sheet behavior - DO NOT CHANGE THIS DIRECTION
-- The implementation uses inverted deltaY values to achieve natural feel
+**Implementation Details:**
+- Uses react-modal-sheet v4.4.0 for gesture handling
+- Snap points are converted to descending order for the library
+- Custom wheel handler for desktop support
+- SSR placeholder prevents hydration mismatches
 
-**Hook Usage:**
+**Snap Points Conversion:**
 ```typescript
-import { useBottomSheet } from '@/hooks/useBottomSheet';
-
-const {
-  currentSnap,
-  currentSheetState, // 'collapsed' | 'half' | 'expanded'
-  isExpanded,
-  isDragging,
-  snapTo,
-  sheetRef,
-  contentRef,
-  // Base drag functions
-  handleDragStart,
-  handleDragMove,
-  handleDragEnd,
-  // Content handlers for scroll behavior
-  handleContentTouchStart,
-  handleContentTouchMove,
-  handleContentTouchEnd,
-} = useBottomSheet({
-  snapPoints: [10, 50, 90],
-  onSnapChange: (snap) => console.log('Snapped to:', snap)
-});
-
-// Programmatically control
-snapTo(90); // Expand to 90%
+// Our API: [10, 50, 90] - percentages from bottom (ascending)
+// Converted to: [0.9, 0.5, 0.1] - decimals from top (descending)
+// react-modal-sheet expects descending order
 ```
 
+**Note:** The `useBottomSheet` hook is now a minimal stub for backward compatibility. All gesture logic is handled by react-modal-sheet.
+
 **Sheet States:**
-- **Collapsed (10%)**: Scroll DOWN to expand to half
-- **Half (50%)**: DEFAULT starting state, scroll DOWN to expand full, UP to collapse
-- **Expanded (90%)**: Content scrollable, scroll UP from top to collapse
+- **Collapsed (10%)**: Minimal visible state
+- **Half (50%)**: DEFAULT starting state
+- **Expanded (90%)**: Content scrollable, sheet moves only at scroll boundaries
 
 ## TDD Workflow
 
@@ -348,12 +331,15 @@ jest.mock('@/hooks/useBottomSheet', () => ({
 |---------|----------|
 | **Duplicate zoom controls** | Let 2GIS handle controls automatically - don't add manually |
 | **GeoControl is not a constructor** | Geolocation not available in 2GIS by default |
-| **Hydration mismatch errors** | Use `isClient` pattern for browser-only values |
+| **Hydration mismatch errors** | BottomSheet includes SSR guards; use BottomSheetClient for dynamic import |
 | **Map not cleaning up** | Always call `map.destroy()` in useEffect cleanup |
 | **Controls added multiple times** | Don't add controls manually - use 2GIS defaults |
 | **Marker creation TypeError** | Don't pass unsupported props like `label` to 2GIS markers |
-| **Passive event listener warnings** | Bottom sheet uses native events with `passive: false` |
-| **Bottom sheet not dragging** | Ensure `touch-action: none` is set on draggable elements |
+| **Snap points assertion error** | react-modal-sheet needs descending order - handled automatically |
+| **Bottom sheet not dragging** | Check react-modal-sheet is properly installed |
+| **Layout shift on initial load** | Initialize state with empty arrays instead of undefined; use hardcoded colors instead of CSS variables |
+| **White borders flash** | CSS overrides remove react-modal-sheet padding; ensure bottom-sheet.css is imported |
+| **Quick Access Panel height issue** | Use conditional rendering instead of animated height transitions |
 
 ## MCP Servers
 
@@ -479,15 +465,48 @@ git add src/ && git commit -m "feat: implement marker clustering"
 3. Check React StrictMode (dev only)
 
 # Bottom sheet issues?
-1. Check touch-action: none is set on draggable elements
-2. Verify passive: false on native touch listeners
-3. Ensure snap points are valid numbers [10, 50, 90]
+1. Ensure react-modal-sheet is installed (v4.4.0)
+2. Check snap points are valid [10, 50, 90]
+3. For SSR issues, use BottomSheetClient component
 4. Test on actual mobile device for touch gestures
-5. **REMEMBER**: Scroll direction is INVERTED for natural feel:
-   - DOWN = EXPAND, UP = COLLAPSE (matches iOS/Android)
-   - Implementation inverts deltaY values (-deltaY) for correct behavior
 
-## 🔧 Recent Updates (Jan 2025)
+## 🔧 Recent Updates (January 2025)
+
+### Screen Management System ✅
+- **Added** ScreenManager context for navigation between screens
+- **Implemented** Dashboard, SearchSuggestions, and SearchResults screens
+- **Created** ScreenRenderer with smooth transitions between screens
+- **Added** Back navigation button when not on dashboard
+- **Integrated** SearchBar as sticky header across all screens
+- **Fixed** Quick Access Panel rendering issues with conditional display
+
+### Layout Stability Improvements ✅
+- **Fixed** Dashboard layout shift on initial load
+- **Fixed** White borders flash on dashboard content
+- **Optimized** SSR/client render consistency
+- **Removed** unnecessary padding from react-modal-sheet scroller
+- **Improved** initial state handling to prevent content pop-in
+
+### Bottom Sheet Migration to react-modal-sheet ✅
+- **Replaced** custom gesture implementation with react-modal-sheet v4.4.0
+- **Fixed** React hydration mismatches with SSR guards
+- **Fixed** snap points ordering (now properly converts to descending order)
+- **Removed** legacy feature flags and duplicate implementations
+- **Added** BottomSheetClient for dynamic import option
+- **Maintained** backward-compatible API
+
+### Testing react-modal-sheet Integration
+```bash
+# Run bottom sheet specific tests
+npm test -- BottomSheet
+
+# Check SSR and hydration
+npm test -- hydration
+npm test -- ssr
+
+# Verify gesture handling
+npm test -- sheet-scroll
+```
 
 ### Dashboard Implementation ✅
 - **SearchBar**: Search input with voice assistant and menu
@@ -503,57 +522,15 @@ git add src/ && git commit -m "feat: implement marker clustering"
   - **Cover**: Featured collection covers (placeholder)
   - **RD**: Advertiser cards (placeholder)
 
-### Icon Positioning Fix ✅
-**Problem**: Icons were stretching to fill 24x24 containers
-**Solution**: Icons maintain natural aspect ratios and padding
-- Each icon uses its exact viewBox from Figma (e.g., 19x19 for search)
-- Icons wrapped in fixed-size container divs
-- Container centers icons using flexbox
-- Original padding/margins preserved from designs
+### Icon System Implementation ✅
+- Icons maintain natural aspect ratios from Figma designs
+- Each icon centered in fixed-size container (default 24x24)
+- Original padding/margins preserved
 
-### Story Components Implementation ✅
-**StoryItem Component**:
-- Exact Figma dimensions: 96x112px content with 4px padding
-- Background image with gradient overlay for text readability
-- White text label (11px, semibold, -0.176px tracking)
-- Viewed state: 2px green border (#1BA136)
-- Active state: Scale transform animation (95%)
+### Story Components ✅
+- **StoryItem**: 96x112px with gradient overlay, viewed state border
+- **StoriesPanel**: Horizontal scroll with fade gradients
 
-**StoriesPanel Component**:
-- Horizontal scrolling with hidden scrollbar
-- Fade gradients on left/right edges
-- 8px gap between stories
-- 16px padding from container edges
-
-### Double Border Fix ✅
-**Problem**: Clicking stories created overlapping focus rings and borders
-**Solution**: Consolidated border styling using inset box-shadow
-- Removed separate border div element
-- Used `focus-visible` for keyboard-only focus indication
-- Viewed state uses `box-shadow: inset 0 0 0 2px #1BA136` for inside border
-- Clean visual hierarchy without conflicts
-
-### Gesture Fixes ✅
-
-### Position Jump & Flickering Issues - FIXED ✅
-**Problem**: Curtain jumped to extreme positions (10%/90%) on initial touch
-**Root Cause**: Position calculation used `snapPoint` instead of actual visual position
-**Solution**: Added `startPosition` tracking in gesture state
-
-```typescript
-// FIXED: Track actual position when gesture starts
-gestureState.current.startPosition = state.position; // Not snapPoint!
-let newPosition = gestureState.current.startPosition + deltaPercent;
-```
-
-### Direction Inversion Conflict - FIXED ✅
-**Problem**: Upward drag caused flickering, downward drag locked to 90%
-**Root Cause**: `handleScrollGesture` logic conflicted with direct drag gestures
-**Solution**: Replaced scroll gesture logic with direct drag control for content touches
-
-### Gesture State Corruption - FIXED ✅
-**Problem**: Rapid gestures caused unresponsive or stuck states
-**Solution**: Improved state synchronization and cleanup
 
 ### Advice Section Implementation ✅
 **Complete Advice Section with 2-Column Masonry Layout** (from Figma node 162-220899):
@@ -588,43 +565,42 @@ let newPosition = gestureState.current.startPosition + deltaPercent;
 - Active states: scale-95 transform on press
 - Masonry algorithm places items in shorter column dynamically
 
-## 🚨 Critical Debugging - Gesture Issues
+## 🔧 Recent Updates (January 2025)
 
-### Position Jumps
-```javascript
-// Check if startPosition is tracked correctly
-console.log('Gesture start:', gestureState.current.startPosition, 'vs snap:', state.snapPoint)
+### Screen Management System ✅
+- **Added** ScreenManager context for navigation between screens
+- **Implemented** Dashboard, SearchSuggestions, and SearchResults screens
+- **Created** ScreenRenderer with smooth transitions between screens
+- **Added** Back navigation button when not on dashboard
+- **Integrated** SearchBar as sticky header across all screens
+- **Fixed** Quick Access Panel rendering issues with conditional display
 
-// Verify smooth position progression  
-console.log('Position delta:', newPosition - gestureState.current.startPosition)
-```
+### Layout Stability Improvements ✅
+- **Fixed** Dashboard layout shift on initial load
+- **Fixed** White borders flash on dashboard content
+- **Optimized** SSR/client render consistency
+- **Removed** unnecessary padding from react-modal-sheet scroller
+- **Improved** initial state handling to prevent content pop-in
 
-### Direction Issues
-```javascript
-// Verify drag direction matches intent
-const deltaY = gestureState.current.startY - touch.clientY;
-console.log('Delta:', deltaY, 'Direction:', deltaY > 0 ? 'UP/EXPAND' : 'DOWN/COLLAPSE')
-```
+### Bottom Sheet Migration to react-modal-sheet ✅
+- **Replaced** custom gesture implementation with react-modal-sheet v4.4.0
+- **Fixed** React hydration mismatches with SSR guards
+- **Fixed** snap points ordering (now properly converts to descending order)
+- **Removed** legacy feature flags and duplicate implementations
+- **Added** BottomSheetClient for dynamic import option
+- **Maintained** backward-compatible API
 
-### Flickering/Unresponsive
-```javascript
-// Check for state conflicts
-console.log('isDragging:', state.isDragging, 'isActive:', gestureState.current.isActive)
-
-// Verify content scroll priority
-console.log('Expanded:', isExpanded, 'Can scroll:', canContentScroll(scrollDirection))
-```
-
-### Testing Gesture Fixes
+### Testing react-modal-sheet Integration
 ```bash
-# Run gesture-specific tests
-npm test -- gesture-position-fixes.test.tsx
+# Run bottom sheet specific tests
+npm test -- BottomSheet
 
-# Check gesture performance
-npm test -- --testNamePattern="maintains 60fps"
+# Check SSR and hydration
+npm test -- hydration
+npm test -- ssr
 
-# Verify no regressions
-npm test -- __tests__/components/bottom-sheet/
+# Verify gesture handling
+npm test -- sheet-scroll
 ```
 
 # Marker errors?

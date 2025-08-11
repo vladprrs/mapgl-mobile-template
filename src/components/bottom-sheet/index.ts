@@ -1,3 +1,4 @@
+// Simple, direct export - no feature flags
 export { BottomSheet, type BottomSheetProps } from './BottomSheet';
-export { DragHandle } from './DragHandle';
-export { useBottomSheet, type UseBottomSheetOptions, type SnapPoint } from '@/hooks/useBottomSheet';
+export { BottomSheetClient } from './BottomSheetClient';
+export { BottomSheetWithDashboard } from './BottomSheetWithDashboard';

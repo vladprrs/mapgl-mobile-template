@@ -1,69 +1,20 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
-import { DragHandle } from '@/components/bottom-sheet/DragHandle';
+import { render } from '@testing-library/react';
+import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
 
-describe('DragHandle', () => {
+describe('DragHandle (inline in BottomSheet)', () => {
   it('renders with default styling', () => {
-    const { container } = render(<DragHandle />);
-    
-    const handle = container.firstChild as HTMLElement;
-    expect(handle).toHaveClass('flex', 'justify-center', 'py-2');
-    expect(handle).toHaveClass('cursor-grab');
-    
-    const bar = handle.querySelector('div');
-    expect(bar).toHaveClass('w-12', 'h-1', 'bg-gray-300', 'rounded-full');
+    const { getByTestId } = render(<BottomSheet><div /></BottomSheet>);
+    const handle = getByTestId('drag-handle');
+    expect(handle).toHaveClass('flex', 'justify-center', 'pt-1.5', 'pb-1.5');
+    // react-modal-sheet handles cursor styling internally
   });
 
-  it('shows dragging state', () => {
-    const { container } = render(<DragHandle isDragging={true} />);
-    
-    const handle = container.firstChild as HTMLElement;
-    expect(handle).toHaveClass('active:cursor-grabbing');
-    
-    const bar = handle.querySelector('div');
-    expect(bar).toHaveClass('bg-gray-500');
-  });
-
-  it('calls touch event handlers', () => {
-    const mockTouchStart = jest.fn();
-    const mockTouchMove = jest.fn();
-    const mockTouchEnd = jest.fn();
-    
-    const { container } = render(
-      <DragHandle
-        onTouchStart={mockTouchStart}
-        onTouchMove={mockTouchMove}
-        onTouchEnd={mockTouchEnd}
-      />
-    );
-    
-    const handle = container.firstChild as HTMLElement;
-    
-    fireEvent.touchStart(handle);
-    expect(mockTouchStart).toHaveBeenCalled();
-    
-    fireEvent.touchMove(handle);
-    expect(mockTouchMove).toHaveBeenCalled();
-    
-    fireEvent.touchEnd(handle);
-    expect(mockTouchEnd).toHaveBeenCalled();
-  });
-
-  it('calls mouse event handlers', () => {
-    const mockMouseDown = jest.fn();
-    
-    const { container } = render(<DragHandle onMouseDown={mockMouseDown} />);
-    
-    const handle = container.firstChild as HTMLElement;
-    
-    fireEvent.mouseDown(handle);
-    expect(mockMouseDown).toHaveBeenCalled();
-  });
-
-  it('has touch-action none for gesture handling', () => {
-    const { container } = render(<DragHandle />);
-    
-    const handle = container.firstChild as HTMLElement;
-    expect(handle.style.touchAction).toBe('none');
+  it('has proper sheet structure', () => {
+    const { getByTestId } = render(<BottomSheet><div /></BottomSheet>);
+    const sheet = getByTestId('bottom-sheet');
+    // react-modal-sheet handles touch-action internally
+    expect(sheet).toBeInTheDocument();
+    expect(sheet).toHaveClass('bg-white', 'rounded-t-2xl', 'shadow-2xl');
   });
 });

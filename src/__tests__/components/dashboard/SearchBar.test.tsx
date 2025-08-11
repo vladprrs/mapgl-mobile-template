@@ -26,12 +26,7 @@ describe('SearchBar', () => {
     expect(input).toBeInTheDocument();
   });
 
-  it('renders drag handle', () => {
-    const { container } = render(<SearchBar />);
-    
-    const dragHandle = container.querySelector('[data-drag-handle="true"]');
-    expect(dragHandle).toBeInTheDocument();
-  });
+  // Note: Drag handle removed from SearchBar as it's now provided by BottomSheet
 
   it('renders search icon', () => {
     render(<SearchBar />);

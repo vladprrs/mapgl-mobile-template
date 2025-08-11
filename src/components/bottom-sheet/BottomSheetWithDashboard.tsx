@@ -1,96 +1,129 @@
 'use client';
 
-import React from 'react';
-import { useBottomSheet, type UseBottomSheetOptions } from '@/hooks/useBottomSheet';
-import { SearchBar } from '@/components/dashboard';
+import React, { useState, useCallback } from 'react';
+import { BottomSheet } from './BottomSheet';
+import { SearchBar } from '@/components/dashboard/SearchBar';
+import { ScreenManagerProvider, ScreenRenderer, useScreenManager, ScreenType } from './screens';
+import { debugLog } from '@/lib/logging';
+import type { AdviceItem } from '@/components/dashboard/advice/types';
 
-interface BottomSheetWithDashboardProps extends UseBottomSheetOptions {
-  children: React.ReactNode;
+interface BottomSheetWithDashboardProps {
   className?: string;
+  snapPoints?: [number, number, number];
+  initialSnap?: number;
+  onSnapChange?: (snap: number) => void;
+  items?: AdviceItem[];
 }
 
-export function BottomSheetWithDashboard({
-  children,
+// Inner component that uses the ScreenManager context
+function BottomSheetContent({
   className = '',
   snapPoints = [10, 50, 90],
+  initialSnap,
   onSnapChange,
+  items,
 }: BottomSheetWithDashboardProps) {
-  const {
-    position,
-    isDragging,
-    isExpanded,
-    currentSheetState,
-    handleDragStart,
-    handleDragMove,
-    handleDragEnd,
-    sheetRef,
-    contentRef,
-  } = useBottomSheet({ snapPoints, onSnapChange });
+  const { screenState, navigateTo, navigateBack } = useScreenManager();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
 
-  const transform = `translateY(${100 - position}%)`;
+  const handleSearch = useCallback((query: string) => {
+    debugLog('Search query:', query);
+    setSearchQuery(query);
+    if (query.trim()) {
+      navigateTo(ScreenType.SEARCH_RESULTS, query);
+    }
+  }, [navigateTo]);
+
+  const handleSearchFocus = useCallback(() => {
+    setSearchFocused(true);
+    navigateTo(ScreenType.SEARCH_SUGGESTIONS, searchQuery);
+  }, [navigateTo, searchQuery]);
+
+  const handleSearchBlur = useCallback(() => {
+    setSearchFocused(false);
+    // Don't navigate away immediately to allow clicking on suggestions
+    setTimeout(() => {
+      if (!searchFocused && screenState.currentScreen === ScreenType.SEARCH_SUGGESTIONS && !searchQuery) {
+        navigateTo(ScreenType.DASHBOARD);
+      }
+    }, 200);
+  }, [navigateTo, screenState.currentScreen, searchQuery, searchFocused]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    if (screenState.currentScreen === ScreenType.SEARCH_SUGGESTIONS) {
+      // Update suggestions as user types
+      navigateTo(ScreenType.SEARCH_SUGGESTIONS, value);
+    }
+  }, [navigateTo, screenState.currentScreen]);
+
+  const handleMenuClick = useCallback(() => {
+    debugLog('Menu clicked');
+    // Could open a menu screen in the future
+  }, []);
+
+  const handleVoiceClick = useCallback(() => {
+    debugLog('Voice assistant clicked');
+    // Could trigger voice search
+  }, []);
+
+  const handleBackClick = useCallback(() => {
+    debugLog('Back clicked');
+    navigateBack();
+    setSearchQuery(''); // Clear search when going back
+  }, [navigateBack]);
+
+  // Show back button when not on dashboard
+  const showBackButton = screenState.currentScreen !== ScreenType.DASHBOARD;
 
   return (
-    <div
-      ref={sheetRef}
-      className={`
-        fixed inset-x-0 bottom-0 z-50
-        bg-white rounded-t-2xl shadow-2xl
-        transition-transform duration-300 ease-out
-        ${isDragging ? 'transition-none' : ''}
-        ${currentSheetState === 'expanded' ? 'shadow-3xl' : ''}
-        ${className}
-      `}
-      style={{
-        transform,
-        height: '100vh',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}
-      data-testid="bottom-sheet"
-      data-sheet-state={currentSheetState}
+    <BottomSheet
+      className={className}
+      snapPoints={snapPoints}
+      initialSnap={initialSnap}
+      onSnapChange={onSnapChange}
+      stickyHeader={
+        <div className="relative">
+          {/* Back button overlay */}
+          {showBackButton && (
+            <button
+              onClick={handleBackClick}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Back"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M12.5 15L7.5 10L12.5 5" stroke="#141414" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
+          
+          {/* SearchBar with padding adjustment for back button */}
+          <div className={showBackButton ? 'pl-12' : ''}>
+            <SearchBar
+              onSearch={handleSearch}
+              onMenuClick={handleMenuClick}
+              onVoiceClick={handleVoiceClick}
+              onFocus={handleSearchFocus}
+              onBlur={handleSearchBlur}
+              onChange={handleSearchChange}
+              value={searchQuery}
+              noTopRadius
+            />
+          </div>
+        </div>
+      }
     >
-      {/* Unified header: SearchBar contains the drag handle; keep it outside scroll area */}
-      <div
-        className="bg-white"
-        onTouchStart={(e) => {
-          const target = e.target as HTMLElement;
-          const isDragHandle = target.closest('[data-drag-handle]');
-          if (isDragHandle) {
-            handleDragStart(e.touches[0].clientY, 'touch');
-          }
-        }}
-        onTouchMove={(e) => {
-          if (isDragging) {
-            handleDragMove(e.touches[0].clientY);
-          }
-        }}
-        onTouchEnd={handleDragEnd}
-        onMouseDown={(e) => {
-          const target = e.target as HTMLElement;
-          const isDragHandle = target.closest('[data-drag-handle]');
-          if (isDragHandle) {
-            handleDragStart(e.clientY, 'drag');
-          }
-        }}
-      >
-        <SearchBar noTopRadius />
-      </div>
-
-      {/* Scrollable content area beneath the unified header */}
-      <div
-        ref={contentRef}
-        className={`h-full ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
-        data-testid="bottom-sheet-content"
-        data-scrollable={isExpanded ? 'true' : undefined}
-        style={{
-          scrollBehavior: 'smooth',
-          overscrollBehavior: isExpanded ? 'auto' : 'none',
-          touchAction: isExpanded ? 'auto' : 'none',
-        }}
-      >
-        {children}
-      </div>
-    </div>
+      <ScreenRenderer items={items} />
+    </BottomSheet>
   );
 }
 
-export type { BottomSheetWithDashboardProps };
+// Main component that provides the ScreenManager context
+export function BottomSheetWithDashboard(props: BottomSheetWithDashboardProps) {
+  return (
+    <ScreenManagerProvider initialScreen={ScreenType.DASHBOARD}>
+      <BottomSheetContent {...props} />
+    </ScreenManagerProvider>
+  );
+}

@@ -50,8 +50,9 @@ export function StoriesPanel({
   className = '',
 }: StoriesPanelProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // Initialize gradient visibility based on expected initial state
   const [showLeftGradient, setShowLeftGradient] = useState(false);
-  const [showRightGradient, setShowRightGradient] = useState(true);
+  const [showRightGradient, setShowRightGradient] = useState(stories.length > 3); // Only show if content overflows
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -78,26 +79,26 @@ export function StoriesPanel({
     <div className={`relative w-full ${className}`}>
       {/* Fade gradients - extend to edges for visual effect */}
       {showLeftGradient && (
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[var(--bg-muted)] via-[color-mix(in_srgb,var(--bg-muted)_50%,transparent)] to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#F1F1F1] via-[#F1F1F1]/50 to-transparent z-10 pointer-events-none" />
       )}
       {showRightGradient && (
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--bg-muted)] via-[color-mix(in_srgb,var(--bg-muted)_50%,transparent)] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#F1F1F1] via-[#F1F1F1]/50 to-transparent z-10 pointer-events-none" />
       )}
 
-      {/* Scrollable container */}
+      {/* Scrollable container - no padding as Dashboard already adds px-4 */}
       <div
         ref={scrollContainerRef}
         className="
           flex flex-row gap-2 
           overflow-x-auto
-          scroll-smooth
-          px-4
           [&::-webkit-scrollbar]:hidden
           [-ms-overflow-style:none]
           [scrollbar-width:none]
         "
         style={{
           WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-x',
+          scrollBehavior: 'auto',
         }}
       >
         {/* Story items */}
@@ -112,8 +113,7 @@ export function StoriesPanel({
           />
         ))}
 
-        {/* Right padding for scroll */}
-        <div className="w-4 shrink-0" aria-hidden="true" />
+        {/* No right padding needed as no horizontal padding */}
       </div>
     </div>
   );

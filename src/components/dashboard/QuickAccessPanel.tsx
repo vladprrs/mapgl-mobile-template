@@ -50,8 +50,9 @@ export function QuickAccessPanel({
   className = '',
 }: QuickAccessPanelProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // Initialize gradient visibility based on expected initial state
   const [showLeftGradient, setShowLeftGradient] = useState(false);
-  const [showRightGradient, setShowRightGradient] = useState(true);
+  const [showRightGradient, setShowRightGradient] = useState(actions.length > 3); // Only show if content overflows
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -91,7 +92,6 @@ export function QuickAccessPanel({
         className="
           flex flex-row gap-2 
           overflow-x-auto
-          scroll-smooth
           px-4
           [&::-webkit-scrollbar]:hidden
           [-ms-overflow-style:none]
@@ -99,56 +99,76 @@ export function QuickAccessPanel({
         "
         style={{
           WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-x',
+          scrollBehavior: 'auto',
         }}
       >
 
         {/* Buttons */}
-        {actions.map((action) => (
-          <button
-            key={action.id}
-            onClick={() => handleActionClick(action)}
-            className="
-              flex flex-row items-center gap-2
-              px-3.5 py-2.5
-              bg-gray-900/[0.06] rounded-lg
-              hover:bg-gray-900/[0.08]
-              active:bg-gray-900/[0.10]
-              transition-colors
-              shrink-0
-              group
-            "
-            aria-label={action.label || action.id}
-          >
-            {/* Icon - fixed 24x24 container */}
-            {action.icon && (
-              <div className="flex items-center justify-center w-6 h-6 text-gray-900">
-                {action.icon}
-              </div>
-            )}
+        {actions.map((action) => {
+          // Determine padding based on content (matches Figma exactly)
+          const hasIcon = !!action.icon;
+          const hasLabel = !!(action.label || action.sublabel);
+          const paddingClass = hasIcon && hasLabel 
+            ? "px-[9px] py-2.5" // Icon + label: 9px horizontal padding
+            : "px-3.5 py-2.5";   // Icon only or label only: 14px horizontal padding
+          
+          // Gap between icon and label (Figma: 5px)
+          const gapClass = hasIcon && hasLabel ? "gap-[5px]" : "";
+          
+          return (
+            <button
+              key={action.id}
+              onClick={() => handleActionClick(action)}
+              className={`
+                flex flex-row items-center
+                h-10
+                ${paddingClass}
+                ${gapClass}
+                bg-[rgba(20,20,20,0.06)] rounded-lg
+                hover:bg-[rgba(20,20,20,0.08)]
+                active:bg-[rgba(20,20,20,0.10)]
+                transition-colors
+                shrink-0
+              `}
+              aria-label={action.label || action.id}
+            >
+              {/* Icon container with special positioning for icon+label buttons */}
+              {action.icon && (
+                <div className={`
+                  flex items-center shrink-0
+                  ${hasLabel ? 'justify-end w-[23px] h-5' : 'justify-center w-6 h-6'}
+                `}>
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    {action.icon}
+                  </div>
+                </div>
+              )}
 
-            {/* Label(s) */}
-            {(action.label || action.sublabel) && (
-              <div className="flex flex-row items-center gap-1.5">
-                {action.label && (
-                  <span 
-                    className="text-[15px] font-medium leading-5 tracking-[-0.3px] whitespace-nowrap"
-                    style={{ color: action.labelColor || '#141414' }}
-                  >
-                    {action.label}
-                  </span>
-                )}
-                {action.sublabel && (
-                  <span 
-                    className="text-[15px] font-medium leading-5 tracking-[-0.3px] whitespace-nowrap"
-                    style={{ color: action.sublabelColor || '#141414' }}
-                  >
-                    {action.sublabel}
-                  </span>
-                )}
-              </div>
-            )}
-          </button>
-        ))}
+              {/* Label(s) - matches Figma text styling exactly */}
+              {(action.label || action.sublabel) && (
+                <div className="flex flex-row items-center gap-1.5">
+                  {action.label && (
+                    <span 
+                      className="text-[15px] font-medium leading-[20px] tracking-[-0.3px] whitespace-nowrap"
+                      style={{ color: action.labelColor || '#141414' }}
+                    >
+                      {action.label}
+                    </span>
+                  )}
+                  {action.sublabel && (
+                    <span 
+                      className="text-[15px] font-medium leading-[20px] tracking-[-0.3px] whitespace-nowrap"
+                      style={{ color: action.sublabelColor || '#141414' }}
+                    >
+                      {action.sublabel}
+                    </span>
+                  )}
+                </div>
+              )}
+            </button>
+          );
+        })}
 
         {/* Right padding for scroll */}
         <div className="w-4 shrink-0" aria-hidden="true" />
