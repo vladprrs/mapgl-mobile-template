@@ -176,7 +176,11 @@ export const BottomSheet = forwardRef<
         )}
         
         <Sheet.Content>
-          <Sheet.Scroller draggableAt="both" autoPadding>
+          <Sheet.Scroller 
+            draggableAt="both" 
+            autoPadding
+            disableScroll={snapPoints[snapPoints.length - 1 - currentSnapIndex] !== 90}
+          >
             <div data-testid="bottom-sheet-content">
               {children}
             </div>
