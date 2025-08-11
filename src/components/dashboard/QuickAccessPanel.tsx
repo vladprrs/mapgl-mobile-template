@@ -50,8 +50,9 @@ export function QuickAccessPanel({
   className = '',
 }: QuickAccessPanelProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // Initialize gradient visibility based on expected initial state
   const [showLeftGradient, setShowLeftGradient] = useState(false);
-  const [showRightGradient, setShowRightGradient] = useState(true);
+  const [showRightGradient, setShowRightGradient] = useState(actions.length > 3); // Only show if content overflows
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {

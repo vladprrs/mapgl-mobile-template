@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 import type { AdviceItem } from '@/components/dashboard/advice/types';
 
 export default function Home() {
-  const [devItems, setDevItems] = useState<AdviceItem[] | undefined>(undefined);
+  // Initialize with empty array instead of undefined to prevent layout shift
+  const [devItems, setDevItems] = useState<AdviceItem[]>([]);
 
   useEffect(() => {
     const shouldLoadDemoAdvice =

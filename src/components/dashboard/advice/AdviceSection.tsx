@@ -163,8 +163,8 @@ export function AdviceSection({
         </h2>
       </div>
 
-      {/* Cards container */}
-      <div>
+      {/* Cards container - add min-height to prevent layout shift */}
+      <div style={{ minHeight: items.length === 0 ? '200px' : 'auto' }}>
         {layout === 'mixed' ? (
           renderMixedLayout()
         ) : (
