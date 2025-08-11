@@ -92,7 +92,7 @@ describe('BottomSheet Scroll Interactions', () => {
     await waitFor(() => {
       // The sheet should now be in an expanded state where content can scroll
       // react-modal-sheet handles content scrolling internally
-      expect(content).toHaveClass('overflow-hidden');
+      expect(content).toHaveClass('h-full');
     });
   });
 
@@ -148,8 +148,8 @@ describe('BottomSheet Scroll Interactions', () => {
     const content = container.querySelector('[data-testid="bottom-sheet-content"]') as HTMLElement;
     expect(content).toBeInTheDocument();
 
-    // At default state (50%), content overflow is hidden, so overscroll is naturally prevented
-    expect(content).toHaveClass('overflow-hidden');
+    // At default state (50%), content has h-full class
+    expect(content).toHaveClass('h-full');
     
     // react-modal-sheet handles overscroll behavior internally
   });

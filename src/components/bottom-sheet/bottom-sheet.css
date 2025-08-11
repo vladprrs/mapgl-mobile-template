@@ -24,3 +24,18 @@
 [data-rsbs-root] {
   --rsbs-transition-duration: 260ms;
 }
+
+/* CRITICAL: Enhanced visibility to prevent sheet from seeming "lost" */
+.react-modal-sheet-container {
+  /* Stronger shadow for better edge visibility */
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+  /* Ensure sheet is always above other content */
+  z-index: 51 !important;
+}
+
+/* Make drag handle more prominent when sheet is collapsed */
+[data-sheet-state="collapsed"] .react-modal-sheet-drag-indicator {
+  background-color: rgba(20, 20, 20, 0.5) !important;
+  height: 4px !important;
+  width: 48px !important;
+}

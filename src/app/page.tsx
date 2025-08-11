@@ -2,8 +2,7 @@
 
 import { MapProvider } from '@/components/map/MapProvider';
 import { MapContainer } from '@/components/map/MapContainer';
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
-import { Dashboard } from '@/components/dashboard';
+import { BottomSheetWithDashboard } from '@/components/bottom-sheet/BottomSheetWithDashboard';
 import { useEffect, useState } from 'react';
 import type { AdviceItem } from '@/components/dashboard/advice/types';
 
@@ -26,11 +25,10 @@ export default function Home() {
     <MapProvider>
       <main className="relative w-full h-screen">
         <MapContainer />
-        <BottomSheet
+        <BottomSheetWithDashboard
           snapPoints={[10, 50, 90]}
-        >
-          <Dashboard items={devItems} showSearchBar={true} showQuickAccess={true} />
-        </BottomSheet>
+          items={devItems}
+        />
       </main>
     </MapProvider>
   );

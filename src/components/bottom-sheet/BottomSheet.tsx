@@ -7,6 +7,7 @@ import './bottom-sheet.css';
 export interface BottomSheetProps {
   className?: string;
   header?: React.ReactNode;
+  stickyHeader?: React.ReactNode;
   children?: React.ReactNode;
   snapPoints?: [number, number, number];
   initialSnap?: number;
@@ -20,6 +21,7 @@ export const BottomSheet = forwardRef<
   { 
     className = '', 
     header, 
+    stickyHeader,
     children, 
     snapPoints = [10, 50, 90],
     initialSnap,
@@ -29,16 +31,24 @@ export const BottomSheet = forwardRef<
 ) {
   // Only render the sheet after client-side hydration to prevent mismatches
   const [isMounted, setIsMounted] = useState(false);
-  const [isOpen, setOpen] = useState(true);
+  // CRITICAL: Sheet must ALWAYS remain open to prevent disappearing off-screen
+  // We handle "closing" by snapping to minimum position instead
+  const isOpen = true; // Always true - never allow complete closure
   const sheetRef = useRef<SheetRef | undefined>(undefined);
   
   // Convert percentage snap points to decimals for react-modal-sheet
   // IMPORTANT: react-modal-sheet expects snap points in DESCENDING order
   // Our API uses ascending order [10, 50, 90], so we need to reverse to [90, 50, 10]
   // Then convert to decimals [0.9, 0.5, 0.1]
+  // CRITICAL: Minimum snap point must NEVER be 0 or sheet becomes unreachable!
+  const MIN_SNAP_POINT = 0.1; // 10% minimum height - sheet always visible
   const sheetSnapPoints = [...snapPoints]
     .reverse() // Reverse to get descending order [90, 50, 10]
-    .map(p => parseFloat((p / 100).toFixed(2))); // Convert to decimals and fix precision
+    .map(p => {
+      const decimal = p / 100;
+      // Enforce minimum snap point to prevent sheet from disappearing
+      return parseFloat(Math.max(decimal, MIN_SNAP_POINT).toFixed(2));
+    });
   
   // Find initial snap index (accounting for reversed array)
   const initialSnapValue = initialSnap ?? snapPoints[1]; // Default to middle
@@ -83,46 +93,12 @@ export const BottomSheet = forwardRef<
   
   // Determine state for data attribute (based on original snap point values)
   const originalSnapIndex = snapPoints.length - 1 - currentSnapIndex;
-  const isExpanded = originalSnapIndex === snapPoints.length - 1;
   const stateLabel = originalSnapIndex === 0
     ? 'collapsed'
     : originalSnapIndex < snapPoints.length - 1
     ? 'half'
     : 'expanded';
   
-  // Add custom wheel handler for desktop support
-  useEffect(() => {
-    const handleWheel = (e: Event) => {
-      const wheelEvent = e as WheelEvent;
-      if (!sheetRef.current) return;
-      
-      // Ignore small movements
-      if (Math.abs(wheelEvent.deltaY) < 20) return;
-      
-      wheelEvent.preventDefault();
-      
-      // Determine direction: deltaY < 0 expands (scroll up), deltaY > 0 collapses (scroll down)
-      // Since array is reversed [90, 50, 10], lower index = more expanded
-      const shouldExpand = wheelEvent.deltaY < 0;
-      
-      if (shouldExpand && currentSnapIndex > 0) {
-        // To expand, we go to lower index (higher snap value)
-        sheetRef.current.snapTo(currentSnapIndex - 1);
-      } else if (!shouldExpand && currentSnapIndex < snapPoints.length - 1) {
-        // To collapse, we go to higher index (lower snap value)
-        sheetRef.current.snapTo(currentSnapIndex + 1);
-      }
-    };
-    
-    // Add wheel listener to the sheet container
-    const container = document.querySelector('[data-rsbs-root]');
-    if (container) {
-      container.addEventListener('wheel', handleWheel as EventListener, { passive: false });
-      return () => {
-        container.removeEventListener('wheel', handleWheel as EventListener);
-      };
-    }
-  }, [currentSnapIndex, snapPoints.length]);
   
   // Render placeholder during SSR to prevent hydration mismatch
   if (!isMounted) {
@@ -145,6 +121,11 @@ export const BottomSheet = forwardRef<
             {header}
           </div>
         )}
+        {stickyHeader && (
+          <div className="bg-white sticky top-0 z-10">
+            {stickyHeader}
+          </div>
+        )}
         <div className="overflow-hidden p-4" data-testid="bottom-sheet-content">
           {children}
         </div>
@@ -156,11 +137,19 @@ export const BottomSheet = forwardRef<
     <Sheet
       ref={sheetRef}
       isOpen={isOpen}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        // CRITICAL FIX: Never close the sheet, snap to minimum position instead
+        // This prevents the sheet from disappearing off-screen
+        const minSnapIndex = sheetSnapPoints.length - 1; // Last index is minimum position
+        sheetRef.current?.snapTo(minSnapIndex);
+      }}
       snapPoints={sheetSnapPoints}
       initialSnap={initialSnapIndex}
       onSnap={handleSnap}
       disableDrag={false}
+      // Make it harder to trigger close by increasing thresholds
+      dragCloseThreshold={0.9} // Must drag 90% off screen to trigger close (which we prevent)
+      dragVelocityThreshold={1000} // Require very fast swipe to trigger close
     >
       <Sheet.Container
         className={`bg-white rounded-t-2xl shadow-2xl ${className}`}
@@ -171,23 +160,33 @@ export const BottomSheet = forwardRef<
         }}
       >
         <Sheet.Header>
-          {/* Built-in drag handle */}
-          <div className="flex justify-center py-2" data-testid="drag-handle">
+          {/* Drag handle - 6px from top per Figma */}
+          <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle">
             <div className="w-12 h-1 rounded-full bg-gray-300" />
           </div>
+        </Sheet.Header>
+        
+        <Sheet.Content>
+          {/* Custom headers outside of Scroller */}
           {header && (
             <div className="bg-white" style={{ touchAction: 'manipulation' }}>
               {header}
             </div>
           )}
-        </Sheet.Header>
-        
-        <Sheet.Scroller
-          className={`${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
-          data-testid="bottom-sheet-content"
-        >
-          {children}
-        </Sheet.Scroller>
+          
+          {stickyHeader && (
+            <div className="bg-white sticky top-0 z-10">
+              {stickyHeader}
+            </div>
+          )}
+          
+          <Sheet.Scroller
+            className="h-full"
+            data-testid="bottom-sheet-content"
+          >
+            {children}
+          </Sheet.Scroller>
+        </Sheet.Content>
       </Sheet.Container>
     </Sheet>
   );
