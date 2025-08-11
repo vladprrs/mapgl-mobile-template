@@ -45,3 +45,12 @@
   height: 4px !important;
   width: 48px !important;
 }
+
+/* Indicate draggable state when collapsed */
+[data-sheet-state="collapsed"] [data-rsbs-scroll] {
+  cursor: grab !important;
+}
+
+[data-sheet-state="collapsed"] [data-rsbs-scroll]:active {
+  cursor: grabbing !important;
+}

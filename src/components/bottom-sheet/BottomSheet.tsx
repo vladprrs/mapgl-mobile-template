@@ -99,6 +99,9 @@ export const BottomSheet = forwardRef<
     ? 'half'
     : 'expanded';
   
+  // Disable scrolling only when collapsed to prioritize sheet expansion
+  const shouldDisableScroll = stateLabel === 'collapsed';
+  
   
   // Render placeholder during SSR to prevent hydration mismatch
   if (!isMounted) {
@@ -183,6 +186,8 @@ export const BottomSheet = forwardRef<
           <Sheet.Scroller
             className="h-full"
             data-testid="bottom-sheet-content"
+            draggableAt="both"
+            disableScroll={shouldDisableScroll}
           >
             {children}
           </Sheet.Scroller>
