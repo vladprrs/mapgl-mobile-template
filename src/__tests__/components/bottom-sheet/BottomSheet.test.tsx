@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
@@ -34,7 +33,7 @@ describe('BottomSheet', () => {
       </BottomSheet>
     );
 
-    const dragHandle = container.querySelector('.cursor-grab');
+    const dragHandle = container.querySelector('[data-testid="drag-handle"]');
     expect(dragHandle).toBeInTheDocument();
   });
 
@@ -56,8 +55,8 @@ describe('BottomSheet', () => {
       </BottomSheet>
     );
 
-    const sheet = container.firstChild as HTMLElement;
-    expect(sheet).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'z-50');
+    const sheet = container.querySelector('[data-testid="bottom-sheet"]') as HTMLElement;
+    // react-modal-sheet handles positioning internally
     expect(sheet).toHaveClass('bg-white', 'rounded-t-2xl', 'shadow-2xl');
   });
 
@@ -70,8 +69,8 @@ describe('BottomSheet', () => {
       </BottomSheet>
     );
 
-    // onSnapChange is called on snap; initial mount should not call it
-    expect(mockOnSnapChange).not.toHaveBeenCalled();
+    // react-modal-sheet calls onSnapChange on initial mount with initialSnap
+    expect(mockOnSnapChange).toHaveBeenCalledWith(50);
   });
 
   it('accepts custom snap points', () => {
@@ -81,7 +80,7 @@ describe('BottomSheet', () => {
         <div>Content</div>
       </BottomSheet>
     );
-    const sheet = container.querySelector('.fixed') as HTMLElement;
+    const sheet = container.querySelector('[data-testid="bottom-sheet"]') as HTMLElement;
     expect(sheet).toBeInTheDocument();
   });
 
@@ -97,7 +96,7 @@ describe('BottomSheet', () => {
         </BottomSheet>
       );
 
-      const contentArea = container.querySelector('div[class*="px-4"]');
+      const contentArea = container.querySelector('[data-testid="bottom-sheet-content"]');
       expect(contentArea).toBeInTheDocument();
       
       // Verify handlers are available in hook return
@@ -113,7 +112,7 @@ describe('BottomSheet', () => {
         </BottomSheet>
       );
 
-      const sheet = container.firstChild as HTMLElement;
+      const sheet = container.querySelector('[data-testid="bottom-sheet"]') as HTMLElement;
       expect(sheet).toHaveAttribute('data-sheet-state', 'half'); // New default state
     });
 
@@ -124,7 +123,7 @@ describe('BottomSheet', () => {
         </BottomSheet>
       );
 
-      const contentArea = container.querySelector('div[class*="px-4"]') as HTMLElement;
+      const contentArea = container.querySelector('[data-testid="bottom-sheet-content"]') as HTMLElement;
       expect(contentArea).toBeInTheDocument();
     });
 
@@ -135,9 +134,9 @@ describe('BottomSheet', () => {
         </BottomSheet>
       );
 
-      const contentArea = container.querySelector('div[class*="px-4"]') as HTMLElement;
+      const contentArea = container.querySelector('[data-testid="bottom-sheet-content"]') as HTMLElement;
       expect(contentArea).toBeInTheDocument();
-      expect(contentArea.style.touchAction).toBe('none');
+      // react-modal-sheet handles touch-action internally
     });
 
     it('handles content touch events', () => {
@@ -147,7 +146,7 @@ describe('BottomSheet', () => {
         </BottomSheet>
       );
 
-      const contentArea = container.querySelector('div[class*="px-4"]') as HTMLElement;
+      const contentArea = container.querySelector('[data-testid="bottom-sheet-content"]') as HTMLElement;
       
       // Test that event handlers are properly attached
       expect(contentArea).toBeInTheDocument();
@@ -166,7 +165,7 @@ describe('BottomSheet', () => {
           <div>Content</div>
         </BottomSheet>
       );
-      const sheet = container.firstChild as HTMLElement;
+      const sheet = container.querySelector('[data-testid="bottom-sheet"]') as HTMLElement;
       expect(sheet).toHaveAttribute('data-sheet-state', 'half');
     });
 

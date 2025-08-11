@@ -7,12 +7,14 @@ describe('DragHandle (inline in BottomSheet)', () => {
     const { getByTestId } = render(<BottomSheet><div /></BottomSheet>);
     const handle = getByTestId('drag-handle');
     expect(handle).toHaveClass('flex', 'justify-center', 'py-2');
-    expect(handle).toHaveClass('cursor-grab');
+    // react-modal-sheet handles cursor styling internally
   });
 
-  it('has touch-action none on the sheet wrapper', () => {
+  it('has proper sheet structure', () => {
     const { getByTestId } = render(<BottomSheet><div /></BottomSheet>);
-    const sheet = getByTestId('bottom-sheet') as HTMLElement;
-    expect(sheet.style.touchAction).toBe('none');
+    const sheet = getByTestId('bottom-sheet');
+    // react-modal-sheet handles touch-action internally
+    expect(sheet).toBeInTheDocument();
+    expect(sheet).toHaveClass('bg-white', 'rounded-t-2xl', 'shadow-2xl');
   });
 });

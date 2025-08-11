@@ -1,73 +1,141 @@
 'use client';
 
-import React from 'react';
-import { useBottomSheet, type BottomSheetOptions } from '@/hooks/useBottomSheet';
+import React, { useRef, useImperativeHandle, forwardRef, useCallback, useEffect, useState } from 'react';
+import { Sheet, SheetRef } from 'react-modal-sheet';
+import './bottom-sheet.css';
 
-export interface BottomSheetProps extends BottomSheetOptions {
+export interface BottomSheetProps {
   className?: string;
   header?: React.ReactNode;
   children?: React.ReactNode;
+  snapPoints?: [number, number, number];
+  initialSnap?: number;
+  onSnapChange?: (snap: number) => void;
 }
 
-export function BottomSheet({ className = '', header, children, ...opts }: BottomSheetProps) {
-  const { sheetRef, contentRef, isDragging, currentSnap, onHandlePointerDown } = useBottomSheet(opts);
-
-  const snaps = opts.snapPoints ?? [10, 50, 90];
-  const isExpanded = currentSnap >= Math.max(...snaps);
-  const stateLabel = currentSnap <= Math.min(...snaps)
+export const BottomSheet = forwardRef<
+  { snapTo: (snap: number) => void },
+  BottomSheetProps
+>(function BottomSheet(
+  { 
+    className = '', 
+    header, 
+    children, 
+    snapPoints = [10, 50, 90],
+    initialSnap,
+    onSnapChange
+  },
+  ref
+) {
+  const [isOpen, setOpen] = useState(true);
+  const sheetRef = useRef<SheetRef | undefined>(undefined);
+  
+  // Convert percentage snap points to decimals for react-modal-sheet
+  const sheetSnapPoints = snapPoints.map(p => p / 100);
+  
+  // Find initial snap index
+  const initialSnapIndex = initialSnap 
+    ? snapPoints.indexOf(initialSnap)
+    : 1; // Default to middle
+  
+  // Track current snap for state management
+  const [currentSnapIndex, setCurrentSnapIndex] = useState(initialSnapIndex);
+  
+  const handleSnap = useCallback((snapIndex: number) => {
+    setCurrentSnapIndex(snapIndex);
+    if (onSnapChange) {
+      onSnapChange(snapPoints[snapIndex]);
+    }
+  }, [snapPoints, onSnapChange]);
+  
+  // Expose snapTo method
+  useImperativeHandle(ref, () => ({
+    snapTo: (snapValue: number) => {
+      const index = snapPoints.indexOf(snapValue);
+      if (index !== -1 && sheetRef.current) {
+        sheetRef.current.snapTo(index);
+      }
+    }
+  }), [snapPoints]);
+  
+  // Determine state for data attribute
+  const isExpanded = currentSnapIndex === snapPoints.length - 1;
+  const stateLabel = currentSnapIndex === 0
     ? 'collapsed'
-    : currentSnap < Math.max(...snaps)
+    : currentSnapIndex < snapPoints.length - 1
     ? 'half'
     : 'expanded';
-
-  return (
-    <div
-      ref={sheetRef}
-      className={
-        `fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl ` +
-        `${isDragging ? 'transition-none' : 'transition-transform duration-300 ease-out'} ` +
-        `${className}`
+  
+  // Add custom wheel handler for desktop support
+  useEffect(() => {
+    const handleWheel = (e: Event) => {
+      const wheelEvent = e as WheelEvent;
+      if (!sheetRef.current) return;
+      
+      // Ignore small movements
+      if (Math.abs(wheelEvent.deltaY) < 20) return;
+      
+      wheelEvent.preventDefault();
+      
+      // Determine direction: deltaY < 0 expands, deltaY > 0 collapses
+      const shouldExpand = wheelEvent.deltaY < 0;
+      
+      if (shouldExpand && currentSnapIndex < snapPoints.length - 1) {
+        sheetRef.current.snapTo(currentSnapIndex + 1);
+      } else if (!shouldExpand && currentSnapIndex > 0) {
+        sheetRef.current.snapTo(currentSnapIndex - 1);
       }
-      style={{
-        transform: 'translateY(50%) translateZ(0)',
-        height: '100vh',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        willChange: 'transform',
-        contain: 'layout paint size',
-        backfaceVisibility: 'hidden',
-        touchAction: 'none',
-      }}
-      data-testid="bottom-sheet"
-      data-sheet-state={stateLabel}
+    };
+    
+    // Add wheel listener to the sheet container
+    const container = document.querySelector('[data-rsbs-root]');
+    if (container) {
+      container.addEventListener('wheel', handleWheel as EventListener, { passive: false });
+      return () => {
+        container.removeEventListener('wheel', handleWheel as EventListener);
+      };
+    }
+  }, [currentSnapIndex, snapPoints.length]);
+  
+  return (
+    <Sheet
+      ref={sheetRef}
+      isOpen={isOpen}
+      onClose={() => setOpen(false)}
+      snapPoints={sheetSnapPoints}
+      initialSnap={initialSnapIndex}
+      onSnap={handleSnap}
+      disableDrag={false}
     >
-      <div
-        data-testid="drag-handle"
-        onPointerDown={onHandlePointerDown}
-        className="flex justify-center py-2 cursor-grab active:cursor-grabbing"
-      >
-        <div className={`w-12 h-1 rounded-full ${isDragging ? 'bg-gray-500' : 'bg-gray-300'}`} />
-      </div>
-
-      {header && (
-        <div className="bg-white" style={{ touchAction: 'manipulation' }}>
-          {header}
-        </div>
-      )}
-
-      <div
-        ref={contentRef}
-        className={`h-full ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
-        data-testid="bottom-sheet-content"
+      <Sheet.Container
+        className={`bg-white rounded-t-2xl shadow-2xl ${className}`}
+        data-testid="bottom-sheet"
+        data-sheet-state={stateLabel}
         style={{
-          overscrollBehavior: isExpanded ? 'auto' : 'none',
-          touchAction: isExpanded ? 'pan-y' : 'none',
-          scrollBehavior: 'auto',
+          paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
-        {children}
-      </div>
-    </div>
+        <Sheet.Header>
+          {/* Built-in drag handle */}
+          <div className="flex justify-center py-2" data-testid="drag-handle">
+            <div className="w-12 h-1 rounded-full bg-gray-300" />
+          </div>
+          {header && (
+            <div className="bg-white" style={{ touchAction: 'manipulation' }}>
+              {header}
+            </div>
+          )}
+        </Sheet.Header>
+        
+        <Sheet.Scroller
+          className={`${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
+          data-testid="bottom-sheet-content"
+        >
+          {children}
+        </Sheet.Scroller>
+      </Sheet.Container>
+    </Sheet>
   );
-}
+});
 
 export default BottomSheet;

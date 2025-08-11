@@ -67,7 +67,7 @@ interface SheetComponent extends React.ForwardRefExoticComponent<any> {
 }
 
 const SheetBase = React.forwardRef<any, any>(
-  ({ children, onSnap, initialSnap, isOpen, ...props }, ref) => {
+  ({ children, onSnap, initialSnap, isOpen }, ref) => {
     React.useImperativeHandle(ref, () => ({
       snapTo: jest.fn(),
       y: { get: () => 0 },
@@ -83,7 +83,7 @@ const SheetBase = React.forwardRef<any, any>(
     if (!isOpen) return null;
     
     return (
-      <div data-testid="mocked-sheet" data-rsbs-root {...props}>
+      <div data-testid="mocked-sheet" data-rsbs-root>
         {children}
       </div>
     );
