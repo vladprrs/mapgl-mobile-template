@@ -37,18 +37,14 @@ export const BottomSheet = forwardRef<
   const sheetRef = useRef<SheetRef | undefined>(undefined);
   
   // Convert percentage snap points to decimals for react-modal-sheet
-  // IMPORTANT: react-modal-sheet expects snap points in DESCENDING order
-  // Our API uses ascending order [10, 50, 90], so we need to reverse to [90, 50, 10]
-  // Then convert to decimals [0.9, 0.5, 0.1]
-  // CRITICAL: Minimum snap point must NEVER be 0 or sheet becomes unreachable!
-  const MIN_SNAP_POINT = 0.1; // 10% minimum height - sheet always visible
-  const sheetSnapPoints = [...snapPoints]
-    .reverse() // Reverse to get descending order [90, 50, 10]
-    .map(p => {
-      const decimal = p / 100;
-      // Enforce minimum snap point to prevent sheet from disappearing
-      return parseFloat(Math.max(decimal, MIN_SNAP_POINT).toFixed(2));
-    });
+  // react-modal-sheet expects snap points where:
+  // - Values between 0-1 represent percentages (0.5 = 50% of sheet height)
+  // - Prefer using 1 for fully visible sheet (not 0.9)
+  // Our API: [10, 50, 90] -> react-modal-sheet: [0.9, 0.5, 0.1]
+  const sheetSnapPoints = snapPoints.map(p => {
+    // 90% visible = 0.9, 50% = 0.5, 10% = 0.1
+    return p / 100;
+  }).reverse(); // Reverse for descending order
   
   // Find initial snap index (accounting for reversed array)
   const initialSnapValue = initialSnap ?? snapPoints[1]; // Default to middle
@@ -160,33 +156,30 @@ export const BottomSheet = forwardRef<
         }}
       >
         <Sheet.Header>
-          {/* Drag handle - 6px from top per Figma */}
+          {/* Custom drag handle - 6px from top per Figma */}
           <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle">
             <div className="w-12 h-1 rounded-full bg-gray-300" />
           </div>
         </Sheet.Header>
         
+        {/* Custom headers outside of Sheet.Content */}
+        {header && (
+          <div className="bg-white" style={{ touchAction: 'manipulation' }}>
+            {header}
+          </div>
+        )}
+        
+        {stickyHeader && (
+          <div className="bg-white sticky top-0 z-10">
+            {stickyHeader}
+          </div>
+        )}
+        
         <Sheet.Content>
-          {/* Custom headers outside of Scroller */}
-          {header && (
-            <div className="bg-white" style={{ touchAction: 'manipulation' }}>
-              {header}
+          <Sheet.Scroller draggableAt="both" autoPadding>
+            <div data-testid="bottom-sheet-content">
+              {children}
             </div>
-          )}
-          
-          {stickyHeader && (
-            <div className="bg-white sticky top-0 z-10">
-              {stickyHeader}
-            </div>
-          )}
-          
-          <Sheet.Scroller
-            className="h-full"
-            data-testid="bottom-sheet-content"
-            draggableAt="both"
-            autoPadding
-          >
-            {children}
           </Sheet.Scroller>
         </Sheet.Content>
       </Sheet.Container>
