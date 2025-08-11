@@ -32,6 +32,7 @@ Mobile-first Next.js application that integrates 2GIS MapGL with a performant, g
 - **Framework**: Next.js 15 (App Router)
 - **UI**: React 19, TypeScript 5, Tailwind CSS 4
 - **Maps**: 2GIS MapGL (`@2gis/mapgl`)
+- **Bottom Sheet**: react-modal-sheet 4.4 (gesture-driven with snap points)
 - **Testing**: Jest 30 + Testing Library, Playwright for E2E
 - **Linting**: ESLint 9 + Next presets, Prettier via lint-staged
 
@@ -53,8 +54,9 @@ App layout (src/app/layout.tsx)
   - Communicates with `MapContainer` via a small bridge (`window.__setMapInstance(map)`).
 - **MapContainer** (`src/components/map/MapContainer.tsx`): Dynamically loads `@2gis/mapgl`, validates API key, and initializes the map using `MAP_CONFIG`.
 - **Bottom sheet**
-  - Presentational components: `BottomSheet`, `BottomSheetWithDashboard`
-  - Logic: `useBottomSheet` hook handles drag/touch/wheel gestures, velocity, snap logic, and content-scroll boundary handling.
+  - Main component: `BottomSheet` - uses react-modal-sheet for gesture handling
+  - Client-only wrapper: `BottomSheetClient` - prevents SSR hydration issues
+  - Legacy hook: `useBottomSheet` - minimal stub for backward compatibility
 - **Dashboard** (`src/components/dashboard`): Composed UI (SearchBar, QuickAccessPanel, StoriesPanel, AdviceSection with card types `MetaItem`, `MetaItemAd`, `Cover`, `Interesting`, `RD`).
 - **Configuration**
   - Env: `src/lib/config/env.ts` strongly validates `NEXT_PUBLIC_2GIS_API_KEY` and exposes getters.
@@ -73,15 +75,17 @@ src/
   app/                 # Next.js App Router entrypoints
     layout.tsx         # Global layout/viewport
     page.tsx           # Home: Map + BottomSheet + Dashboard
-    (removed) test-*/page.tsx    # Former dev/test demonstration pages
   components/
     bottom-sheet/      # BottomSheet components
+      BottomSheet.tsx  # Main sheet component using react-modal-sheet
+      BottomSheetClient.tsx # Dynamic import wrapper for SSR
+      bottom-sheet.css # Styles and overrides
+      types.ts         # TypeScript interfaces
     dashboard/         # Dashboard and blocks (advice, stories, search, quick actions)
     icons/             # Icon system
     map/               # MapProvider + MapContainer
-    // Example content components removed (were dev-only): LocationList.tsx, PlaceDetails.tsx
   hooks/
-    useBottomSheet.ts  # Gesture and snap logic for the sheet
+    useBottomSheet.ts  # Minimal stub for backward compatibility
     useMapGL.ts        # Map context hook + types
   lib/
     config/env.ts      # Env getters + validation
@@ -117,27 +121,18 @@ Create `.env.local` in the project root:
 ```bash
 NEXT_PUBLIC_2GIS_API_KEY=your_mapgl_api_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_USE_NEW_BOTTOM_SHEET=false  # Feature flag for bottom sheet implementation
 ```
 
 Get an API key: see 2GIS MapGL docs (`https://docs.2gis.com/en/mapgl/overview#how-to-get-an-api-key`).
 
-### Bottom Sheet Feature Flag
+### Bottom Sheet Implementation
 
-The application supports two bottom sheet implementations:
-- **Legacy** (default): Custom implementation using native gestures
-- **New**: react-modal-sheet based implementation with improved performance
-
-To switch between implementations, set the environment variable:
-```bash
-# Use legacy implementation (default)
-NEXT_PUBLIC_USE_NEW_BOTTOM_SHEET=false
-
-# Use new react-modal-sheet implementation
-NEXT_PUBLIC_USE_NEW_BOTTOM_SHEET=true
-```
-
-Both implementations maintain the same API and user experience. The new implementation is being gradually rolled out and can be instantly rolled back by changing the flag.
+The application uses react-modal-sheet for the bottom sheet component, providing:
+- Native-like gesture handling with snap points
+- Smooth 60fps animations
+- Proper scroll boundary detection
+- SSR-safe rendering with hydration support
+- Mobile-optimized touch and wheel event handling
 
 ### Run dev server
 
@@ -241,7 +236,15 @@ Example demos were previously under `src/app/test-*` routes but have been remove
   - Ensure `.env.local` has `NEXT_PUBLIC_2GIS_API_KEY`.
   - Restart dev server after adding env vars.
 - Bottom sheet scroll feels stuck
-  - In expanded state, content scroll takes priority; sheet only moves at clear boundaries or with deliberate gestures (see `useBottomSheet`).
+  - In expanded state (90%), content scroll takes priority
+  - Sheet only moves when content is at scroll boundaries
+  - This is expected behavior for mobile UX consistency
+- Snap points assertion error
+  - react-modal-sheet expects descending order [0.9, 0.5, 0.1]
+  - The component automatically converts from our API [10, 50, 90]
+- Hydration warnings
+  - Use `BottomSheetClient` for dynamic import if needed
+  - Component includes SSR placeholder to prevent mismatches
 - E2E tests time out
   - Verify dev server started; Playwright will launch it, but port conflicts can break tests.
   - Run `npx playwright install` if browsers are missing.
