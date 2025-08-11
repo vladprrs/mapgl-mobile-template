@@ -56,7 +56,7 @@ export function BottomSheet({ className = '', header, children, ...opts }: Botto
 
       <div
         ref={contentRef}
-        className={`h-full pb-4 ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
+        className={`h-full ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
         data-testid="bottom-sheet-content"
         style={{
           overscrollBehavior: isExpanded ? 'auto' : 'none',

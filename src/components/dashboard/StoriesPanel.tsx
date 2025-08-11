@@ -84,13 +84,12 @@ export function StoriesPanel({
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--bg-muted)] via-[color-mix(in_srgb,var(--bg-muted)_50%,transparent)] to-transparent z-10 pointer-events-none" />
       )}
 
-      {/* Scrollable container */}
+      {/* Scrollable container - no padding as Dashboard already adds px-4 */}
       <div
         ref={scrollContainerRef}
         className="
           flex flex-row gap-2 
           overflow-x-auto
-          px-4
           [&::-webkit-scrollbar]:hidden
           [-ms-overflow-style:none]
           [scrollbar-width:none]
@@ -113,8 +112,7 @@ export function StoriesPanel({
           />
         ))}
 
-        {/* Right padding for scroll */}
-        <div className="w-4 shrink-0" aria-hidden="true" />
+        {/* No right padding needed as no horizontal padding */}
       </div>
     </div>
   );

@@ -128,7 +128,7 @@ export const BottomSheet = forwardRef<
         </Sheet.Header>
         
         <Sheet.Scroller
-          className={`pb-4 ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
+          className={`${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
           data-testid="bottom-sheet-content"
           draggableAt="top"
         >

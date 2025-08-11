@@ -60,9 +60,9 @@ export function Dashboard({
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      {/* Search Bar: sticky only when not within sheet */}
+      {/* Search Bar: Figma spec - contained within header with pt-4 */}
       {effectiveShowSearchBar && (
-        <div className={withinSheet ? 'bg-white' : 'sticky top-0 z-20 bg-white'}>
+        <div className={`bg-white ${withinSheet ? '' : 'sticky top-0 z-20'}`}>
           <SearchBar
             onSearch={handleSearch}
             onMenuClick={handleMenuClick}
@@ -72,26 +72,27 @@ export function Dashboard({
         </div>
       )}
 
-      {/* Quick Access Panel: remains inside content flow; hidden by default within sheet */}
+      {/* Quick Access Panel: Figma spec - py-4 vertical padding */}
       {effectiveShowQuickAccess && (
-        <div className="bg-white pt-2 pb-4 border-b border-gray-100">
+        <div className="bg-white py-4">
           <QuickAccessPanel onActionClick={handleQuickAction} />
         </div>
       )}
 
-      {/* Stories Panel and subsequent blocks on muted background - edge-to-edge */}
-      <div className="flex-1" style={{ backgroundColor: 'var(--bg-muted)' }}>
-        {/* Stories Panel */}
-        <div className="pt-4 pb-4">
-          <StoriesPanel onStoryClick={handleStoryClick} />
+      {/* Stories Panel and subsequent blocks on muted background - Figma spec bg #F1F1F1 */}
+      <div className="flex-1 bg-[#f1f1f1]">
+        {/* Stories Panel - Figma spec: pt-4 pb-4 px-4 */}
+        <div className="pt-4 pb-4 px-4">
+          <StoriesPanel onStoryClick={handleStoryClick} className="w-full" />
         </div>
 
-        {/* Advice Section */}
-        <div className="pb-4">
+        {/* Advice Section - Figma spec: px-4 pb-[60px] */}
+        <div className="px-4 pb-[60px]">
           <AdviceSection 
             items={items ?? []}
             layout="mixed"
             onItemClick={handleAdviceClick}
+            className="w-full"
           />
         </div>
       </div>

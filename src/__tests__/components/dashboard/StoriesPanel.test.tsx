@@ -91,20 +91,20 @@ describe('StoriesPanel', () => {
     expect(scrollContainer).toHaveClass('gap-2');
   });
 
-  it('has proper padding', () => {
+  it('has no horizontal padding as Dashboard provides it', () => {
     render(<StoriesPanel stories={mockStories} />);
     
     const scrollContainer = screen.getAllByRole('button')[0].parentElement;
-    expect(scrollContainer).toHaveClass('px-4');
+    expect(scrollContainer).not.toHaveClass('px-4');
   });
 
-  it('includes right padding element for scroll', () => {
+  it('does not include right padding element', () => {
     render(<StoriesPanel stories={mockStories} />);
     
     const scrollContainer = screen.getAllByRole('button')[0].parentElement;
-    const rightPadding = scrollContainer?.lastElementChild;
+    const lastChild = scrollContainer?.lastElementChild;
     
-    expect(rightPadding).toHaveClass('w-4', 'shrink-0');
-    expect(rightPadding).toHaveAttribute('aria-hidden', 'true');
+    // Last child should be a story item, not padding
+    expect(lastChild?.tagName).toBe('BUTTON');
   });
 });

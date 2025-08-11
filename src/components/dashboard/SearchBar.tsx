@@ -37,9 +37,9 @@ export function SearchBar({
   };
 
   return (
-    <div className={`bg-white border-b border-gray-100 ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
-      {/* Search Bar Container - removed drag handle as it's provided by BottomSheet */}
-      <div className="flex flex-row items-start gap-3 px-4 py-3">
+    <div className={`bg-white ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
+      {/* Search Bar Container - Figma spec: pt-4 px-4, no bottom border */}
+      <div className="flex flex-row items-start gap-3 px-4 pt-4">
         {/* Search Input */}
         <div className="flex-1 min-w-0">
           <form onSubmit={handleSubmit}>
