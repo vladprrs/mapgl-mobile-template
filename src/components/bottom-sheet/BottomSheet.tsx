@@ -33,20 +33,28 @@ export const BottomSheet = forwardRef<
   const sheetRef = useRef<SheetRef | undefined>(undefined);
   
   // Convert percentage snap points to decimals for react-modal-sheet
-  const sheetSnapPoints = snapPoints.map(p => p / 100);
+  // IMPORTANT: react-modal-sheet expects snap points in DESCENDING order (from top)
+  // Our API uses ascending order (from bottom), so we need to reverse and invert
+  const sheetSnapPoints = snapPoints
+    .map(p => 1 - p / 100) // Convert to distance from top (invert)
+    .reverse(); // Reverse to get descending order
   
-  // Find initial snap index
-  const initialSnapIndex = initialSnap 
-    ? snapPoints.indexOf(initialSnap)
-    : 1; // Default to middle
+  // Find initial snap index (accounting for reversed array)
+  const initialSnapValue = initialSnap ?? snapPoints[1]; // Default to middle
+  const originalIndex = snapPoints.indexOf(initialSnapValue);
+  const initialSnapIndex = originalIndex !== -1 
+    ? snapPoints.length - 1 - originalIndex // Reverse the index
+    : snapPoints.length - 2; // Default to middle in reversed array
   
   // Track current snap for state management
   const [currentSnapIndex, setCurrentSnapIndex] = useState(initialSnapIndex);
   
   const handleSnap = useCallback((snapIndex: number) => {
     setCurrentSnapIndex(snapIndex);
+    // Convert back to original snap point value
+    const originalIndex = snapPoints.length - 1 - snapIndex;
     if (onSnapChange) {
-      onSnapChange(snapPoints[snapIndex]);
+      onSnapChange(snapPoints[originalIndex]);
     }
   }, [snapPoints, onSnapChange]);
   
@@ -55,25 +63,29 @@ export const BottomSheet = forwardRef<
     setIsMounted(true);
     // Call onSnapChange with initial value after mount
     if (onSnapChange) {
-      onSnapChange(snapPoints[initialSnapIndex ?? 1]);
+      const originalIndex = snapPoints.length - 1 - initialSnapIndex;
+      onSnapChange(snapPoints[originalIndex]);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Expose snapTo method
   useImperativeHandle(ref, () => ({
     snapTo: (snapValue: number) => {
-      const index = snapPoints.indexOf(snapValue);
-      if (index !== -1 && sheetRef.current) {
-        sheetRef.current.snapTo(index);
+      const originalIndex = snapPoints.indexOf(snapValue);
+      if (originalIndex !== -1 && sheetRef.current) {
+        // Convert to reversed index for react-modal-sheet
+        const reversedIndex = snapPoints.length - 1 - originalIndex;
+        sheetRef.current.snapTo(reversedIndex);
       }
     }
   }), [snapPoints]);
   
-  // Determine state for data attribute
-  const isExpanded = currentSnapIndex === snapPoints.length - 1;
-  const stateLabel = currentSnapIndex === 0
+  // Determine state for data attribute (based on original snap point values)
+  const originalSnapIndex = snapPoints.length - 1 - currentSnapIndex;
+  const isExpanded = originalSnapIndex === snapPoints.length - 1;
+  const stateLabel = originalSnapIndex === 0
     ? 'collapsed'
-    : currentSnapIndex < snapPoints.length - 1
+    : originalSnapIndex < snapPoints.length - 1
     ? 'half'
     : 'expanded';
   
@@ -89,12 +101,15 @@ export const BottomSheet = forwardRef<
       wheelEvent.preventDefault();
       
       // Determine direction: deltaY < 0 expands, deltaY > 0 collapses
+      // Note: Because snap points are reversed, we need to invert the navigation
       const shouldExpand = wheelEvent.deltaY < 0;
       
-      if (shouldExpand && currentSnapIndex < snapPoints.length - 1) {
-        sheetRef.current.snapTo(currentSnapIndex + 1);
-      } else if (!shouldExpand && currentSnapIndex > 0) {
+      if (shouldExpand && currentSnapIndex > 0) {
+        // To expand, we go to lower index (because array is reversed)
         sheetRef.current.snapTo(currentSnapIndex - 1);
+      } else if (!shouldExpand && currentSnapIndex < snapPoints.length - 1) {
+        // To collapse, we go to higher index (because array is reversed)
+        sheetRef.current.snapTo(currentSnapIndex + 1);
       }
     };
     
