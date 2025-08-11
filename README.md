@@ -256,7 +256,12 @@ Example demos were previously under `src/app/test-*` routes but have been remove
   - In expanded state (90%), content scroll takes priority
   - Sheet only moves when content is at scroll boundaries
   - This is expected behavior for mobile UX consistency
-- **Bottom sheet content scrolls instead of dragging on mobile**
+- **Bottom sheet content scrolls instead of dragging at 50% snap point**
+  - FIXED (Jan 2025): Added conditional `disableScroll` based on snap position
+  - Content now only scrolls when sheet is fully expanded (90%)
+  - At 10% and 50% positions, only dragging works (no content scrolling)
+  - This prevents the scroll/drag gesture conflict on touch devices
+- **Bottom sheet content scrolls instead of dragging on mobile (legacy issue)**
   - Check that `touchAction: "none"` is NOT set globally on body/html
   - Only the map container should have `touchAction: "none"`
   - Global touch-action blocks react-modal-sheet's gesture detection

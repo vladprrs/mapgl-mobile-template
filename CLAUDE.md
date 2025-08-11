@@ -485,9 +485,16 @@ git add src/ && git commit -m "feat: implement marker clustering"
 2. Check snap points are valid [10, 50, 90]
 3. For SSR issues, use BottomSheetClient component
 4. Test on actual mobile device for touch gestures
-5. If content scrolls instead of dragging: check touchAction isn't set globally
+5. If content scrolls instead of dragging: FIXED - Added conditional disableScroll based on snap position
 
 ## 🔧 Recent Updates (January 2025)
+
+### Critical Scroll/Drag Fix ✅
+- **Fixed** Bottom sheet content scrolling instead of dragging at 50% snap point
+- **Added** Conditional `disableScroll` prop to Sheet.Scroller based on current snap position
+- **Behavior**: Content now only scrolls when sheet is fully expanded (90%)
+- **At 10% and 50%**: Only dragging works, content scrolling is disabled
+- **Prevents** Scroll/drag gesture conflict on touch devices
 
 ### Critical Touch Action Fix ✅ 
 - **Fixed** Bottom sheet scroll vs drag detection on mobile devices
