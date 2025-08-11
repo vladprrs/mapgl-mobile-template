@@ -27,8 +27,9 @@ describe('BottomSheet SSR', () => {
       
       // Should not contain calculated pixel values
       expect(html).not.toMatch(/translateY\(\d+\.?\d*px\)/)
-      // react-modal-sheet handles positioning internally
-      expect(html).toContain('data-rsbs-root')
+      // Should contain the SSR placeholder with proper positioning
+      expect(html).toContain('fixed bottom-0')
+      expect(html).toContain('height:50vh')
     })
 
     it('should render consistent HTML structure', () => {

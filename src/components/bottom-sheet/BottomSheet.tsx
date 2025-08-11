@@ -27,6 +27,8 @@ export const BottomSheet = forwardRef<
   },
   ref
 ) {
+  // Only render the sheet after client-side hydration to prevent mismatches
+  const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setOpen] = useState(true);
   const sheetRef = useRef<SheetRef | undefined>(undefined);
   
@@ -48,6 +50,15 @@ export const BottomSheet = forwardRef<
     }
   }, [snapPoints, onSnapChange]);
   
+  // Ensure component only renders on client to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+    // Call onSnapChange with initial value after mount
+    if (onSnapChange) {
+      onSnapChange(snapPoints[initialSnapIndex ?? 1]);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Expose snapTo method
   useImperativeHandle(ref, () => ({
     snapTo: (snapValue: number) => {
@@ -97,6 +108,34 @@ export const BottomSheet = forwardRef<
     }
   }, [currentSnapIndex, snapPoints.length]);
   
+  // Render placeholder during SSR to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div 
+        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl z-50 ${className}`}
+        style={{
+          height: `${snapPoints[initialSnapIndex ?? 1]}vh`,
+          transform: 'translateY(0)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+        data-testid="bottom-sheet"
+        data-sheet-state={stateLabel}
+      >
+        <div className="flex justify-center py-2" data-testid="drag-handle">
+          <div className="w-12 h-1 rounded-full bg-gray-300" />
+        </div>
+        {header && (
+          <div className="bg-white" style={{ touchAction: 'manipulation' }}>
+            {header}
+          </div>
+        )}
+        <div className="overflow-hidden p-4" data-testid="bottom-sheet-content">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Sheet
       ref={sheetRef}
