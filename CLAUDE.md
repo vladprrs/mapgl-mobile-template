@@ -337,6 +337,9 @@ jest.mock('@/hooks/useBottomSheet', () => ({
 | **Marker creation TypeError** | Don't pass unsupported props like `label` to 2GIS markers |
 | **Snap points assertion error** | react-modal-sheet needs descending order - handled automatically |
 | **Bottom sheet not dragging** | Check react-modal-sheet is properly installed |
+| **Layout shift on initial load** | Initialize state with empty arrays instead of undefined; use hardcoded colors instead of CSS variables |
+| **White borders flash** | CSS overrides remove react-modal-sheet padding; ensure bottom-sheet.css is imported |
+| **Quick Access Panel height issue** | Use conditional rendering instead of animated height transitions |
 
 ## MCP Servers
 
@@ -469,6 +472,21 @@ git add src/ && git commit -m "feat: implement marker clustering"
 
 ## 🔧 Recent Updates (January 2025)
 
+### Screen Management System ✅
+- **Added** ScreenManager context for navigation between screens
+- **Implemented** Dashboard, SearchSuggestions, and SearchResults screens
+- **Created** ScreenRenderer with smooth transitions between screens
+- **Added** Back navigation button when not on dashboard
+- **Integrated** SearchBar as sticky header across all screens
+- **Fixed** Quick Access Panel rendering issues with conditional display
+
+### Layout Stability Improvements ✅
+- **Fixed** Dashboard layout shift on initial load
+- **Fixed** White borders flash on dashboard content
+- **Optimized** SSR/client render consistency
+- **Removed** unnecessary padding from react-modal-sheet scroller
+- **Improved** initial state handling to prevent content pop-in
+
 ### Bottom Sheet Migration to react-modal-sheet ✅
 - **Replaced** custom gesture implementation with react-modal-sheet v4.4.0
 - **Fixed** React hydration mismatches with SSR guards
@@ -548,6 +566,21 @@ npm test -- sheet-scroll
 - Masonry algorithm places items in shorter column dynamically
 
 ## 🔧 Recent Updates (January 2025)
+
+### Screen Management System ✅
+- **Added** ScreenManager context for navigation between screens
+- **Implemented** Dashboard, SearchSuggestions, and SearchResults screens
+- **Created** ScreenRenderer with smooth transitions between screens
+- **Added** Back navigation button when not on dashboard
+- **Integrated** SearchBar as sticky header across all screens
+- **Fixed** Quick Access Panel rendering issues with conditional display
+
+### Layout Stability Improvements ✅
+- **Fixed** Dashboard layout shift on initial load
+- **Fixed** White borders flash on dashboard content
+- **Optimized** SSR/client render consistency
+- **Removed** unnecessary padding from react-modal-sheet scroller
+- **Improved** initial state handling to prevent content pop-in
 
 ### Bottom Sheet Migration to react-modal-sheet ✅
 - **Replaced** custom gesture implementation with react-modal-sheet v4.4.0

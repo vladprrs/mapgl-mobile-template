@@ -33,6 +33,7 @@ Mobile-first Next.js application that integrates 2GIS MapGL with a performant, g
 - **UI**: React 19, TypeScript 5, Tailwind CSS 4
 - **Maps**: 2GIS MapGL (`@2gis/mapgl`)
 - **Bottom Sheet**: react-modal-sheet 4.4 (gesture-driven with snap points)
+- **Screen Management**: Custom context-based navigation system with smooth transitions
 - **Testing**: Jest 30 + Testing Library, Playwright for E2E
 - **Linting**: ESLint 9 + Next presets, Prettier via lint-staged
 
@@ -46,7 +47,12 @@ App layout (src/app/layout.tsx)
        └─ MapProvider (context)
             ├─ MapContainer (creates 2GIS Map)
             └─ BottomSheetWithDashboard
-                 └─ Dashboard (SearchBar, QuickAccessPanel, StoriesPanel, AdviceSection)
+                 └─ ScreenManager (navigation context)
+                      ├─ SearchBar (sticky header with back navigation)
+                      └─ ScreenRenderer
+                           ├─ Dashboard (default screen)
+                           ├─ SearchSuggestions
+                           └─ SearchResults
 ```
 
 - **App layout** (`src/app/layout.tsx`): Sets viewport meta, disables page scroll, and locks the app to the viewport for mobile UX.
@@ -56,6 +62,8 @@ App layout (src/app/layout.tsx)
 - **Bottom sheet**
   - Main component: `BottomSheet` - uses react-modal-sheet for gesture handling
   - Client-only wrapper: `BottomSheetClient` - prevents SSR hydration issues
+  - With Dashboard: `BottomSheetWithDashboard` - integrates screen management
+  - Screen Manager: Context-based navigation between dashboard, search suggestions, and results
   - Legacy hook: `useBottomSheet` - minimal stub for backward compatibility
 - **Dashboard** (`src/components/dashboard`): Composed UI (SearchBar, QuickAccessPanel, StoriesPanel, AdviceSection with card types `MetaItem`, `MetaItemAd`, `Cover`, `Interesting`, `RD`).
 - **Configuration**
@@ -79,10 +87,17 @@ src/
     bottom-sheet/      # BottomSheet components
       BottomSheet.tsx  # Main sheet component using react-modal-sheet
       BottomSheetClient.tsx # Dynamic import wrapper for SSR
+      BottomSheetWithDashboard.tsx # Integrated sheet with screen management
       bottom-sheet.css # Styles and overrides
-      types.ts         # TypeScript interfaces
+      screens/         # Screen management system
+        ScreenManagerContext.tsx # Navigation state management
+        ScreenRenderer.tsx # Screen switching with transitions
+        SearchSuggestions.tsx # Search suggestions screen
+        SearchResults.tsx # Search results screen
+        types.ts       # Screen types and interfaces
     dashboard/         # Dashboard and blocks (advice, stories, search, quick actions)
-    icons/             # Icon system
+      advice/          # Advice section components (MetaItem, Cover, RD, etc.)
+    icons/             # Icon system with Figma-extracted SVGs
     map/               # MapProvider + MapContainer
   hooks/
     useBottomSheet.ts  # Minimal stub for backward compatibility
@@ -90,6 +105,8 @@ src/
   lib/
     config/env.ts      # Env getters + validation
     mapgl/config.ts    # Map defaults and helpers
+    icons/             # Icon definitions and constants
+    logging.ts         # Debug logging utilities
   types/
     env.d.ts           # Env var typings
     mapgl.d.ts         # 2GIS MapGL global types
@@ -232,14 +249,20 @@ Example demos were previously under `src/app/test-*` routes but have been remove
 
 ## Troubleshooting
 
-- Map doesn’t load / errors in console
+- **Map doesn't load / errors in console**
   - Ensure `.env.local` has `NEXT_PUBLIC_2GIS_API_KEY`.
   - Restart dev server after adding env vars.
-- Bottom sheet scroll feels stuck
+- **Bottom sheet scroll feels stuck**
   - In expanded state (90%), content scroll takes priority
   - Sheet only moves when content is at scroll boundaries
   - This is expected behavior for mobile UX consistency
-- Snap points assertion error
+- **Layout shift on initial load**
+  - Fixed: CSS ensures consistent padding between SSR and client renders
+  - If persists, check for dynamic content loading in useEffect
+- **White borders flash on dashboard**
+  - Fixed: react-modal-sheet scroller padding removed via CSS overrides
+  - Ensure `bottom-sheet.css` is imported
+- **Snap points assertion error**
   - react-modal-sheet expects descending order [0.9, 0.5, 0.1]
   - The component automatically converts from our API [10, 50, 90]
 - Hydration warnings
