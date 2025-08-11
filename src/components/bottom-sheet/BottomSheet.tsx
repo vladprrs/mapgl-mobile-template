@@ -33,11 +33,12 @@ export const BottomSheet = forwardRef<
   const sheetRef = useRef<SheetRef | undefined>(undefined);
   
   // Convert percentage snap points to decimals for react-modal-sheet
-  // IMPORTANT: react-modal-sheet expects snap points in DESCENDING order (from top)
-  // Our API uses ascending order (from bottom), so we need to reverse and invert
-  const sheetSnapPoints = snapPoints
-    .map(p => 1 - p / 100) // Convert to distance from top (invert)
-    .reverse(); // Reverse to get descending order
+  // IMPORTANT: react-modal-sheet expects snap points in DESCENDING order
+  // Our API uses ascending order [10, 50, 90], so we need to reverse to [90, 50, 10]
+  // Then convert to decimals [0.9, 0.5, 0.1]
+  const sheetSnapPoints = [...snapPoints]
+    .reverse() // Reverse to get descending order [90, 50, 10]
+    .map(p => parseFloat((p / 100).toFixed(2))); // Convert to decimals and fix precision
   
   // Find initial snap index (accounting for reversed array)
   const initialSnapValue = initialSnap ?? snapPoints[1]; // Default to middle
@@ -100,15 +101,15 @@ export const BottomSheet = forwardRef<
       
       wheelEvent.preventDefault();
       
-      // Determine direction: deltaY < 0 expands, deltaY > 0 collapses
-      // Note: Because snap points are reversed, we need to invert the navigation
+      // Determine direction: deltaY < 0 expands (scroll up), deltaY > 0 collapses (scroll down)
+      // Since array is reversed [90, 50, 10], lower index = more expanded
       const shouldExpand = wheelEvent.deltaY < 0;
       
       if (shouldExpand && currentSnapIndex > 0) {
-        // To expand, we go to lower index (because array is reversed)
+        // To expand, we go to lower index (higher snap value)
         sheetRef.current.snapTo(currentSnapIndex - 1);
       } else if (!shouldExpand && currentSnapIndex < snapPoints.length - 1) {
-        // To collapse, we go to higher index (because array is reversed)
+        // To collapse, we go to higher index (lower snap value)
         sheetRef.current.snapTo(currentSnapIndex + 1);
       }
     };
