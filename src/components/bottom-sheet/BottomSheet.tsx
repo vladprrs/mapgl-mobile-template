@@ -126,7 +126,7 @@ export const BottomSheet = forwardRef<
             {stickyHeader}
           </div>
         )}
-        <div className="overflow-hidden p-4" data-testid="bottom-sheet-content">
+        <div className="overflow-hidden" data-testid="bottom-sheet-content">
           {children}
         </div>
       </div>

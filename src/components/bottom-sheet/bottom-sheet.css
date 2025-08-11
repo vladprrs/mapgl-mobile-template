@@ -20,6 +20,12 @@
   will-change: transform;
 }
 
+/* Fix initial padding-bottom flash */
+[data-rsbs-scroll] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 /* Match current animation timing */
 [data-rsbs-root] {
   --rsbs-transition-duration: 260ms;
