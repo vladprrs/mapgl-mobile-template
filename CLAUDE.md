@@ -337,6 +337,7 @@ jest.mock('@/hooks/useBottomSheet', () => ({
 | **Marker creation TypeError** | Don't pass unsupported props like `label` to 2GIS markers |
 | **Snap points assertion error** | react-modal-sheet needs descending order - handled automatically |
 | **Bottom sheet not dragging** | Check react-modal-sheet is properly installed |
+| **Bottom sheet content scrolls instead of dragging** | NEVER set `touchAction: "none"` globally on body/html - only on map container. Global touch-action blocks gesture libraries |
 | **Layout shift on initial load** | Initialize state with empty arrays instead of undefined; use hardcoded colors instead of CSS variables |
 | **White borders flash** | CSS overrides remove react-modal-sheet padding; ensure bottom-sheet.css is imported |
 | **Quick Access Panel height issue** | Use conditional rendering instead of animated height transitions |
@@ -424,9 +425,24 @@ See `/docs/figma-asset-workflow.md` for detailed workflow documentation.
 ## Mobile Optimization
 
 - **Viewport:** `viewport-fit=cover` for notches
-- **Touch:** `touch-action: none` on draggable elements
+- **Touch:** ⚠️ ONLY set `touch-action: none` on map container, NEVER globally
 - **Safe areas:** `padding-bottom: env(safe-area-inset-bottom)`
 - **Map settings:** `cooperativeGestures: false`, `pitch: 0`
+
+### Critical: Touch Action Scoping
+**NEVER** set `touchAction: "none"` globally on body or html elements. This blocks ALL touch gestures and breaks gesture-based libraries like react-modal-sheet.
+
+✅ **Correct**: Apply only to map container
+```tsx
+// MapContainer.tsx
+<div style={{ touchAction: 'none' }}> // Only for map
+```
+
+❌ **Wrong**: Global application
+```tsx
+// layout.tsx
+<body style={{ touchAction: 'none' }}> // Breaks gesture libraries!
+```
 
 ## Git Workflow
 
@@ -469,8 +485,15 @@ git add src/ && git commit -m "feat: implement marker clustering"
 2. Check snap points are valid [10, 50, 90]
 3. For SSR issues, use BottomSheetClient component
 4. Test on actual mobile device for touch gestures
+5. If content scrolls instead of dragging: check touchAction isn't set globally
 
 ## 🔧 Recent Updates (January 2025)
+
+### Critical Touch Action Fix ✅ 
+- **Fixed** Bottom sheet scroll vs drag detection on mobile devices
+- **Moved** `touchAction: "none"` from global body to map container only
+- **Resolved** Gesture conflict between react-modal-sheet and global touch blocking
+- **Important**: Never set touchAction globally - it breaks gesture libraries
 
 ### Screen Management System ✅
 - **Added** ScreenManager context for navigation between screens

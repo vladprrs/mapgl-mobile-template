@@ -256,6 +256,10 @@ Example demos were previously under `src/app/test-*` routes but have been remove
   - In expanded state (90%), content scroll takes priority
   - Sheet only moves when content is at scroll boundaries
   - This is expected behavior for mobile UX consistency
+- **Bottom sheet content scrolls instead of dragging on mobile**
+  - Check that `touchAction: "none"` is NOT set globally on body/html
+  - Only the map container should have `touchAction: "none"`
+  - Global touch-action blocks react-modal-sheet's gesture detection
 - **Layout shift on initial load**
   - Fixed: CSS ensures consistent padding between SSR and client renders
   - If persists, check for dynamic content loading in useEffect
@@ -265,10 +269,10 @@ Example demos were previously under `src/app/test-*` routes but have been remove
 - **Snap points assertion error**
   - react-modal-sheet expects descending order [0.9, 0.5, 0.1]
   - The component automatically converts from our API [10, 50, 90]
-- Hydration warnings
+- **Hydration warnings**
   - Use `BottomSheetClient` for dynamic import if needed
   - Component includes SSR placeholder to prevent mismatches
-- E2E tests time out
+- **E2E tests time out**
   - Verify dev server started; Playwright will launch it, but port conflicts can break tests.
   - Run `npx playwright install` if browsers are missing.
 
