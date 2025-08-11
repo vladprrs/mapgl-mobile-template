@@ -106,7 +106,14 @@ export function MapContainer({ className = '' }: MapContainerProps) {
       ref={containerRef}
       className={`w-full h-full ${className}`}
       data-testid="map-root"
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+      style={{ 
+        position: 'absolute', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0,
+        touchAction: 'none' // Preserve map gesture handling (pinch, pan, etc.)
+      }}
     />
   );
 }

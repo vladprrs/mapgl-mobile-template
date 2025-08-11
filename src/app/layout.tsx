@@ -34,7 +34,6 @@ export default function RootLayout({
           height: "100vh",
           width: "100vw",
           position: "fixed",
-          touchAction: "none",
         }}
       >
         {children}
