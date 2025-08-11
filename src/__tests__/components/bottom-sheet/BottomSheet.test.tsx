@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet';
+import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
 
 // Mock the hook with base functions
 const mockHandlers = {

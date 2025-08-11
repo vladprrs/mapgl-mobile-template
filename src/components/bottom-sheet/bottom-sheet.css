@@ -1,0 +1,26 @@
+/* Override react-modal-sheet defaults to match current styles */
+[data-rsbs-root] {
+  z-index: 50 !important;
+}
+
+[data-rsbs-overlay] {
+  z-index: 49 !important;
+}
+
+[data-rsbs-header] {
+  cursor: grab;
+}
+
+[data-rsbs-header]:active {
+  cursor: grabbing;
+}
+
+/* Ensure smooth animations */
+[data-rsbs-content] {
+  will-change: transform;
+}
+
+/* Match current animation timing */
+[data-rsbs-root] {
+  --rsbs-transition-duration: 260ms;
+}

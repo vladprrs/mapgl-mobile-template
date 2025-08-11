@@ -74,13 +74,13 @@ export function Dashboard({
 
       {/* Quick Access Panel: remains inside content flow; hidden by default within sheet */}
       {effectiveShowQuickAccess && (
-        <div className="bg-white pt-1 pb-4">
+        <div className="bg-white pt-2 pb-4 border-b border-gray-100">
           <QuickAccessPanel onActionClick={handleQuickAction} />
         </div>
       )}
 
-      {/* Stories Panel and subsequent blocks on muted background */}
-      <div style={{ backgroundColor: 'var(--bg-muted)' }}>
+      {/* Stories Panel and subsequent blocks on muted background - edge-to-edge */}
+      <div className="flex-1" style={{ backgroundColor: 'var(--bg-muted)' }}>
         {/* Stories Panel */}
         <div className="pt-4 pb-4">
           <StoriesPanel onStoryClick={handleStoryClick} />

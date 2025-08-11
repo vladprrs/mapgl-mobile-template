@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet'
+import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
 
 describe('BottomSheet', () => {
   const mockOnSnapChange = jest.fn()

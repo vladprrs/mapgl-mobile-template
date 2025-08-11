@@ -117,9 +117,27 @@ Create `.env.local` in the project root:
 ```bash
 NEXT_PUBLIC_2GIS_API_KEY=your_mapgl_api_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_USE_NEW_BOTTOM_SHEET=false  # Feature flag for bottom sheet implementation
 ```
 
 Get an API key: see 2GIS MapGL docs (`https://docs.2gis.com/en/mapgl/overview#how-to-get-an-api-key`).
+
+### Bottom Sheet Feature Flag
+
+The application supports two bottom sheet implementations:
+- **Legacy** (default): Custom implementation using native gestures
+- **New**: react-modal-sheet based implementation with improved performance
+
+To switch between implementations, set the environment variable:
+```bash
+# Use legacy implementation (default)
+NEXT_PUBLIC_USE_NEW_BOTTOM_SHEET=false
+
+# Use new react-modal-sheet implementation
+NEXT_PUBLIC_USE_NEW_BOTTOM_SHEET=true
+```
+
+Both implementations maintain the same API and user experience. The new implementation is being gradually rolled out and can be instantly rolled back by changing the flag.
 
 ### Run dev server
 
@@ -194,7 +212,7 @@ const Demo = () => {
 ### Bottom sheet
 
 ```tsx
-import { SimpleBottomSheet as BottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet'
+import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
 
 <BottomSheet snapPoints={[10, 50, 90]} onSnapChange={(s) => console.log(s)}>
   {/* your content */}

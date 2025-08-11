@@ -2,7 +2,7 @@
 
 import { MapProvider } from '@/components/map/MapProvider';
 import { MapContainer } from '@/components/map/MapContainer';
-import { SimpleBottomSheet } from '@/components/bottom-sheet/SimpleBottomSheet';
+import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
 import { Dashboard } from '@/components/dashboard';
 import { useEffect, useState } from 'react';
 import type { AdviceItem } from '@/components/dashboard/advice/types';
@@ -26,16 +26,11 @@ export default function Home() {
     <MapProvider>
       <main className="relative w-full h-screen">
         <MapContainer />
-        <SimpleBottomSheet
+        <BottomSheet
           snapPoints={[10, 50, 90]}
-          header={
-            <div className="bg-white">
-              {/* Keep header simple; Dashboard internal bars are disabled below */}
-            </div>
-          }
         >
-          <Dashboard items={devItems} showSearchBar={false} showQuickAccess={false} />
-        </SimpleBottomSheet>
+          <Dashboard items={devItems} showSearchBar={true} showQuickAccess={true} />
+        </BottomSheet>
       </main>
     </MapProvider>
   );

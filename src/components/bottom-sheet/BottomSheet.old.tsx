@@ -1,16 +1,16 @@
 'use client';
 
 import React from 'react';
-import { useSimpleBottomSheet, type SimpleSheetOptions } from '@/hooks/useSimpleBottomSheet';
+import { useBottomSheet, type BottomSheetOptions } from '@/hooks/useBottomSheet';
 
-export interface SimpleBottomSheetProps extends SimpleSheetOptions {
+export interface BottomSheetProps extends BottomSheetOptions {
   className?: string;
-  header?: React.ReactNode; // Optional header (e.g., SearchBar + QuickAccess)
-  children?: React.ReactNode; // Scrollable content
+  header?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-export function SimpleBottomSheet({ className = '', header, children, ...opts }: SimpleBottomSheetProps) {
-  const { sheetRef, contentRef, isDragging, currentSnap, onHandlePointerDown } = useSimpleBottomSheet(opts);
+export function BottomSheet({ className = '', header, children, ...opts }: BottomSheetProps) {
+  const { sheetRef, contentRef, isDragging, currentSnap, onHandlePointerDown } = useBottomSheet(opts);
 
   const snaps = opts.snapPoints ?? [10, 50, 90];
   const isExpanded = currentSnap >= Math.max(...snaps);
@@ -56,7 +56,7 @@ export function SimpleBottomSheet({ className = '', header, children, ...opts }:
 
       <div
         ref={contentRef}
-        className={`h-full px-4 pb-4 ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
+        className={`h-full pb-4 ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
         data-testid="bottom-sheet-content"
         style={{
           overscrollBehavior: isExpanded ? 'auto' : 'none',
@@ -70,6 +70,4 @@ export function SimpleBottomSheet({ className = '', header, children, ...opts }:
   );
 }
 
-export default SimpleBottomSheet;
-
-
+export default BottomSheet;

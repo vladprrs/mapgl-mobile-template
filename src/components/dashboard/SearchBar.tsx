@@ -37,17 +37,9 @@ export function SearchBar({
   };
 
   return (
-    <div className={`bg-white ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
-      {/* Drag Handle */}
-      <div 
-        className="flex items-center justify-center w-full pt-1.5 pb-1.5 cursor-grab active:cursor-grabbing"
-        data-drag-handle="true"
-      >
-        <div className="w-10 h-1 rounded-md pointer-events-none" style={{ backgroundColor: COLORS.DRAG_HANDLE }} />
-      </div>
-
-      {/* Search Bar Container */}
-      <div className="flex flex-row items-start gap-3 px-4 pb-3">
+    <div className={`bg-white border-b border-gray-100 ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
+      {/* Search Bar Container - removed drag handle as it's provided by BottomSheet */}
+      <div className="flex flex-row items-start gap-3 px-4 py-3">
         {/* Search Input */}
         <div className="flex-1 min-w-0">
           <form onSubmit={handleSubmit}>
