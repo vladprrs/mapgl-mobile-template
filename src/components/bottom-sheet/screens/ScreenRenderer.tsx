@@ -72,16 +72,12 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Quick Access Panel - only show on dashboard with fade transition */}
-      <div 
-        className={`bg-white overflow-hidden transition-all duration-300 ease-in-out ${
-          currentScreen === ScreenType.DASHBOARD 
-            ? 'pt-2 pb-4 opacity-100 max-h-20' 
-            : 'opacity-0 max-h-0'
-        }`}
-      >
-        <QuickAccessPanel onActionClick={handleQuickAction} />
-      </div>
+      {/* Quick Access Panel - only show on dashboard */}
+      {currentScreen === ScreenType.DASHBOARD && (
+        <div className="bg-white pt-2 pb-4 relative z-10">
+          <QuickAccessPanel onActionClick={handleQuickAction} />
+        </div>
+      )}
 
       {/* Screen content with smooth transition */}
       <div 
