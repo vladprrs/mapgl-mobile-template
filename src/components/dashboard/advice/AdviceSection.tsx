@@ -155,7 +155,14 @@ export function AdviceSection({
   };
 
   return (
-    <div className={`w-full ${className}`}>
+    <div 
+      className={`w-full ${className}`}
+      style={{
+        // Allow vertical drag gestures to pass through for bottom sheet dragging
+        // This matches the behavior of StoriesPanel which uses 'pan-x' for horizontal scroll
+        touchAction: 'pan-y',
+      }}
+    >
       {/* Section title - exact Figma specs */}
       <div className="pb-3">
         <h2 className="font-semibold text-[19px] leading-6 tracking-[-0.38px] text-[#141414]">

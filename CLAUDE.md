@@ -497,6 +497,13 @@ git add src/ && git commit -m "feat: implement marker clustering"
 
 ## 🔧 Recent Updates (January 2025)
 
+### Fixed Inconsistent Drag Behavior in Expanded State ✅
+- **Fixed** Advice section now allows sheet dragging when expanded (90%), matching stories behavior
+- **Implementation** Added `touchAction: 'pan-y'` to AdviceSection and Dashboard containers
+- **Behavior**: When at 90% snap and content is scrolled to top, dragging down on any content area pulls the sheet down
+- **Consistency**: Both StoriesPanel and AdviceSection now have consistent drag behavior
+- **Test page** available at `/test-drag-expanded` for verification
+
 ### Enhanced Draggable Area for Collapsed State ✅
 - **New Feature** When bottom sheet is collapsed (10% snap), the entire visible content area is now draggable
 - **Implementation** Extended Sheet.Header drag zone to include SearchBar when collapsed

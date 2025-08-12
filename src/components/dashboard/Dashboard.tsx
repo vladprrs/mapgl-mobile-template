@@ -80,7 +80,14 @@ export function Dashboard({
       )}
 
       {/* Stories Panel and subsequent blocks on muted background - Figma spec bg #F1F1F1 */}
-      <div className="flex-1 bg-[#f1f1f1]">
+      <div 
+        className="flex-1 bg-[#f1f1f1]"
+        style={{
+          // Allow vertical drag gestures to pass through for bottom sheet dragging
+          // This ensures consistent behavior across all dashboard content
+          touchAction: 'pan-y',
+        }}
+      >
         {/* Stories Panel - Figma spec: pt-4 pb-4 px-4 */}
         <div className="pt-4 pb-4 px-4">
           <StoriesPanel onStoryClick={handleStoryClick} className="w-full" />
