@@ -30,14 +30,7 @@ export function SearchResults({
 
   if (searchResults.length === 0) {
     return (
-      <div 
-        className={`flex flex-col items-center justify-center py-12 ${className}`}
-        style={{ 
-          backgroundColor: '#F1F1F1',
-          border: 'none',
-          margin: 0,
-        }}
-      >
+      <div className={`flex flex-col items-center justify-center py-12 ${className}`}>
         <Icon name={ICONS.SEARCH} size={48} color={COLORS.TEXT_SECONDARY} />
         <p className="mt-4 text-gray-500">No results found for &ldquo;{query}&rdquo;</p>
         <p className="mt-1 text-sm text-gray-400">Try searching for something else</p>
@@ -46,24 +39,8 @@ export function SearchResults({
   }
 
   return (
-    <div 
-      className={`flex flex-col ${className}`}
-      style={{ 
-        backgroundColor: '#F1F1F1',
-        border: 'none',
-        margin: 0,
-        padding: 0,
-      }}
-    >
-      {/* Results list using new SearchResultCard component */}
-      <div 
-        className="flex flex-col gap-3 p-4"
-        style={{ 
-          backgroundColor: 'transparent',
-          border: 'none',
-        }}
-      >
-        {searchResults.map((result) => (
+    <div className={`flex flex-col gap-4 p-4 ${className}`}>
+      {searchResults.map((result) => (
           <SearchResultCard
             key={result.organization.id}
             variant={result.variant}
@@ -92,7 +69,6 @@ export function SearchResults({
             }}
           />
         ))}
-      </div>
     </div>
   );
 }
