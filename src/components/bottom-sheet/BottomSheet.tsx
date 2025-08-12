@@ -158,17 +158,37 @@ const BottomSheetComponent = forwardRef<
             style={{ 
               cursor: 'grab',
               backgroundColor: headerBackground,
+              // Remove any visual separation between header sections
+              margin: 0,
+              padding: 0,
             }}
             data-testid="drag-header-extended"
           >
             {/* Drag handle at top */}
-            <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle" style={{ backgroundColor: headerBackground }}>
+            <div 
+              className="flex justify-center pt-1.5 pb-1.5" 
+              data-testid="drag-handle" 
+              style={{ 
+                backgroundColor: headerBackground,
+                // Ensure no borders or edges
+                border: 'none',
+                margin: 0,
+              }}
+            >
               <div className="w-12 h-1 rounded-full bg-gray-300" />
             </div>
             
             {/* Include sticky header in drag area at ALL snap points */}
             {stickyHeader && (
-              <div className="pointer-events-none" style={{ backgroundColor: headerBackground }}>
+              <div 
+                className="pointer-events-none" 
+                style={{ 
+                  backgroundColor: headerBackground,
+                  // Ensure seamless connection
+                  marginTop: 0,
+                  border: 'none',
+                }}
+              >
                 <div className="pointer-events-auto">
                   {stickyHeader}
                 </div>
@@ -184,13 +204,14 @@ const BottomSheetComponent = forwardRef<
           </div>
         )}
         
-        <Sheet.Content>
+        <Sheet.Content style={{ border: 'none', margin: 0, padding: 0 }}>
           <Sheet.Scroller 
             draggableAt="both" 
             autoPadding
             disableScroll={snapPoints[snapPoints.length - 1 - currentSnapIndex] !== 90}
+            style={{ border: 'none', margin: 0 }}
           >
-            <div data-testid="bottom-sheet-content">
+            <div data-testid="bottom-sheet-content" style={{ border: 'none', margin: 0 }}>
               {children}
             </div>
           </Sheet.Scroller>

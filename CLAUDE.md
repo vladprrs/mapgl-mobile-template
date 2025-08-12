@@ -525,6 +525,18 @@ git add src/ && git commit -m "feat: implement marker clustering"
 
 ## 🔧 Recent Updates (January 2025)
 
+### Fixed Visual Borders on SearchResults Screen ✅
+- **Problem**: Unwanted gray lines/borders appearing between SearchBar and first search result card
+- **Root Cause**: Visual separation from padding and potential edge effects in react-modal-sheet components
+- **Solution**: Added explicit border removal and seamless background styling
+- **Implementation**:
+  - Removed all borders from Sheet.Header, Sheet.Content, and Sheet.Scroller
+  - Added CSS overrides to prevent react-modal-sheet from adding borders
+  - Ensured seamless background color transition between components
+  - Eliminated any pseudo-elements that could create visual lines
+- **Result**: Clean spacing between SearchBar and cards with no visible borders or dividers
+- **Test page**: Available at `/test-border-fix` for verification
+
 ### Fixed Bottom Sheet Manual Dragging with Automatic Transitions ✅
 - **Problem**: Manual dragging broke after adding automatic snap point adjustments for screen changes
 - **Root Cause**: Automatic snap effect was re-triggering on every render, conflicting with manual drags

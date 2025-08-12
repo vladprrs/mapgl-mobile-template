@@ -65,3 +65,29 @@
   position: relative;
   z-index: 1;
 }
+
+/* Remove any borders or dividers from react-modal-sheet components */
+[data-rsbs-header],
+[data-rsbs-content],
+[data-rsbs-scroll] {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  outline: none !important;
+}
+
+/* Ensure seamless background on SearchResults screen */
+[data-rsbs-header] > div,
+[data-rsbs-content] > div {
+  border: none !important;
+  margin: 0 !important;
+}
+
+/* Remove any box-shadow that might create visual lines */
+[data-rsbs-header]::after,
+[data-rsbs-header]::before,
+[data-rsbs-content]::after,
+[data-rsbs-content]::before {
+  content: none !important;
+  display: none !important;
+}
