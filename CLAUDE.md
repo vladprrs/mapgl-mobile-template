@@ -88,17 +88,16 @@ src/
 │   ├── mapgl/            # Map config & utilities
 │   ├── config/           # Environment config
 │   └── icons/            # Icon definitions and mappings
-└── __tests__/            # Component and hook tests
-    ├── components/
-    │   ├── bottom-sheet/  # BottomSheet test suite
-    │   ├── screen-manager/ # Screen manager tests
-    │   └── dashboard/     # Dashboard component tests
-    │       ├── advice/    # Advice component tests
-    │       ├── SearchBar.test.tsx
-    │       ├── QuickAccessPanel.test.tsx
-    │       ├── StoryItem.test.tsx
-    │       └── StoriesPanel.test.tsx
-    └── hooks/            # Hook test suite
+├── src/__tests__/        # Component tests (co-located with source)
+│   └── components/
+│       ├── bottom-sheet/  # BottomSheet tests
+│       └── dashboard/     # Dashboard component tests
+│           └── advice/    # Advice component tests
+└── __tests__/            # Integration and E2E tests
+    ├── integration/      # Integration test suite
+    ├── unit/            # Unit test suite
+    └── components/      # Additional component tests
+        └── screen-manager/ # Screen manager tests
 ```
 
 ## Critical Patterns

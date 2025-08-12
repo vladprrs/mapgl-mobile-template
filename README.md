@@ -46,7 +46,7 @@ App layout (src/app/layout.tsx)
   └─ Home page (src/app/page.tsx)
        └─ MapProvider (context)
             ├─ MapContainer (creates 2GIS Map)
-            └─ BottomSheetWithDashboard
+            └─ MobileMapShell (app-shell integration)
                  └─ ScreenManager (navigation context)
                       ├─ SearchBar (sticky header with back navigation)
                       └─ ScreenRenderer
@@ -59,12 +59,18 @@ App layout (src/app/layout.tsx)
 - **MapProvider** (`src/components/map/MapProvider.tsx`): React Context that exposes the 2GIS map instance and helpers: `addMarker`, `removeMarker`, `clearMarkers`, `centerOnLocation`, `centerOnMarker`.
   - Communicates with `MapContainer` via a small bridge (`window.__setMapInstance(map)`).
 - **MapContainer** (`src/components/map/MapContainer.tsx`): Dynamically loads `@2gis/mapgl`, validates API key, and initializes the map using `MAP_CONFIG`.
-- **Bottom sheet**
-  - Main component: `BottomSheet` - uses react-modal-sheet for gesture handling
-  - Client-only wrapper: `BottomSheetClient` - prevents SSR hydration issues
-  - With Dashboard: `BottomSheetWithDashboard` - integrates screen management
-  - Screen Manager: Context-based navigation between dashboard, search suggestions, and results
-  - Legacy hook: `useBottomSheet` - minimal stub for backward compatibility
+- **MobileMapShell** (`src/components/app-shell/MobileMapShell.tsx`): Main app integration component that combines:
+  - Bottom sheet with gesture handling (via react-modal-sheet)
+  - Screen management system
+  - Search bar with navigation
+  - Map center adjustments based on sheet position
+- **Bottom sheet** (`src/components/bottom-sheet`)
+  - `BottomSheet`: Main component using react-modal-sheet 4.4.0 for gesture handling
+  - `BottomSheetClient`: SSR-safe version available in same export
+  - All types consolidated in `BottomSheet.types.ts`
+- **Screen Manager** (`src/components/screen-manager`): Separate navigation system for screens within the sheet
+  - Context-based navigation between Dashboard, SearchSuggestions, and SearchResults
+  - Smooth transitions and back navigation support
 - **Dashboard** (`src/components/dashboard`): Composed UI (SearchBar, QuickAccessPanel, StoriesPanel, AdviceSection with card types `MetaItem`, `MetaItemAd`, `Cover`, `Interesting`, `RD`).
 - **Configuration**
   - Env: `src/lib/config/env.ts` strongly validates `NEXT_PUBLIC_2GIS_API_KEY` and exposes getters.
@@ -73,7 +79,8 @@ App layout (src/app/layout.tsx)
 ### Data flow & state management
 
 - Map state and operations are provided via React Context (`useMapGL`).
-- Bottom sheet state is local to the sheet via `useBottomSheet`.
+- Bottom sheet state is managed internally by react-modal-sheet.
+- Screen navigation state is managed by ScreenManager context.
 - No backend/API calls in this template; all demo data is local.
 
 ## Directory structure
@@ -82,25 +89,28 @@ App layout (src/app/layout.tsx)
 src/
   app/                 # Next.js App Router entrypoints
     layout.tsx         # Global layout/viewport
-    page.tsx           # Home: Map + BottomSheet + Dashboard
+    page.tsx           # Home: Map + MobileMapShell
   components/
-    bottom-sheet/      # BottomSheet components
-      BottomSheet.tsx  # Main sheet component using react-modal-sheet
-      BottomSheetClient.tsx # Dynamic import wrapper for SSR
-      BottomSheetWithDashboard.tsx # Integrated sheet with screen management
+    app-shell/         # Main app integration
+      MobileMapShell.tsx # Integrated map + bottom sheet + screens
+      index.ts         # Exports
+    bottom-sheet/      # Core bottom sheet component
+      BottomSheet.tsx  # Main sheet component (includes SSR handling)
+      BottomSheet.types.ts # All bottom sheet types
       bottom-sheet.css # Styles and overrides
-      screens/         # Screen management system
-        ScreenManagerContext.tsx # Navigation state management
-        ScreenRenderer.tsx # Screen switching with transitions
-        SearchSuggestions.tsx # Search suggestions screen
-        SearchResults.tsx # Search results screen
-        types.ts       # Screen types and interfaces
+      index.ts         # Clean exports
+    screen-manager/    # Screen navigation system
+      ScreenManagerContext.tsx # Navigation state management
+      ScreenRenderer.tsx # Screen switching logic
+      SearchSuggestions.tsx # Search suggestions screen
+      SearchResults.tsx # Search results screen
+      types.ts         # Screen types and interfaces
+      index.ts         # Exports
     dashboard/         # Dashboard and blocks (advice, stories, search, quick actions)
       advice/          # Advice section components (MetaItem, Cover, RD, etc.)
     icons/             # Icon system with Figma-extracted SVGs
     map/               # MapProvider + MapContainer
   hooks/
-    useBottomSheet.ts  # Minimal stub for backward compatibility
     useMapGL.ts        # Map context hook + types
   lib/
     config/env.ts      # Env getters + validation
@@ -114,8 +124,17 @@ src/
 public/
   assets/...           # Static images and SVGs used by dashboard blocks
 
-__tests__/
-  unit/ integration/ e2e/ performance/  # Jest + Playwright tests
+src/__tests__/         # Component tests (co-located with source)
+  components/
+    bottom-sheet/      # BottomSheet tests
+    dashboard/         # Dashboard component tests
+      advice/          # Advice component tests
+
+__tests__/             # Integration and E2E tests
+  integration/         # Integration test suite
+  unit/               # Unit test suite
+  components/
+    screen-manager/    # Screen manager tests
 ```
 
 ## Getting started
@@ -224,11 +243,26 @@ const Demo = () => {
 ### Bottom sheet
 
 ```tsx
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
+import { BottomSheet } from '@/components/bottom-sheet'
 
 <BottomSheet snapPoints={[10, 50, 90]} onSnapChange={(s) => console.log(s)}>
   {/* your content */}
 </BottomSheet>
+
+// For SSR issues, use BottomSheetClient
+import { BottomSheetClient } from '@/components/bottom-sheet'
+```
+
+### Mobile App Shell (Main Integration)
+
+```tsx
+import { MobileMapShell } from '@/components/app-shell'
+import { MapProvider, MapContainer } from '@/components/map'
+
+<MapProvider>
+  <MapContainer />
+  <MobileMapShell snapPoints={[10, 50, 90]} items={adviceItems} />
+</MapProvider>
 ```
 
 ### Dashboard
@@ -238,8 +272,6 @@ import { Dashboard } from '@/components/dashboard'
 
 <Dashboard onSearch={(q) => console.log('search:', q)} />
 ```
-
-Example demos were previously under `src/app/test-*` routes but have been removed for production readiness.
 
 ## Accessibility, performance, and styling
 
