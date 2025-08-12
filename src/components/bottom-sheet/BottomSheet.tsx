@@ -186,10 +186,13 @@ const BottomSheetComponent = forwardRef<
                   backgroundColor: headerBackground,
                   // Ensure seamless connection
                   marginTop: 0,
+                  marginBottom: 0,
                   border: 'none',
+                  borderBottom: 'none',
+                  paddingBottom: 0,
                 }}
               >
-                <div className="pointer-events-auto">
+                <div className="pointer-events-auto" style={{ border: 'none', margin: 0 }}>
                   {stickyHeader}
                 </div>
               </div>

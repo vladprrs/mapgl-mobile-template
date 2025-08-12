@@ -91,3 +91,27 @@
   content: none !important;
   display: none !important;
 }
+
+/* Specific rules for SearchResults screen to ensure clean layout */
+[data-sheet-state="half"] [data-rsbs-header],
+[data-sheet-state="half"] [data-rsbs-content] {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Remove any potential divider lines between header and content */
+[data-rsbs-header] + [data-rsbs-content] {
+  margin-top: 0 !important;
+  border-top: none !important;
+}
+
+/* Ensure SearchBar on results screen has no bottom border */
+.bg-\[\#F1F1F1\] {
+  border-bottom: none !important;
+}
+
+/* Clean transitions between sections */
+[data-rsbs-header] > * {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
