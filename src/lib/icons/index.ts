@@ -8,6 +8,7 @@ export const ICONS = {
   // UI Icons
   SEARCH: 'search',
   MENU: 'menu',
+  CLOSE: 'close',
   
   // Navigation Icons
   HOME: 'home',

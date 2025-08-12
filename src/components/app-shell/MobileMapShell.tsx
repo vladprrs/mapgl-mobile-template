@@ -86,6 +86,12 @@ function MobileMapShellContent({
     setSearchQuery(''); // Clear search when going back
   }, [navigateBack]);
 
+  const handleClearSearch = useCallback(() => {
+    debugLog('Clear search clicked');
+    setSearchQuery('');
+    navigateTo(ScreenType.DASHBOARD);
+  }, [navigateTo]);
+
   const handleSnapChange = useCallback((snap: number) => {
     // Adjust map center to keep the same point visible
     if (previousSnapRef.current !== snap) {
@@ -104,8 +110,9 @@ function MobileMapShellContent({
     }
   }, [adjustCenterForBottomSheet, onSnapChange, map]);
 
-  // Show back button when not on dashboard
-  const showBackButton = screenState.currentScreen !== ScreenType.DASHBOARD;
+  // Determine if we're in suggestion/search mode
+  const isSearchMode = screenState.currentScreen === ScreenType.SEARCH_SUGGESTIONS || 
+                       screenState.currentScreen === ScreenType.SEARCH_RESULTS;
 
   return (
     <BottomSheet
@@ -115,8 +122,8 @@ function MobileMapShellContent({
       onSnapChange={handleSnapChange}
       stickyHeader={
         <div className="relative">
-          {/* Back button overlay */}
-          {showBackButton && (
+          {/* Back button overlay - only show for search results */}
+          {screenState.currentScreen === ScreenType.SEARCH_RESULTS && (
             <button
               onClick={handleBackClick}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
@@ -128,8 +135,8 @@ function MobileMapShellContent({
             </button>
           )}
           
-          {/* SearchBar with padding adjustment for back button */}
-          <div className={showBackButton ? 'pl-12' : ''}>
+          {/* SearchBar with variant based on screen state */}
+          <div className={screenState.currentScreen === ScreenType.SEARCH_RESULTS ? 'pl-12' : ''}>
             <SearchBar
               onSearch={handleSearch}
               onMenuClick={handleMenuClick}
@@ -137,8 +144,10 @@ function MobileMapShellContent({
               onFocus={handleSearchFocus}
               onBlur={handleSearchBlur}
               onChange={handleSearchChange}
+              onClear={handleClearSearch}
               value={searchQuery}
               noTopRadius
+              variant={isSearchMode ? 'suggest' : 'dashboard'}
             />
           </div>
         </div>

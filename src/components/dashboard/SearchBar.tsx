@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Icon, ICONS, IMAGES, COLORS } from '@/components/icons';
 import Image from 'next/image';
 
+export type SearchBarVariant = 'dashboard' | 'suggest';
+
 interface SearchBarProps {
   placeholder?: string;
   onSearch?: (query: string) => void;
@@ -12,9 +14,11 @@ interface SearchBarProps {
   onFocus?: () => void;
   onBlur?: () => void;
   onChange?: (value: string) => void;
+  onClear?: () => void;
   value?: string;
   className?: string;
   noTopRadius?: boolean;
+  variant?: SearchBarVariant;
 }
 
 export function SearchBar({
@@ -25,9 +29,11 @@ export function SearchBar({
   onFocus,
   onBlur,
   onChange,
+  onClear,
   value: controlledValue,
   className = '',
   noTopRadius = false,
+  variant = 'dashboard',
 }: SearchBarProps) {
   const [internalValue, setInternalValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -123,9 +129,20 @@ export function SearchBar({
           </form>
         </div>
 
-        {/* Menu Button */}
+        {/* Menu/Clear Button */}
         <button
-          onClick={onMenuClick}
+          onClick={() => {
+            if (variant === 'suggest') {
+              // Clear the search and call onClear callback
+              if (controlledValue === undefined) {
+                setInternalValue('');
+              }
+              onChange?.('');
+              onClear?.();
+            } else {
+              onMenuClick?.();
+            }
+          }}
           className="
             flex items-center justify-center
             w-10 h-10 shrink-0
@@ -134,9 +151,13 @@ export function SearchBar({
             transition-opacity
           "
           style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
-          aria-label="Menu"
+          aria-label={variant === 'suggest' ? 'Clear search' : 'Menu'}
         >
-          <Icon name={ICONS.MENU} size={24} color={COLORS.TEXT_PRIMARY} />
+          <Icon 
+            name={variant === 'suggest' ? ICONS.CLOSE : ICONS.MENU} 
+            size={24} 
+            color={COLORS.TEXT_PRIMARY} 
+          />
         </button>
       </div>
     </div>

@@ -24,6 +24,7 @@ npm run build && npm start
 ## Test Pages (removed for production)
 
 - Former: `/test-stories`, `/test-advice`
+- Current: `/test-suggestions` - Test page for search suggestion rows
 
 ## Commands
 
@@ -58,6 +59,7 @@ src/
 │   │   ├── ScreenManagerContext.tsx  # Navigation state management
 │   │   ├── ScreenRenderer.tsx        # Screen switching logic
 │   │   ├── SearchSuggestions.tsx     # Search suggestions screen
+│   │   ├── SuggestRow.tsx            # Search suggestion row component (3 variants)
 │   │   ├── SearchResults.tsx         # Search results screen
 │   │   ├── types.ts       # Screen types and interfaces
 │   │   └── index.ts       # Exports
@@ -202,7 +204,10 @@ import { Dashboard } from '@/components/dashboard';
 - Integrated drag handle (6px from top edge)
 - Search input with icon
 - Voice assistant (Salut) button with actual Figma asset
-- Menu button
+- Two variants:
+  - `dashboard`: Menu burger icon on right
+  - `suggest`: X/Clear button on right (clears search and returns to dashboard)
+- Identical padding/spacing in both modes
 - Bottom padding creates 16px gap to next component
 
 #### QuickAccessPanel  
@@ -671,4 +676,95 @@ npm test -- sheet-scroll
 3. Verify coordinates are [lng, lat] format
 4. Check map instance exists before adding markers
 ```
+
+### SuggestRow Component ✅
+Search suggestion row component with three variants matching Figma designs:
+
+**Variants:**
+1. **Saved Address** (home/work icons)
+   - Shows saved locations with title, address, and distance
+   - Icons: Home or Work
+   
+2. **Organization** (search results)
+   - Shows business/organization with highlighted search match
+   - Bold text for matched query, gray for rest
+   
+3. **Category/Rubric** (category search)
+   - Shows category name with branch count
+   - Optional matched text highlighting
+
+**Usage:**
+```typescript
+import { SuggestRow, SuggestType } from '@/components/screen-manager';
+
+<SuggestRow
+  type={SuggestType.SAVED_ADDRESS}
+  title="Дом"
+  subtitle="Красный проспект, 49"
+  distance="5 км"
+  icon="home"
+  onClick={() => handleSelect()}
+/>
+
+<SuggestRow
+  type={SuggestType.ORGANIZATION}
+  title="МЕСТО, инвест-апарты"
+  subtitle="Красный проспект, 49"
+  highlightedText="МЕС"
+  onClick={() => handleSelect()}
+/>
+
+<SuggestRow
+  type={SuggestType.CATEGORY}
+  title="Аквапарки/Водные аттракционы"
+  branchCount="6 филиалов"
+  highlightedText="Места отдыха"
+  onClick={() => handleSelect()}
+/>
+```
+
+**Test Page:** `/test-suggestions`
+
+### SearchBar Component ✅
+Search bar component with two visual modes for different contexts:
+
+**Variants:**
+1. **Dashboard mode** (default)
+   - Shows menu burger icon on the right
+   - Used on the main dashboard screen
+   
+2. **Suggest mode** 
+   - Shows X/clear button on the right
+   - Used on search suggestions and results screens
+   - Clear button clears input and returns to dashboard
+
+**Usage:**
+```typescript
+import { SearchBar, SearchBarVariant } from '@/components/dashboard';
+
+// Dashboard mode (default)
+<SearchBar
+  onSearch={(query) => handleSearch(query)}
+  onMenuClick={() => openMenu()}
+  variant="dashboard"
+/>
+
+// Suggest mode with clear functionality
+<SearchBar
+  value={searchQuery}
+  onChange={(value) => setSearchQuery(value)}
+  onClear={() => {
+    setSearchQuery('');
+    navigateToDashboard();
+  }}
+  variant="suggest"
+/>
+```
+
+**Features:**
+- Identical padding and spacing in both modes
+- Smooth transitions between modes
+- Voice assistant button (Salut) in both modes
+- Focus/blur handling for search interactions
+- Controlled and uncontrolled value support
 ```
