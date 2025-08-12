@@ -72,11 +72,20 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
 
   // Determine background color based on screen
   const getBackgroundColor = () => {
-    return currentScreen === ScreenType.SEARCH_RESULTS ? 'bg-[#F1F1F1]' : 'bg-white';
+    return currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'transparent';
   };
 
   return (
-    <div className={`flex flex-col h-full ${getBackgroundColor()}`}>
+    <div 
+      className="flex flex-col h-full"
+      style={{ 
+        backgroundColor: getBackgroundColor(),
+        // Ensure no borders or visual separations
+        border: 'none',
+        margin: 0,
+        padding: 0,
+      }}
+    >
       {/* Quick Access Panel - only show on dashboard */}
       {currentScreen === ScreenType.DASHBOARD && (
         <div className="bg-white pt-2 pb-4 relative z-10">
@@ -89,6 +98,13 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
         className={`flex-1 transition-all duration-300 ease-in-out ${
           isTransitioning ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
         }`}
+        style={{
+          // Ensure the content area also has the correct background
+          backgroundColor: currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'transparent',
+          border: 'none',
+          margin: 0,
+          padding: 0,
+        }}
       >
         {renderScreen()}
       </div>
