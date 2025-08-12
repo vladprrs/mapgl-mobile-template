@@ -21,10 +21,9 @@ npm run test:coverage       # Check coverage
 npm run build && npm start
 ```
 
-## Test Pages (removed for production)
+## Test Pages
 
-- Former: `/test-stories`, `/test-advice`
-- Current: `/test-suggestions` - Test page for search suggestion rows
+All test pages have been removed. Testing should be done directly in the main application flow.
 
 ## Commands
 
@@ -43,9 +42,7 @@ npm run build && npm start
 src/
 ├── app/                    # Next.js app router
 │   ├── page.tsx           # Main app with MobileMapShell
-│   ├── layout.tsx         # Root layout with mobile optimization
-│   ├── test-stories/      # Story components test page
-│   └── test-advice/       # Advice components test page
+│   └── layout.tsx         # Root layout with mobile optimization
 ├── components/
 │   ├── app-shell/         # Main app integration
 │   │   ├── MobileMapShell.tsx  # Integrated map + bottom sheet + screens
@@ -535,7 +532,6 @@ git add src/ && git commit -m "feat: implement marker clustering"
   - Ensured seamless background color transition between components
   - Eliminated any pseudo-elements that could create visual lines
 - **Result**: Clean spacing between SearchBar and cards with no visible borders or dividers
-- **Test page**: Available at `/test-border-fix` for verification
 
 ### Fixed Bottom Sheet Manual Dragging with Automatic Transitions ✅
 - **Problem**: Manual dragging broke after adding automatic snap point adjustments for screen changes
@@ -550,7 +546,6 @@ git add src/ && git commit -m "feat: implement marker clustering"
   - Manually drag the sheet to any snap point (10%, 50%, 90%)
   - Automatic adjustments still work when switching screens
   - Manual dragging works even after automatic adjustments
-- **Test page**: Available at `/test-drag-fix` for verification
 
 ### SearchResults Screen Color Scheme Fix ✅
 - **Fixed** Entire SearchResults screen background to #F1F1F1
@@ -573,14 +568,12 @@ git add src/ && git commit -m "feat: implement marker clustering"
 - **Implementation** Added `touchAction: 'pan-y'` to AdviceSection and Dashboard containers
 - **Behavior**: When at 90% snap and content is scrolled to top, dragging down on any content area pulls the sheet down
 - **Consistency**: Both StoriesPanel and AdviceSection now have consistent drag behavior
-- **Test page** available at `/test-drag-expanded` for verification
 
 ### Fixed Excessive Spacing Between Components ✅
 - **Fixed** Removed excessive spacing between SearchBar and QuickAccessPanel 
 - **Issue** The `minHeight: 100px` on Sheet.Header drag zone was creating large gaps
 - **Solution** Removed minHeight constraint, allowing natural content sizing
 - **Result** Exact 16px spacing (8px from SearchBar bottom + 8px from QuickAccess top)
-- **Test page** available at `/test-spacing` for visual verification
 
 ### Universal Draggable Area at ALL Snap Points ✅
 - **Fixed** Extended drag area now works at ALL snap points (10%, 50%, 90%), not just collapsed state
@@ -590,7 +583,6 @@ git add src/ && git commit -m "feat: implement marker clustering"
   - At 50% snap: Drag from anywhere in the visible content (SearchBar, QuickAccess, Stories, etc.)
   - At 90% snap: Drag from anywhere when scrolled to top; normal scrolling when not at top
 - **Interactive elements** remain clickable (search input focus, buttons) through proper pointer-events management
-- **Test pages** available at `/test-drag-all` for comprehensive verification
 
 ### Critical Scroll/Drag Fix ✅
 - **Fixed** Bottom sheet content scrolling instead of dragging at 50% snap point
@@ -789,7 +781,6 @@ import { SuggestRow, SuggestType } from '@/components/screen-manager';
 />
 ```
 
-**Test Page:** `/test-suggestions`
 
 ### SearchBar Component ✅
 Search bar component with two visual modes for different contexts:
@@ -834,3 +825,20 @@ import { SearchBar, SearchBarVariant } from '@/components/dashboard';
 - Focus/blur handling for search interactions
 - Controlled and uncontrolled value support
 ```
+
+## Important Development Guidelines
+
+### Testing Approach
+**NEVER create test pages** (e.g., `/test-feature`, `/test-fix`, `/test-border-fix`, etc.)
+- Always test fixes directly in the main application flow
+- Use the development server (`npm run dev`) with the actual app
+- Test features in their real context within existing screens
+- Rely on git for rollback if changes need to be reverted
+- Test pages add unnecessary clutter to the project
+
+### Proper Testing Workflow
+1. Make changes to the actual components
+2. Test in the running application at `http://localhost:3000`
+3. Use existing screens and navigation to verify fixes
+4. Run automated tests with `npm test`
+5. If issues arise, use `git reset` or `git checkout` to revert
