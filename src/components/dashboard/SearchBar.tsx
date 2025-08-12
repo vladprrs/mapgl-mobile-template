@@ -75,7 +75,16 @@ export function SearchBar({
   const isResults = variant === 'results';
   
   return (
-    <div className={`${isResults ? 'bg-[#F1F1F1]' : 'bg-white'} ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
+    <div 
+      className={`${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}
+      style={{
+        backgroundColor: isResults ? '#F1F1F1' : 'white',
+        // Ensure no borders or visual separations
+        border: 'none',
+        borderTop: 'none',
+        borderBottom: 'none',
+        margin: 0,
+      }}>
       {/* Search Bar Container - 8px bottom padding for spacing to next element */}
       <div className="flex flex-row items-start gap-3 px-4 pb-2">
         {/* Search Input */}
