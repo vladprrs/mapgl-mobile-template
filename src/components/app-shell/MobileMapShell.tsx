@@ -172,9 +172,9 @@ function MobileMapShellContent({
     }
   };
 
-  // Determine header background based on screen
+  // Determine header background based on screen - match Figma exactly
   const getHeaderBackground = () => {
-    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
+    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? 'rgba(241, 241, 241, 0.7)' : 'white';
   };
 
   return (

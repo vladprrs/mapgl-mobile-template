@@ -107,9 +107,9 @@ const BottomSheetComponent = forwardRef<
       >
         <div className="flex justify-center py-2" data-testid="drag-handle">
           <div 
-            className="w-12 h-1 rounded-full" 
+            className="w-10 h-1 rounded-md" 
             style={{
-              backgroundColor: headerBackground === '#F1F1F1' ? 'transparent' : 'rgba(137, 137, 137, 0.25)',
+              backgroundColor: 'rgba(137, 137, 137, 0.25)',
             }}
           />
         </div>
@@ -149,15 +149,13 @@ const BottomSheetComponent = forwardRef<
       dragVelocityThreshold={1000} // Require very fast swipe to trigger close
     >
       <Sheet.Container
-        className={`bg-white ${className}`}
+        className={`bg-white rounded-t-2xl ${className}`}
         data-testid="bottom-sheet"
         data-sheet-state={stateLabel}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom)',
-          // Conditionally apply rounded corners and shadow
-          borderTopLeftRadius: headerBackground === '#F1F1F1' ? '0' : '16px',
-          borderTopRightRadius: headerBackground === '#F1F1F1' ? '0' : '16px',
-          boxShadow: headerBackground === '#F1F1F1' ? 'none' : '0 -10px 25px rgba(0, 0, 0, 0.15)',
+          // Always keep rounded corners as per Figma design
+          boxShadow: headerBackground?.includes('241') ? 'none' : '0 -10px 25px rgba(0, 0, 0, 0.15)',
         }}
       >
         <Sheet.Header>
@@ -167,6 +165,9 @@ const BottomSheetComponent = forwardRef<
             style={{ 
               cursor: 'grab',
               backgroundColor: headerBackground,
+              // Add blur effect for SearchResults screen
+              backdropFilter: headerBackground?.includes('241') ? 'blur(10px)' : 'none',
+              WebkitBackdropFilter: headerBackground?.includes('241') ? 'blur(10px)' : 'none',
               // Remove any visual separation between header sections
               margin: 0,
               padding: 0,
@@ -185,10 +186,10 @@ const BottomSheetComponent = forwardRef<
               }}
             >
               <div 
-                className="w-12 h-1 rounded-full" 
+                className="w-10 h-1 rounded-md" 
                 style={{
-                  // Hide drag handle on gray background (SearchResults)
-                  backgroundColor: headerBackground === '#F1F1F1' ? 'transparent' : 'rgba(137, 137, 137, 0.25)',
+                  // Drag handle should always be visible as per Figma
+                  backgroundColor: 'rgba(137, 137, 137, 0.25)',
                 }}
               />
             </div>

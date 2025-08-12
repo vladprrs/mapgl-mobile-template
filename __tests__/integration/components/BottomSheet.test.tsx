@@ -21,8 +21,8 @@ describe('BottomSheet', () => {
         </BottomSheet>
       )
 
-      // Check for drag handle by its visual indicator
-      const handle = container.querySelector('.w-12')
+      // Check for drag handle by its visual indicator (w-10 as per Figma)
+      const handle = container.querySelector('.w-10')
       expect(handle).toBeInTheDocument()
     })
 

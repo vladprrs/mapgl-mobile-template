@@ -76,16 +76,14 @@ export function SearchBar({
   
   return (
     <div 
-      className={`${noTopRadius || isResults ? '' : 'rounded-t-2xl'} ${className}`}
+      className={`${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}
       style={{
-        backgroundColor: isResults ? '#F1F1F1' : 'white',
+        backgroundColor: isResults ? 'transparent' : 'white',
         // Ensure no borders or visual separations
         border: 'none',
         borderTop: 'none',
         borderBottom: 'none',
         margin: 0,
-        // Remove any border radius on results screen
-        borderRadius: isResults ? '0' : undefined,
       }}>
       {/* Search Bar Container - 8px bottom padding for spacing to next element */}
       <div className="flex flex-row items-start gap-3 px-4 pb-2">
@@ -95,7 +93,7 @@ export function SearchBar({
             <div
               className={`
                 flex flex-row items-center gap-1.5 h-10 px-2
-                ${isResults ? 'bg-white' : 'bg-gray-900/[0.06]'} rounded-lg
+                bg-gray-900/[0.06] rounded-lg
                 transition-all duration-200
                 ${isFocused ? 'ring-2 ring-gray-900/20' : ''}
               `}

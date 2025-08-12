@@ -127,14 +127,7 @@
   border: none !important;
 }
 
-/* Ensure no rounded corners bleed through on SearchResults */
-[data-testid="drag-header-extended"][style*="F1F1F1"] {
-  border-radius: 0 !important;
-}
-
-[data-testid="drag-header-extended"][style*="F1F1F1"] * {
-  border-radius: 0 !important;
-}
+/* Keep rounded corners as per Figma design */
 
 /* Hide the container shadow completely on gray background */
 .react-modal-sheet-container {
