@@ -525,6 +525,21 @@ git add src/ && git commit -m "feat: implement marker clustering"
 
 ## 🔧 Recent Updates (January 2025)
 
+### Fixed Bottom Sheet Manual Dragging with Automatic Transitions ✅
+- **Problem**: Manual dragging broke after adding automatic snap point adjustments for screen changes
+- **Root Cause**: Automatic snap effect was re-triggering on every render, conflicting with manual drags
+- **Solution**: Track screen changes separately and only auto-snap when screen actually changes
+- **Implementation**:
+  - Added `previousScreenRef` to track actual screen transitions
+  - Added `isAutoSnappingRef` flag to distinguish automatic vs manual snaps
+  - Modified effect to only trigger on screen changes, not on snap changes
+  - Preserved both functionalities working together seamlessly
+- **Result**: Users can now:
+  - Manually drag the sheet to any snap point (10%, 50%, 90%)
+  - Automatic adjustments still work when switching screens
+  - Manual dragging works even after automatic adjustments
+- **Test page**: Available at `/test-drag-fix` for verification
+
 ### SearchResults Screen Color Scheme Fix ✅
 - **Fixed** Entire SearchResults screen background to #F1F1F1
 - **Added** `headerBackground` prop to BottomSheet for dynamic backgrounds

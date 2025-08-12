@@ -32,6 +32,8 @@ function MobileMapShellContent({
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
   const bottomSheetRef = useRef<BottomSheetRef>(null);
+  const previousScreenRef = useRef<ScreenType>(screenState.currentScreen);
+  const isAutoSnappingRef = useRef<boolean>(false);
   
   // Sync local search query with screen manager state
   useEffect(() => {
@@ -40,8 +42,15 @@ function MobileMapShellContent({
     }
   }, [screenState.searchQuery]);
   
-  // Automatically adjust snap point based on current screen
+  // Automatically adjust snap point ONLY when screen changes
   useEffect(() => {
+    // Only trigger automatic snap if the screen actually changed
+    if (previousScreenRef.current === screenState.currentScreen) {
+      return;
+    }
+    
+    previousScreenRef.current = screenState.currentScreen;
+    
     let targetSnap: number;
     
     switch (screenState.currentScreen) {
@@ -63,10 +72,11 @@ function MobileMapShellContent({
     // Only snap if the target is different from current position
     if (targetSnap !== currentSnap && bottomSheetRef.current) {
       debugLog(`Auto-adjusting snap point to ${targetSnap}% for ${screenState.currentScreen}`);
+      isAutoSnappingRef.current = true;
       bottomSheetRef.current.snapTo(targetSnap);
-      setCurrentSnap(targetSnap);
+      // Don't update currentSnap here - let handleSnapChange do it
     }
-  }, [screenState.currentScreen, currentSnap]);
+  }, [screenState.currentScreen, currentSnap]); // Include currentSnap but only use it for comparison
   
   // Execute pending adjustments when map becomes available
   useEffect(() => {
@@ -126,6 +136,12 @@ function MobileMapShellContent({
   const handleSnapChange = useCallback((snap: number) => {
     // Update current snap state
     setCurrentSnap(snap);
+    
+    // Check if this was an automatic snap (triggered by screen change)
+    if (isAutoSnappingRef.current) {
+      isAutoSnappingRef.current = false;
+      // For automatic snaps, we still want to adjust the map center
+    }
     
     // Adjust map center to keep the same point visible
     if (previousSnapRef.current !== snap) {

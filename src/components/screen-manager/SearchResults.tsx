@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { Icon, ICONS, COLORS } from '@/components/icons';
+import { SearchResultCard } from '@/components/search-results/SearchResultCard';
+import { mockSearchResults } from '@/__mocks__/search-results/organizations';
 
 interface SearchResult {
   id: string;
@@ -23,35 +25,10 @@ export function SearchResults({
   onSelectResult,
   className = '' 
 }: SearchResultsProps) {
-  // Mock results - replace with actual API call
-  const results: SearchResult[] = [
-    {
-      id: '1',
-      name: `${query} Restaurant`,
-      category: 'Restaurant',
-      address: 'Tverskaya Street, 1',
-      distance: '0.5 km',
-      rating: 4.5,
-    },
-    {
-      id: '2',
-      name: `${query} Cafe`,
-      category: 'Cafe',
-      address: 'Arbat Street, 15',
-      distance: '1.2 km',
-      rating: 4.2,
-    },
-    {
-      id: '3',
-      name: `${query} Shop`,
-      category: 'Shopping',
-      address: 'Red Square, 3',
-      distance: '2.0 km',
-      rating: 4.8,
-    },
-  ];
+  // Use mock data for now - replace with actual API call
+  const searchResults = mockSearchResults;
 
-  if (results.length === 0) {
+  if (searchResults.length === 0) {
     return (
       <div className={`flex flex-col items-center justify-center py-12 bg-[#F1F1F1] ${className}`}>
         <Icon name={ICONS.SEARCH} size={48} color={COLORS.TEXT_SECONDARY} />
@@ -63,51 +40,36 @@ export function SearchResults({
 
   return (
     <div className={`flex flex-col bg-[#F1F1F1] ${className}`}>
-      {/* Results list - no header, directly show results like SearchSuggestions */}
-      <div className="flex flex-col">
-        {results.map((result) => (
-          <button
-            key={result.id}
-            onClick={() => onSelectResult(result)}
-            className="flex items-start gap-3 px-4 py-4 bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors border-b border-gray-100"
-          >
-            {/* Location icon */}
-            <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg mt-1">
-              <Icon 
-                name={ICONS.LOCATION} 
-                size={20} 
-                color={COLORS.TEXT_SECONDARY} 
-              />
-            </div>
-            
-            {/* Result details */}
-            <div className="flex-1 text-left">
-              <h4 className="font-medium text-[15px] text-gray-900">
-                {result.name}
-              </h4>
-              <p className="text-sm text-gray-500 mt-0.5">
-                {result.category}
-              </p>
-              <p className="text-sm text-gray-400 mt-1">
-                {result.address}
-              </p>
-              
-              {/* Distance and rating */}
-              <div className="flex items-center gap-3 mt-2">
-                {result.distance && (
-                  <span className="text-xs text-gray-500">
-                    {result.distance}
-                  </span>
-                )}
-                {result.rating && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs text-yellow-600">★</span>
-                    <span className="text-xs text-gray-600">{result.rating}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </button>
+      {/* Results list using new SearchResultCard component */}
+      <div className="flex flex-col gap-3 p-4">
+        {searchResults.map((result) => (
+          <SearchResultCard
+            key={result.organization.id}
+            variant={result.variant}
+            organization={result.organization}
+            features={result.features}
+            onClick={() => {
+              // Convert to old SearchResult format for compatibility
+              const oldResult: SearchResult = {
+                id: result.organization.id,
+                name: result.organization.name,
+                category: result.organization.category,
+                address: result.organization.address,
+                distance: result.organization.distance,
+                rating: result.organization.rating
+              };
+              onSelectResult(oldResult);
+            }}
+            onRouteClick={() => {
+              console.log('Route to:', result.organization.id);
+            }}
+            onServiceClick={(service) => {
+              console.log('Service clicked:', service, 'for', result.organization.id);
+            }}
+            onButtonClick={() => {
+              console.log('Button clicked for:', result.organization.id);
+            }}
+          />
         ))}
       </div>
     </div>
