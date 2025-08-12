@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { BottomSheet } from '@/components/bottom-sheet';
+import { BottomSheet, BottomSheetRef } from '@/components/bottom-sheet';
 import { SearchBar } from '@/components/dashboard/SearchBar';
 import { ScreenManagerProvider, ScreenRenderer, useScreenManager, ScreenType } from '@/components/screen-manager';
 import { debugLog } from '@/lib/logging';
@@ -28,8 +28,10 @@ function MobileMapShellContent({
   const { adjustCenterForBottomSheet, map } = useMapGL();
   const [searchQuery, setSearchQuery] = useState(screenState.searchQuery || '');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [currentSnap, setCurrentSnap] = useState<number>(initialSnap ?? snapPoints[1]);
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
+  const bottomSheetRef = useRef<BottomSheetRef>(null);
   
   // Sync local search query with screen manager state
   useEffect(() => {
@@ -37,6 +39,34 @@ function MobileMapShellContent({
       setSearchQuery(screenState.searchQuery);
     }
   }, [screenState.searchQuery]);
+  
+  // Automatically adjust snap point based on current screen
+  useEffect(() => {
+    let targetSnap: number;
+    
+    switch (screenState.currentScreen) {
+      case ScreenType.SEARCH_SUGGESTIONS:
+        // Expand to 90% for better visibility of suggestions
+        targetSnap = 90;
+        break;
+      case ScreenType.SEARCH_RESULTS:
+        // Set to 50% to show both results and map
+        targetSnap = 50;
+        break;
+      case ScreenType.DASHBOARD:
+      default:
+        // Keep at 50% for dashboard (or use current position)
+        targetSnap = 50;
+        break;
+    }
+    
+    // Only snap if the target is different from current position
+    if (targetSnap !== currentSnap && bottomSheetRef.current) {
+      debugLog(`Auto-adjusting snap point to ${targetSnap}% for ${screenState.currentScreen}`);
+      bottomSheetRef.current.snapTo(targetSnap);
+      setCurrentSnap(targetSnap);
+    }
+  }, [screenState.currentScreen, currentSnap]);
   
   // Execute pending adjustments when map becomes available
   useEffect(() => {
@@ -94,6 +124,9 @@ function MobileMapShellContent({
   }, [navigateTo]);
 
   const handleSnapChange = useCallback((snap: number) => {
+    // Update current snap state
+    setCurrentSnap(snap);
+    
     // Adjust map center to keep the same point visible
     if (previousSnapRef.current !== snap) {
       if (map) {
@@ -130,6 +163,7 @@ function MobileMapShellContent({
 
   return (
     <BottomSheet
+      ref={bottomSheetRef}
       className={className}
       snapPoints={snapPoints}
       initialSnap={initialSnap}
