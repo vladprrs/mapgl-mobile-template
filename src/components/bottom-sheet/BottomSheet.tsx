@@ -19,7 +19,8 @@ const BottomSheetComponent = forwardRef<
     children, 
     snapPoints = [10, 50, 90],
     initialSnap,
-    onSnapChange
+    onSnapChange,
+    headerBackground = 'white'
   },
   ref
 ) {
@@ -156,17 +157,18 @@ const BottomSheetComponent = forwardRef<
             className="w-full relative"
             style={{ 
               cursor: 'grab',
+              backgroundColor: headerBackground,
             }}
             data-testid="drag-header-extended"
           >
             {/* Drag handle at top */}
-            <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle">
+            <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle" style={{ backgroundColor: headerBackground }}>
               <div className="w-12 h-1 rounded-full bg-gray-300" />
             </div>
             
             {/* Include sticky header in drag area at ALL snap points */}
             {stickyHeader && (
-              <div className="bg-white pointer-events-none">
+              <div className="pointer-events-none" style={{ backgroundColor: headerBackground }}>
                 <div className="pointer-events-auto">
                   {stickyHeader}
                 </div>

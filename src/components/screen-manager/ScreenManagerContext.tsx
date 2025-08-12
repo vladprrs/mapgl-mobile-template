@@ -16,15 +16,18 @@ const ScreenManagerContext = createContext<ScreenManagerContextValue | undefined
 interface ScreenManagerProviderProps {
   children: ReactNode;
   initialScreen?: ScreenType;
+  initialQuery?: string;
 }
 
 export function ScreenManagerProvider({ 
   children, 
-  initialScreen = ScreenType.DASHBOARD 
+  initialScreen = ScreenType.DASHBOARD,
+  initialQuery = ''
 }: ScreenManagerProviderProps) {
   const [screenState, setScreenState] = useState<ScreenState>({
     currentScreen: initialScreen,
     screenHistory: [initialScreen],
+    searchQuery: initialQuery,
   });
   
   const [isTransitioning, setIsTransitioning] = useState(false);

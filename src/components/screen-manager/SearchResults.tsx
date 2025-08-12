@@ -53,7 +53,7 @@ export function SearchResults({
 
   if (results.length === 0) {
     return (
-      <div className={`flex flex-col items-center justify-center py-12 bg-white ${className}`}>
+      <div className={`flex flex-col items-center justify-center py-12 bg-[#F1F1F1] ${className}`}>
         <Icon name={ICONS.SEARCH} size={48} color={COLORS.TEXT_SECONDARY} />
         <p className="mt-4 text-gray-500">No results found for &ldquo;{query}&rdquo;</p>
         <p className="mt-1 text-sm text-gray-400">Try searching for something else</p>
@@ -62,21 +62,14 @@ export function SearchResults({
   }
 
   return (
-    <div className={`flex flex-col bg-white ${className}`}>
-      {/* Results header */}
-      <div className="px-4 pt-4 pb-2 border-b border-gray-100">
-        <p className="text-sm text-gray-500">
-          Found {results.length} results for &ldquo;{query}&rdquo;
-        </p>
-      </div>
-      
-      {/* Results list */}
+    <div className={`flex flex-col bg-[#F1F1F1] ${className}`}>
+      {/* Results list - no header, directly show results like SearchSuggestions */}
       <div className="flex flex-col">
         {results.map((result) => (
           <button
             key={result.id}
             onClick={() => onSelectResult(result)}
-            className="flex items-start gap-3 px-4 py-4 hover:bg-gray-50 active:bg-gray-100 transition-colors border-b border-gray-100"
+            className="flex items-start gap-3 px-4 py-4 bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors border-b border-gray-100"
           >
             {/* Location icon */}
             <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg mt-1">

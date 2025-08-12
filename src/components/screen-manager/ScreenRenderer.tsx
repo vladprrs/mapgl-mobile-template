@@ -70,8 +70,13 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
     }
   };
 
+  // Determine background color based on screen
+  const getBackgroundColor = () => {
+    return currentScreen === ScreenType.SEARCH_RESULTS ? 'bg-[#F1F1F1]' : 'bg-white';
+  };
+
   return (
-    <div className="flex flex-col h-full">
+    <div className={`flex flex-col h-full ${getBackgroundColor()}`}>
       {/* Quick Access Panel - only show on dashboard */}
       {currentScreen === ScreenType.DASHBOARD && (
         <div className="bg-white pt-2 pb-4 relative z-10">

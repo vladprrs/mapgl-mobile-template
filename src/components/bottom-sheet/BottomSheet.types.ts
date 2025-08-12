@@ -14,6 +14,7 @@ export interface BottomSheetProps {
   snapPoints?: [number, number, number];
   initialSnap?: number;
   onSnapChange?: (snap: number) => void;
+  headerBackground?: string;
 }
 
 export interface BottomSheetRef {

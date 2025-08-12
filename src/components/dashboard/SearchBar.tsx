@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Icon, ICONS, IMAGES, COLORS } from '@/components/icons';
 import Image from 'next/image';
 
-export type SearchBarVariant = 'dashboard' | 'suggest';
+export type SearchBarVariant = 'dashboard' | 'suggest' | 'results';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -71,8 +71,11 @@ export function SearchBar({
     onBlur?.();
   };
 
+  // Determine if this is the results variant (different background)
+  const isResults = variant === 'results';
+  
   return (
-    <div className={`bg-white ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
+    <div className={`${isResults ? 'bg-[#F1F1F1]' : 'bg-white'} ${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}>
       {/* Search Bar Container - 8px bottom padding for spacing to next element */}
       <div className="flex flex-row items-start gap-3 px-4 pb-2">
         {/* Search Input */}
@@ -81,14 +84,18 @@ export function SearchBar({
             <div
               className={`
                 flex flex-row items-center gap-1.5 h-10 px-2
-                bg-gray-900/[0.06] rounded-lg
+                ${isResults ? 'bg-white' : 'bg-gray-900/[0.06]'} rounded-lg
                 transition-all duration-200
                 ${isFocused ? 'ring-2 ring-gray-900/20' : ''}
               `}
             >
               {/* Search Icon - fixed 24x24 container */}
               <div className="flex items-center justify-center w-6 h-6 shrink-0">
-                <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />
+                <Icon 
+                  name={ICONS.SEARCH} 
+                  size={24} 
+                  color={COLORS.TEXT_SECONDARY} 
+                />
               </div>
 
               {/* Input Field */}
@@ -132,7 +139,7 @@ export function SearchBar({
         {/* Menu/Clear Button */}
         <button
           onClick={() => {
-            if (variant === 'suggest') {
+            if (variant === 'suggest' || variant === 'results') {
               // Clear the search and call onClear callback
               if (controlledValue === undefined) {
                 setInternalValue('');
@@ -151,10 +158,10 @@ export function SearchBar({
             transition-opacity
           "
           style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
-          aria-label={variant === 'suggest' ? 'Clear search' : 'Menu'}
+          aria-label={variant === 'suggest' || variant === 'results' ? 'Clear search' : 'Menu'}
         >
           <Icon 
-            name={variant === 'suggest' ? ICONS.CLOSE : ICONS.MENU} 
+            name={variant === 'suggest' || variant === 'results' ? ICONS.CLOSE : ICONS.MENU} 
             size={24} 
             color={COLORS.TEXT_PRIMARY} 
           />

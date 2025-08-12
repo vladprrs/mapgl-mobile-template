@@ -24,12 +24,19 @@ function MobileMapShellContent({
   onSnapChange,
   items,
 }: MobileMapShellProps) {
-  const { screenState, navigateTo, navigateBack } = useScreenManager();
+  const { screenState, navigateTo } = useScreenManager();
   const { adjustCenterForBottomSheet, map } = useMapGL();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(screenState.searchQuery || '');
   const [searchFocused, setSearchFocused] = useState(false);
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
+  
+  // Sync local search query with screen manager state
+  useEffect(() => {
+    if (screenState.searchQuery !== undefined) {
+      setSearchQuery(screenState.searchQuery);
+    }
+  }, [screenState.searchQuery]);
   
   // Execute pending adjustments when map becomes available
   useEffect(() => {
@@ -80,12 +87,6 @@ function MobileMapShellContent({
     // Could trigger voice search
   }, []);
 
-  const handleBackClick = useCallback(() => {
-    debugLog('Back clicked');
-    navigateBack();
-    setSearchQuery(''); // Clear search when going back
-  }, [navigateBack]);
-
   const handleClearSearch = useCallback(() => {
     debugLog('Clear search clicked');
     setSearchQuery('');
@@ -110,9 +111,22 @@ function MobileMapShellContent({
     }
   }, [adjustCenterForBottomSheet, onSnapChange, map]);
 
-  // Determine if we're in suggestion/search mode
-  const isSearchMode = screenState.currentScreen === ScreenType.SEARCH_SUGGESTIONS || 
-                       screenState.currentScreen === ScreenType.SEARCH_RESULTS;
+  // Determine the search bar variant based on current screen
+  const getSearchBarVariant = () => {
+    switch (screenState.currentScreen) {
+      case ScreenType.SEARCH_RESULTS:
+        return 'results';
+      case ScreenType.SEARCH_SUGGESTIONS:
+        return 'suggest';
+      default:
+        return 'dashboard';
+    }
+  };
+
+  // Determine header background based on screen
+  const getHeaderBackground = () => {
+    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
+  };
 
   return (
     <BottomSheet
@@ -120,37 +134,20 @@ function MobileMapShellContent({
       snapPoints={snapPoints}
       initialSnap={initialSnap}
       onSnapChange={handleSnapChange}
+      headerBackground={getHeaderBackground()}
       stickyHeader={
-        <div className="relative">
-          {/* Back button overlay - only show for search results */}
-          {screenState.currentScreen === ScreenType.SEARCH_RESULTS && (
-            <button
-              onClick={handleBackClick}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="Back"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M12.5 15L7.5 10L12.5 5" stroke="#141414" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          )}
-          
-          {/* SearchBar with variant based on screen state */}
-          <div className={screenState.currentScreen === ScreenType.SEARCH_RESULTS ? 'pl-12' : ''}>
-            <SearchBar
-              onSearch={handleSearch}
-              onMenuClick={handleMenuClick}
-              onVoiceClick={handleVoiceClick}
-              onFocus={handleSearchFocus}
-              onBlur={handleSearchBlur}
-              onChange={handleSearchChange}
-              onClear={handleClearSearch}
-              value={searchQuery}
-              noTopRadius
-              variant={isSearchMode ? 'suggest' : 'dashboard'}
-            />
-          </div>
-        </div>
+        <SearchBar
+          onSearch={handleSearch}
+          onMenuClick={handleMenuClick}
+          onVoiceClick={handleVoiceClick}
+          onFocus={handleSearchFocus}
+          onBlur={handleSearchBlur}
+          onChange={handleSearchChange}
+          onClear={handleClearSearch}
+          value={searchQuery}
+          noTopRadius
+          variant={getSearchBarVariant()}
+        />
       }
     >
       <ScreenRenderer items={items} />
