@@ -77,7 +77,7 @@ export function QuickAccessPanel({
   };
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={`relative w-full ${className}`} data-testid="quick-access-panel">
       {/* Fade gradients - extend to edges for visual effect */}
       {showLeftGradient && (
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white via-white/50 to-transparent z-10 pointer-events-none" />

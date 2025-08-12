@@ -504,6 +504,13 @@ git add src/ && git commit -m "feat: implement marker clustering"
 - **Consistency**: Both StoriesPanel and AdviceSection now have consistent drag behavior
 - **Test page** available at `/test-drag-expanded` for verification
 
+### Fixed Excessive Spacing Between Components ✅
+- **Fixed** Removed excessive spacing between SearchBar and QuickAccessPanel 
+- **Issue** The `minHeight: 100px` on Sheet.Header drag zone was creating large gaps
+- **Solution** Removed minHeight constraint, allowing natural content sizing
+- **Result** Exact 16px spacing (8px from SearchBar bottom + 8px from QuickAccess top)
+- **Test page** available at `/test-spacing` for visual verification
+
 ### Universal Draggable Area at ALL Snap Points ✅
 - **Fixed** Extended drag area now works at ALL snap points (10%, 50%, 90%), not just collapsed state
 - **Implementation** Removed conditional logic - Sheet.Header always wraps content area for consistent dragging

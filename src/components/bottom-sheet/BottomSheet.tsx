@@ -155,7 +155,6 @@ const BottomSheetComponent = forwardRef<
           <div 
             className="w-full relative"
             style={{ 
-              minHeight: '100px', // Extended drag area at all snap points
               cursor: 'grab',
             }}
             data-testid="drag-header-extended"
