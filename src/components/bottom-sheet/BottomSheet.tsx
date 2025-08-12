@@ -1,21 +1,15 @@
 'use client';
 
 import React, { useRef, useImperativeHandle, forwardRef, useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Sheet, SheetRef } from 'react-modal-sheet';
 import './bottom-sheet.css';
+import type { BottomSheetProps, BottomSheetRef } from './BottomSheet.types';
 
-export interface BottomSheetProps {
-  className?: string;
-  header?: React.ReactNode;
-  stickyHeader?: React.ReactNode;
-  children?: React.ReactNode;
-  snapPoints?: [number, number, number];
-  initialSnap?: number;
-  onSnapChange?: (snap: number) => void;
-}
+export type { BottomSheetProps, BottomSheetRef } from './BottomSheet.types';
 
-export const BottomSheet = forwardRef<
-  { snapTo: (snap: number) => void },
+const BottomSheetComponent = forwardRef<
+  BottomSheetRef,
   BottomSheetProps
 >(function BottomSheet(
   { 
@@ -60,8 +54,9 @@ export const BottomSheet = forwardRef<
     setCurrentSnapIndex(snapIndex);
     // Convert back to original snap point value
     const originalIndex = snapPoints.length - 1 - snapIndex;
+    const snapValue = snapPoints[originalIndex];
     if (onSnapChange) {
-      onSnapChange(snapPoints[originalIndex]);
+      onSnapChange(snapValue);
     }
   }, [snapPoints, onSnapChange]);
   
@@ -190,5 +185,37 @@ export const BottomSheet = forwardRef<
     </Sheet>
   );
 });
+
+// Loading placeholder that maintains layout during SSR
+const BottomSheetPlaceholder = () => (
+  <div 
+    className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl z-50"
+    style={{
+      height: '50vh', // Default middle position
+      transform: 'translateY(0)',
+      paddingBottom: 'env(safe-area-inset-bottom)',
+    }}
+    data-testid="bottom-sheet-placeholder"
+  >
+    <div className="flex justify-center py-2">
+      <div className="w-12 h-1 rounded-full bg-gray-300" />
+    </div>
+    <div className="p-4">
+      {/* Content will be loaded after hydration */}
+    </div>
+  </div>
+);
+
+// Export the main component directly
+export const BottomSheet = BottomSheetComponent;
+
+// Export a client-only version for cases where SSR issues occur
+export const BottomSheetClient = dynamic(
+  () => Promise.resolve({ default: BottomSheetComponent }),
+  {
+    ssr: false,
+    loading: () => <BottomSheetPlaceholder />,
+  }
+) as typeof BottomSheetComponent;
 
 export default BottomSheet;

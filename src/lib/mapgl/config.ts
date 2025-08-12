@@ -1,6 +1,6 @@
 export const MAP_CONFIG = {
-  defaultCenter: [37.618423, 55.751244] as [number, number], // Moscow
-  defaultZoom: 13,
+  defaultCenter: [37.531323, 55.736413] as [number, number], // Moscow
+  defaultZoom: 14,
   defaultStyle: 'c080bb6a-8134-4993-93a1-5b4d8c36a59b',
   mobileSettings: {
     pitch: 0,

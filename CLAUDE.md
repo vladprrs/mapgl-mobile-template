@@ -41,13 +41,26 @@ npm run build && npm start
 ```
 src/
 ├── app/                    # Next.js app router
-│   ├── page.tsx           # Main app with MapProvider + Dashboard
+│   ├── page.tsx           # Main app with MobileMapShell
 │   ├── layout.tsx         # Root layout with mobile optimization
 │   ├── test-stories/      # Story components test page
 │   └── test-advice/       # Advice components test page
 ├── components/
-│   ├── map/               # MapContainer, MapProvider
-│   ├── bottom-sheet/      # BottomSheet (react-modal-sheet), BottomSheetClient
+│   ├── app-shell/         # Main app integration
+│   │   ├── MobileMapShell.tsx  # Integrated map + bottom sheet + screens
+│   │   └── index.ts       # Exports
+│   ├── bottom-sheet/      # Core bottom sheet component
+│   │   ├── BottomSheet.tsx      # Main sheet component (includes SSR handling)
+│   │   ├── BottomSheet.types.ts # All bottom sheet types
+│   │   ├── bottom-sheet.css     # Styles and overrides
+│   │   └── index.ts       # Clean exports
+│   ├── screen-manager/    # Screen navigation system
+│   │   ├── ScreenManagerContext.tsx  # Navigation state management
+│   │   ├── ScreenRenderer.tsx        # Screen switching logic
+│   │   ├── SearchSuggestions.tsx     # Search suggestions screen
+│   │   ├── SearchResults.tsx         # Search results screen
+│   │   ├── types.ts       # Screen types and interfaces
+│   │   └── index.ts       # Exports
 │   ├── dashboard/         # Dashboard components
 │   │   ├── Dashboard.tsx  # Main dashboard container
 │   │   ├── SearchBar.tsx  # Search with voice assistant
@@ -65,14 +78,12 @@ src/
 │   │   │   ├── mockData.ts        # Sample data
 │   │   │   └── index.ts           # Exports
 │   │   └── index.ts       # Dashboard exports
-│   ├── icons/             # Icon system
-│   │   ├── Icon.tsx       # Reusable icon component
-│   │   └── index.ts       # Icon exports
-│   ├── (removed) LocationList.tsx   # Former sample component
-│   └── (removed) PlaceDetails.tsx   # Former sample component
+│   ├── map/               # MapContainer, MapProvider
+│   └── icons/             # Icon system
+│       ├── Icon.tsx       # Reusable icon component
+│       └── index.ts       # Icon exports
 ├── hooks/
-│   ├── useMapGL.ts        # Map context and operations
-│   └── useBottomSheet.ts  # Minimal stub for backward compatibility (not used)
+│   └── useMapGL.ts        # Map context and operations
 ├── lib/
 │   ├── mapgl/            # Map config & utilities
 │   ├── config/           # Environment config
@@ -80,12 +91,9 @@ src/
 └── __tests__/            # Component and hook tests
     ├── components/
     │   ├── bottom-sheet/  # BottomSheet test suite
+    │   ├── screen-manager/ # Screen manager tests
     │   └── dashboard/     # Dashboard component tests
     │       ├── advice/    # Advice component tests
-    │       │   ├── MetaItem.test.tsx
-    │       │   ├── MetaItemAd.test.tsx
-    │       │   ├── Interesting.test.tsx
-    │       │   └── AdviceSection.test.tsx
     │       ├── SearchBar.test.tsx
     │       ├── QuickAccessPanel.test.tsx
     │       ├── StoryItem.test.tsx
@@ -167,17 +175,26 @@ removeMarker('marker-id');
 clearMarkers(); // Remove all markers
 ```
 
+### Mobile App Shell
+
+Main app integration component that combines map, bottom sheet, and screen management.
+
+```typescript
+import { MobileMapShell } from '@/components/app-shell';
+
+// Usage in main app
+<MobileMapShell 
+  snapPoints={[10, 50, 90]}
+  items={adviceItems}
+/>
+```
+
 ### Dashboard Component
 
-The main interface rendered inside the BottomSheet, providing search and quick access features.
+The main interface rendered inside the MobileMapShell, providing search and quick access features.
 
 ```typescript
 import { Dashboard } from '@/components/dashboard';
-
-// Usage in BottomSheet
-<BottomSheetWithDashboard snapPoints={[10, 50, 90]}>
-  <Dashboard />
-</BottomSheetWithDashboard>
 ```
 
 **Components:**
@@ -255,9 +272,8 @@ import { BottomSheet } from '@/components/bottom-sheet';
   {/* your content */}
 </BottomSheet>
 
-// For dynamic import (prevents SSR issues)
-import { BottomSheetClient } from '@/components/bottom-sheet';
-<BottomSheetClient>{/* your content */}</BottomSheetClient>
+// For SSR issues, BottomSheetClient is available in the same import
+import { BottomSheet, BottomSheetClient } from '@/components/bottom-sheet';
 ```
 
 **Key Features:**
@@ -280,7 +296,7 @@ import { BottomSheetClient } from '@/components/bottom-sheet';
 // react-modal-sheet expects descending order
 ```
 
-**Note:** The `useBottomSheet` hook is now a minimal stub for backward compatibility. All gesture logic is handled by react-modal-sheet.
+**Note:** The `useBottomSheet` hook has been removed. All gesture logic is handled by react-modal-sheet.
 
 **Sheet States:**
 - **Collapsed (10%)**: Minimal visible state
@@ -310,18 +326,11 @@ jest.mock('@2gis/mapgl', () => ({
 }));
 ```
 
-**Mock Bottom Sheet Hook in tests:**
+**Mock Bottom Sheet in tests:**
 ```typescript
-jest.mock('@/hooks/useBottomSheet', () => ({
-  useBottomSheet: jest.fn(() => ({
-    position: 10,
-    isDragging: false,
-    isExpanded: false,
-    handleDragStart: jest.fn(),
-    handleDragMove: jest.fn(),
-    handleDragEnd: jest.fn(),
-    sheetRef: { current: null },
-  })),
+jest.mock('@/components/bottom-sheet', () => ({
+  BottomSheet: ({ children }) => <div data-testid="bottom-sheet">{children}</div>,
+  BottomSheetClient: ({ children }) => <div data-testid="bottom-sheet-client">{children}</div>,
 }));
 ```
 

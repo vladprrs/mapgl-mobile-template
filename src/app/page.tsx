@@ -2,12 +2,12 @@
 
 import { MapProvider } from '@/components/map/MapProvider';
 import { MapContainer } from '@/components/map/MapContainer';
-import { BottomSheetWithDashboard } from '@/components/bottom-sheet/BottomSheetWithDashboard';
+import { MobileMapShell } from '@/components/app-shell';
 import { useEffect, useState } from 'react';
 import type { AdviceItem } from '@/components/dashboard/advice/types';
 
-export default function Home() {
-  // Initialize with empty array instead of undefined to prevent layout shift
+// Inner component that has access to MapContext
+function MapWithBottomSheet() {
   const [devItems, setDevItems] = useState<AdviceItem[]>([]);
 
   useEffect(() => {
@@ -23,14 +23,20 @@ export default function Home() {
   }, []);
 
   return (
+    <main className="relative w-full h-screen">
+      <MapContainer />
+      <MobileMapShell
+        snapPoints={[10, 50, 90]}
+        items={devItems}
+      />
+    </main>
+  );
+}
+
+export default function Home() {
+  return (
     <MapProvider>
-      <main className="relative w-full h-screen">
-        <MapContainer />
-        <BottomSheetWithDashboard
-          snapPoints={[10, 50, 90]}
-          items={devItems}
-        />
-      </main>
+      <MapWithBottomSheet />
     </MapProvider>
   );
 }

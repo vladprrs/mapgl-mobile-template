@@ -14,6 +14,7 @@ export function MapProvider({ children }: MapProviderProps) {
   const [map, setMap] = useState<Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const markersRef = useRef<globalThis.Map<string, Marker>>(new globalThis.Map());
+  const originalCenterRef = useRef<[number, number] | null>(null);
 
   const addMarker = useCallback(async (id: string, coords: [number, number], options?: Record<string, unknown>) => {
     if (!map) return;
@@ -87,6 +88,10 @@ export function MapProvider({ children }: MapProviderProps) {
     if (marker) {
       // @ts-expect-error - coordinates property exists
       const coords = (marker as { coordinates: [number, number] }).coordinates;
+      
+      // Reset original center when manually centering on marker
+      originalCenterRef.current = coords;
+      
       map.setCenter(coords, {
         duration: MAP_CONFIG.animation.duration,
         easing: MAP_CONFIG.animation.easing,
@@ -96,6 +101,9 @@ export function MapProvider({ children }: MapProviderProps) {
 
   const centerOnLocation = useCallback((coords: [number, number], zoom?: number) => {
     if (!map) return;
+    
+    // Reset original center when manually centering
+    originalCenterRef.current = coords;
     
     map.setCenter(coords, {
       duration: MAP_CONFIG.animation.duration,
@@ -108,6 +116,53 @@ export function MapProvider({ children }: MapProviderProps) {
         easing: MAP_CONFIG.animation.easing,
       });
     }
+  }, [map]);
+
+  const adjustCenterForBottomSheet = useCallback((oldSheetPercent: number, newSheetPercent: number) => {
+    if (!map) {
+      return;
+    }
+    
+    // Skip if position hasn't changed significantly
+    if (Math.abs(oldSheetPercent - newSheetPercent) < 0.1) {
+      return;
+    }
+    
+    const viewportHeight = window.innerHeight;
+    
+    // Calculate the center of visible area for old and new positions
+    // Visible area is from top of viewport to top of sheet
+    const oldSheetHeight = (oldSheetPercent / 100) * viewportHeight;
+    const newSheetHeight = (newSheetPercent / 100) * viewportHeight;
+    
+    // Center of visible area in screen coordinates
+    const oldVisibleCenter = (viewportHeight - oldSheetHeight) / 2;
+    const newVisibleCenter = (viewportHeight - newSheetHeight) / 2;
+    
+    // Calculate how much we need to shift vertically in pixels
+    // When sheet goes up, visible center goes up, so we need to pan map down
+    const pixelShift = newVisibleCenter - oldVisibleCenter;
+    
+    // Get the geographic point that was at the old visible center
+    // This is the point we want to keep centered
+    const currentCenter = map.getCenter();
+    const centerPixels = map.project(currentCenter);
+    
+    // The point that was at the old visible center is now offset by pixelShift
+    // We need to find what geographic point is now at that screen position
+    const targetPixels = {
+      x: centerPixels.x,
+      y: centerPixels.y - pixelShift // Subtract because screen Y is inverted
+    };
+    
+    // Convert back to geographic coordinates
+    const newCenter = map.unproject(targetPixels);
+    
+    // Pan to the new center
+    map.setCenter(newCenter, {
+      duration: MAP_CONFIG.animation.duration,
+      easing: MAP_CONFIG.animation.easing,
+    });
   }, [map]);
 
   // Cleanup on unmount
@@ -126,6 +181,7 @@ export function MapProvider({ children }: MapProviderProps) {
     clearMarkers,
     centerOnMarker,
     centerOnLocation,
+    adjustCenterForBottomSheet,
   };
 
   // Internal setter for map instance
@@ -135,6 +191,8 @@ export function MapProvider({ children }: MapProviderProps) {
       (window as unknown as { __setMapInstance?: (mapInstance: Map) => void }).__setMapInstance = (mapInstance: Map) => {
         setMap(mapInstance);
         setIsLoading(false);
+        // Set initial original center from config
+        originalCenterRef.current = MAP_CONFIG.defaultCenter;
       };
     }
   }, []);

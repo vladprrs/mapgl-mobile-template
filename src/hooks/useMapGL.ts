@@ -12,6 +12,7 @@ export interface MapContextValue {
   clearMarkers: () => void;
   centerOnMarker: (id: string) => void;
   centerOnLocation: (coords: [number, number], zoom?: number) => void;
+  adjustCenterForBottomSheet: (oldSheetPercent: number, newSheetPercent: number) => void;
 }
 
 export const MapContext = createContext<MapContextValue | null>(null);

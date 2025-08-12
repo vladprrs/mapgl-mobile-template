@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, renderHook, act } from '@testing-library/react';
-import { ScreenManagerProvider, useScreenManager } from '@/components/bottom-sheet/screens/ScreenManagerContext';
-import { ScreenType } from '@/components/bottom-sheet/screens/types';
+import { ScreenManagerProvider, useScreenManager } from '@/components/screen-manager/ScreenManagerContext';
+import { ScreenType } from '@/components/screen-manager/types';
 
 describe('ScreenManagerContext', () => {
   describe('ScreenManagerProvider', () => {

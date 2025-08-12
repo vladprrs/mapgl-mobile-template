@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { BottomSheet } from './BottomSheet';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { BottomSheet } from '@/components/bottom-sheet';
 import { SearchBar } from '@/components/dashboard/SearchBar';
-import { ScreenManagerProvider, ScreenRenderer, useScreenManager, ScreenType } from './screens';
+import { ScreenManagerProvider, ScreenRenderer, useScreenManager, ScreenType } from '@/components/screen-manager';
 import { debugLog } from '@/lib/logging';
+import { useMapGL } from '@/hooks/useMapGL';
 import type { AdviceItem } from '@/components/dashboard/advice/types';
 
-interface BottomSheetWithDashboardProps {
+interface MobileMapShellProps {
   className?: string;
   snapPoints?: [number, number, number];
   initialSnap?: number;
@@ -16,16 +17,27 @@ interface BottomSheetWithDashboardProps {
 }
 
 // Inner component that uses the ScreenManager context
-function BottomSheetContent({
+function MobileMapShellContent({
   className = '',
   snapPoints = [10, 50, 90],
   initialSnap,
   onSnapChange,
   items,
-}: BottomSheetWithDashboardProps) {
+}: MobileMapShellProps) {
   const { screenState, navigateTo, navigateBack } = useScreenManager();
+  const { adjustCenterForBottomSheet, map } = useMapGL();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
+  const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
+  
+  // Execute pending adjustments when map becomes available
+  useEffect(() => {
+    if (map && pendingAdjustmentRef.current) {
+      adjustCenterForBottomSheet(pendingAdjustmentRef.current.old, pendingAdjustmentRef.current.new);
+      pendingAdjustmentRef.current = null;
+    }
+  }, [map, adjustCenterForBottomSheet]);
 
   const handleSearch = useCallback((query: string) => {
     debugLog('Search query:', query);
@@ -74,6 +86,24 @@ function BottomSheetContent({
     setSearchQuery(''); // Clear search when going back
   }, [navigateBack]);
 
+  const handleSnapChange = useCallback((snap: number) => {
+    // Adjust map center to keep the same point visible
+    if (previousSnapRef.current !== snap) {
+      if (map) {
+        adjustCenterForBottomSheet(previousSnapRef.current, snap);
+      } else {
+        // Queue adjustment for when map becomes available
+        pendingAdjustmentRef.current = { old: previousSnapRef.current, new: snap };
+      }
+      previousSnapRef.current = snap;
+    }
+    
+    // Call the original onSnapChange if provided
+    if (onSnapChange) {
+      onSnapChange(snap);
+    }
+  }, [adjustCenterForBottomSheet, onSnapChange, map]);
+
   // Show back button when not on dashboard
   const showBackButton = screenState.currentScreen !== ScreenType.DASHBOARD;
 
@@ -82,7 +112,7 @@ function BottomSheetContent({
       className={className}
       snapPoints={snapPoints}
       initialSnap={initialSnap}
-      onSnapChange={onSnapChange}
+      onSnapChange={handleSnapChange}
       stickyHeader={
         <div className="relative">
           {/* Back button overlay */}
@@ -120,10 +150,10 @@ function BottomSheetContent({
 }
 
 // Main component that provides the ScreenManager context
-export function BottomSheetWithDashboard(props: BottomSheetWithDashboardProps) {
+export function MobileMapShell(props: MobileMapShellProps) {
   return (
     <ScreenManagerProvider initialScreen={ScreenType.DASHBOARD}>
-      <BottomSheetContent {...props} />
+      <MobileMapShellContent {...props} />
     </ScreenManagerProvider>
   );
 }

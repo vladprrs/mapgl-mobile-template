@@ -1,4 +1,2 @@
-// Simple, direct export - no feature flags
-export { BottomSheet, type BottomSheetProps } from './BottomSheet';
-export { BottomSheetClient } from './BottomSheetClient';
-export { BottomSheetWithDashboard } from './BottomSheetWithDashboard';
+export { BottomSheet, BottomSheetClient } from './BottomSheet';
+export type { BottomSheetProps, BottomSheetRef, BottomSheetOptions, SnapPoint } from './BottomSheet.types';
