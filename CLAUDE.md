@@ -497,6 +497,16 @@ git add src/ && git commit -m "feat: implement marker clustering"
 
 ## 🔧 Recent Updates (January 2025)
 
+### Enhanced Draggable Area for Collapsed State ✅
+- **New Feature** When bottom sheet is collapsed (10% snap), the entire visible content area is now draggable
+- **Implementation** Extended Sheet.Header drag zone to include SearchBar when collapsed
+- **Behavior**: 
+  - At 10% snap: Drag from anywhere in the visible area (SearchBar, handle, etc.)
+  - At 50% snap: Drag only from handle bar
+  - At 90% snap: Drag only from handle bar, content scrolling enabled
+- **Interactive elements** remain clickable (search input focus, buttons) through proper pointer-events management
+- **Test page** available at `/test-drag` for verification
+
 ### Critical Scroll/Drag Fix ✅
 - **Fixed** Bottom sheet content scrolling instead of dragging at 50% snap point
 - **Added** Conditional `disableScroll` prop to Sheet.Scroller based on current snap position

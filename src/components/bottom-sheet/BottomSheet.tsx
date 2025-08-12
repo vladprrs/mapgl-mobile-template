@@ -151,10 +151,36 @@ const BottomSheetComponent = forwardRef<
         }}
       >
         <Sheet.Header>
-          {/* Custom drag handle - 6px from top per Figma */}
-          <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle">
-            <div className="w-12 h-1 rounded-full bg-gray-300" />
-          </div>
+          {/* Extended drag area when collapsed */}
+          {snapPoints[snapPoints.length - 1 - currentSnapIndex] === 10 ? (
+            <div 
+              className="w-full relative"
+              style={{ 
+                minHeight: '100px', // Extended drag area when collapsed
+                cursor: 'grab',
+              }}
+              data-testid="drag-header-extended"
+            >
+              {/* Drag handle at top */}
+              <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle">
+                <div className="w-12 h-1 rounded-full bg-gray-300" />
+              </div>
+              
+              {/* Include sticky header in drag area when collapsed */}
+              {stickyHeader && (
+                <div className="bg-white pointer-events-none">
+                  <div className="pointer-events-auto">
+                    {stickyHeader}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Normal drag handle when not collapsed */
+            <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle">
+              <div className="w-12 h-1 rounded-full bg-gray-300" />
+            </div>
+          )}
         </Sheet.Header>
         
         {/* Custom headers outside of Sheet.Content */}
@@ -164,7 +190,8 @@ const BottomSheetComponent = forwardRef<
           </div>
         )}
         
-        {stickyHeader && (
+        {/* Sticky header when NOT collapsed (rendered outside Sheet.Header) */}
+        {stickyHeader && snapPoints[snapPoints.length - 1 - currentSnapIndex] !== 10 && (
           <div className="bg-white sticky top-0 z-10">
             {stickyHeader}
           </div>

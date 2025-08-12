@@ -45,3 +45,21 @@
   height: 4px !important;
   width: 48px !important;
 }
+
+/* Visual feedback for extended drag header when grabbing */
+[data-testid="drag-header-extended"]:active {
+  cursor: grabbing !important;
+}
+
+/* Ensure smooth interaction in collapsed state */
+[data-sheet-state="collapsed"] {
+  /* Allow vertical dragging while preserving horizontal scroll */
+  touch-action: pan-x !important;
+}
+
+/* Ensure interactive elements within drag zone remain clickable */
+[data-testid="drag-header-extended"] input,
+[data-testid="drag-header-extended"] button {
+  position: relative;
+  z-index: 1;
+}
