@@ -504,15 +504,15 @@ git add src/ && git commit -m "feat: implement marker clustering"
 - **Consistency**: Both StoriesPanel and AdviceSection now have consistent drag behavior
 - **Test page** available at `/test-drag-expanded` for verification
 
-### Enhanced Draggable Area for Collapsed State ✅
-- **New Feature** When bottom sheet is collapsed (10% snap), the entire visible content area is now draggable
-- **Implementation** Extended Sheet.Header drag zone to include SearchBar when collapsed
+### Universal Draggable Area at ALL Snap Points ✅
+- **Fixed** Extended drag area now works at ALL snap points (10%, 50%, 90%), not just collapsed state
+- **Implementation** Removed conditional logic - Sheet.Header always wraps content area for consistent dragging
 - **Behavior**: 
   - At 10% snap: Drag from anywhere in the visible area (SearchBar, handle, etc.)
-  - At 50% snap: Drag only from handle bar
-  - At 90% snap: Drag only from handle bar, content scrolling enabled
+  - At 50% snap: Drag from anywhere in the visible content (SearchBar, QuickAccess, Stories, etc.)
+  - At 90% snap: Drag from anywhere when scrolled to top; normal scrolling when not at top
 - **Interactive elements** remain clickable (search input focus, buttons) through proper pointer-events management
-- **Test page** available at `/test-drag` for verification
+- **Test pages** available at `/test-drag-all` for comprehensive verification
 
 ### Critical Scroll/Drag Fix ✅
 - **Fixed** Bottom sheet content scrolling instead of dragging at 50% snap point

@@ -51,8 +51,10 @@
   cursor: grabbing !important;
 }
 
-/* Ensure smooth interaction in collapsed state */
-[data-sheet-state="collapsed"] {
+/* Ensure smooth interaction at ALL snap states */
+[data-sheet-state="collapsed"],
+[data-sheet-state="half"],
+[data-sheet-state="expanded"] {
   /* Allow vertical dragging while preserving horizontal scroll */
   touch-action: pan-x !important;
 }
