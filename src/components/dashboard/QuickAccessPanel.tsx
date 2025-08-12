@@ -13,36 +13,29 @@ export interface QuickAction {
   onClick?: () => void;
 }
 
+// Import mock data structure from centralized location
+import { mockQuickActionsData } from '@/__mocks__/dashboard/quickAccess';
+
 interface QuickAccessPanelProps {
   actions?: QuickAction[];
   onActionClick?: (actionId: string) => void;
   className?: string;
 }
 
-const defaultActions: QuickAction[] = [
-  {
-    id: 'bookmark',
-    icon: <Icon name={ICONS.BOOKMARK} color={COLORS.TEXT_PRIMARY} />,
-  },
-  {
-    id: 'home',
-    icon: <Icon name={ICONS.HOME} color={COLORS.TEXT_PRIMARY} />,
-    label: '45 мин',
-    labelColor: COLORS.TRAFFIC_HEAVY,
-  },
-  {
-    id: 'work',
-    icon: <Icon name={ICONS.WORK} color={COLORS.TEXT_PRIMARY} />,
-    label: '45 мин',
-    labelColor: COLORS.TRAFFIC_MODERATE,
-  },
-  {
-    id: 'location',
-    label: 'Немировича-Данченко, 45',
-    sublabel: '50 мин',
-    sublabelColor: COLORS.TRAFFIC_LIGHT,
-  },
-];
+// Generate default actions with icons from mock data
+const defaultActions: QuickAction[] = mockQuickActionsData.map(action => {
+  // Add appropriate icons based on action id
+  const iconMap: Record<string, React.ReactNode> = {
+    bookmark: <Icon name={ICONS.BOOKMARK} color={COLORS.TEXT_PRIMARY} />,
+    home: <Icon name={ICONS.HOME} color={COLORS.TEXT_PRIMARY} />,
+    work: <Icon name={ICONS.WORK} color={COLORS.TEXT_PRIMARY} />,
+  };
+  
+  return {
+    ...action,
+    icon: iconMap[action.id],
+  } as QuickAction;
+});
 
 export function QuickAccessPanel({
   actions = defaultActions,

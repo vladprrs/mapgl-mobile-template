@@ -2,6 +2,8 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { StoryItem } from './StoryItem';
+// Import default stories from centralized mock data
+import { mockStories as defaultStories } from '@/__mocks__/dashboard/stories';
 
 export interface Story {
   id: string;
@@ -15,34 +17,6 @@ interface StoriesPanelProps {
   onStoryClick?: (storyId: string) => void;
   className?: string;
 }
-
-// Default stories for demo
-const defaultStories: Story[] = [
-  {
-    id: '1',
-    imageUrl: '/assets/stories/d8d5249851401c81411a441573fe467750b6e049.png',
-    label: 'Заголовок стоис три строки',
-    isViewed: true,
-  },
-  {
-    id: '2',
-    imageUrl: '/assets/stories/cd1a0d93b746871ac856345bbbf8054a55131586.png',
-    label: 'Заголовок стоис три строки',
-    isViewed: true,
-  },
-  {
-    id: '3',
-    imageUrl: '/assets/stories/6db4130db09497160e078c4e5160e605753cdc52.png',
-    label: 'Заголовок стоис три строки',
-    isViewed: true,
-  },
-  {
-    id: '4',
-    imageUrl: '/assets/stories/5738e1bc9a25d52bf21144f9c160f545681e96d7.png',
-    label: 'Заголовок стоис три строки',
-    isViewed: true,
-  },
-];
 
 export function StoriesPanel({
   stories = defaultStories,

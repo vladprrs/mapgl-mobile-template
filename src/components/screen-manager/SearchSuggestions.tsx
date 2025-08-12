@@ -9,77 +9,26 @@ interface SearchSuggestionsProps {
   className?: string;
 }
 
-// Type definitions for suggestions
-interface SavedAddressSuggestion {
-  type: SuggestType.SAVED_ADDRESS;
-  title: string;
-  subtitle: string;
-  distance: string;
-  icon: 'home' | 'work';
-}
+// Import mock data from centralized location
+import { 
+  mockSavedAddresses,
+  mockOrganizations, 
+  mockCategories 
+} from '@/__mocks__/search/suggestions';
 
-interface OrganizationSuggestion {
-  type: SuggestType.ORGANIZATION;
-  title: string;
-  subtitle: string;
-  highlightedText: string;
-}
+// Re-export types for convenience
+export type { 
+  SavedAddressSuggestion,
+  OrganizationSuggestion,
+  CategorySuggestion,
+  SearchSuggestion
+} from '@/__mocks__/search/suggestions';
 
-interface CategorySuggestion {
-  type: SuggestType.CATEGORY;
-  title: string;
-  branchCount: string;
-  highlightedText: string;
-}
-
-// Type is used internally for filtering - removing from exports
-
-// Mock data for different suggestion types
+// Use imported mock data
 const mockSuggestions = {
-  savedAddresses: [
-    {
-      type: SuggestType.SAVED_ADDRESS,
-      title: 'Дом',
-      subtitle: 'Красный проспект, 49',
-      distance: '5 км',
-      icon: 'home' as const,
-    },
-    {
-      type: SuggestType.SAVED_ADDRESS,
-      title: 'Работа',
-      subtitle: 'Октябрьская, 42',
-      distance: '12 км',
-      icon: 'work' as const,
-    },
-  ] as SavedAddressSuggestion[],
-  organizations: [
-    {
-      type: SuggestType.ORGANIZATION,
-      title: 'МЕСТО, инвест-апарты',
-      subtitle: 'Красный проспект, 49',
-      highlightedText: 'МЕС',
-    },
-    {
-      type: SuggestType.ORGANIZATION,
-      title: 'Место встречи, кафе',
-      subtitle: 'Ленина, 21',
-      highlightedText: 'Мес',
-    },
-  ] as OrganizationSuggestion[],
-  categories: [
-    {
-      type: SuggestType.CATEGORY,
-      title: 'Аквапарки/Водные аттракционы',
-      branchCount: '6 филиалов',
-      highlightedText: 'Места отдыха',
-    },
-    {
-      type: SuggestType.CATEGORY,
-      title: 'Рестораны',
-      branchCount: '124 филиала',
-      highlightedText: '',
-    },
-  ] as CategorySuggestion[],
+  savedAddresses: mockSavedAddresses,
+  organizations: mockOrganizations,
+  categories: mockCategories,
 };
 
 export function SearchSuggestions({ 
