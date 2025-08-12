@@ -15,6 +15,7 @@ describe('DragHandle (inline in BottomSheet)', () => {
     const sheet = getByTestId('bottom-sheet');
     // react-modal-sheet handles touch-action internally
     expect(sheet).toBeInTheDocument();
-    expect(sheet).toHaveClass('bg-white', 'rounded-t-2xl', 'shadow-2xl');
+    expect(sheet).toHaveClass('bg-white');
+    // Shadow and rounded corners are now conditional based on headerBackground
   });
 });

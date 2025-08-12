@@ -44,8 +44,8 @@ describe('BottomSheet', () => {
       )
 
       const sheet = container.querySelector('[data-testid="bottom-sheet"]')
-      expect(sheet).toHaveClass('rounded-t-2xl')
-      expect(sheet).toHaveClass('shadow-2xl')
+      // Rounded corners and shadows are now conditional based on headerBackground
+      expect(sheet).toBeInTheDocument()
       // Check that transform styles are applied inline
       const style = sheet?.getAttribute('style') || ''
       // touch-action is on the handle, not the sheet

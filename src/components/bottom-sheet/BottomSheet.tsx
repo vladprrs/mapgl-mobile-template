@@ -106,7 +106,12 @@ const BottomSheetComponent = forwardRef<
         data-sheet-state={stateLabel}
       >
         <div className="flex justify-center py-2" data-testid="drag-handle">
-          <div className="w-12 h-1 rounded-full bg-gray-300" />
+          <div 
+            className="w-12 h-1 rounded-full" 
+            style={{
+              backgroundColor: headerBackground === '#F1F1F1' ? 'transparent' : 'rgba(137, 137, 137, 0.25)',
+            }}
+          />
         </div>
         {header && (
           <div className="bg-white" style={{ touchAction: 'manipulation' }}>
@@ -144,11 +149,15 @@ const BottomSheetComponent = forwardRef<
       dragVelocityThreshold={1000} // Require very fast swipe to trigger close
     >
       <Sheet.Container
-        className={`bg-white rounded-t-2xl shadow-2xl ${className}`}
+        className={`bg-white ${className}`}
         data-testid="bottom-sheet"
         data-sheet-state={stateLabel}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom)',
+          // Conditionally apply rounded corners and shadow
+          borderTopLeftRadius: headerBackground === '#F1F1F1' ? '0' : '16px',
+          borderTopRightRadius: headerBackground === '#F1F1F1' ? '0' : '16px',
+          boxShadow: headerBackground === '#F1F1F1' ? 'none' : '0 -10px 25px rgba(0, 0, 0, 0.15)',
         }}
       >
         <Sheet.Header>
@@ -164,7 +173,7 @@ const BottomSheetComponent = forwardRef<
             }}
             data-testid="drag-header-extended"
           >
-            {/* Drag handle at top */}
+            {/* Drag handle at top - hide on gray background screens */}
             <div 
               className="flex justify-center pt-1.5 pb-1.5" 
               data-testid="drag-handle" 
@@ -175,7 +184,13 @@ const BottomSheetComponent = forwardRef<
                 margin: 0,
               }}
             >
-              <div className="w-12 h-1 rounded-full bg-gray-300" />
+              <div 
+                className="w-12 h-1 rounded-full" 
+                style={{
+                  // Hide drag handle on gray background (SearchResults)
+                  backgroundColor: headerBackground === '#F1F1F1' ? 'transparent' : 'rgba(137, 137, 137, 0.25)',
+                }}
+              />
             </div>
             
             {/* Include sticky header in drag area at ALL snap points */}

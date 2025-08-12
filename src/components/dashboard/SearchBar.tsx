@@ -76,7 +76,7 @@ export function SearchBar({
   
   return (
     <div 
-      className={`${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}
+      className={`${noTopRadius || isResults ? '' : 'rounded-t-2xl'} ${className}`}
       style={{
         backgroundColor: isResults ? '#F1F1F1' : 'white',
         // Ensure no borders or visual separations
@@ -84,6 +84,8 @@ export function SearchBar({
         borderTop: 'none',
         borderBottom: 'none',
         margin: 0,
+        // Remove any border radius on results screen
+        borderRadius: isResults ? '0' : undefined,
       }}>
       {/* Search Bar Container - 8px bottom padding for spacing to next element */}
       <div className="flex flex-row items-start gap-3 px-4 pb-2">

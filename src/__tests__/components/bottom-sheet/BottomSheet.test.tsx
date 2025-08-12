@@ -57,7 +57,8 @@ describe('BottomSheet', () => {
 
     const sheet = container.querySelector('[data-testid="bottom-sheet"]') as HTMLElement;
     // react-modal-sheet handles positioning internally
-    expect(sheet).toHaveClass('bg-white', 'rounded-t-2xl', 'shadow-2xl');
+    expect(sheet).toHaveClass('bg-white');
+    // Shadow and rounded corners are now conditional based on headerBackground
   });
 
   it('calls onSnapChange when provided', () => {

@@ -115,3 +115,39 @@
   border-bottom: none !important;
   box-shadow: none !important;
 }
+
+/* Special handling for SearchResults screen to remove ALL artifacts */
+[data-testid="bottom-sheet"][data-sheet-state] {
+  overflow: hidden !important;
+}
+
+/* Hide ANY shadows or borders when header background is gray */
+[data-testid="drag-header-extended"] {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Ensure no rounded corners bleed through on SearchResults */
+[data-testid="drag-header-extended"][style*="F1F1F1"] {
+  border-radius: 0 !important;
+}
+
+[data-testid="drag-header-extended"][style*="F1F1F1"] * {
+  border-radius: 0 !important;
+}
+
+/* Hide the container shadow completely on gray background */
+.react-modal-sheet-container {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+/* Remove any pseudo-elements that might create lines */
+[data-rsbs-header]::before,
+[data-rsbs-header]::after,
+[data-rsbs-content]::before,
+[data-rsbs-content]::after,
+[data-testid="drag-header-extended"]::before,
+[data-testid="drag-header-extended"]::after {
+  display: none !important;
+  content: none !important;
+}

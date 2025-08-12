@@ -59,7 +59,7 @@ export function SearchResults({
       <div 
         className="flex flex-col gap-3 p-4"
         style={{ 
-          backgroundColor: '#F1F1F1',
+          backgroundColor: 'transparent',
           border: 'none',
         }}
       >
