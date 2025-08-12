@@ -120,6 +120,12 @@ src/
   types/
     env.d.ts           # Env var typings
     mapgl.d.ts         # 2GIS MapGL global types
+  __mocks__/           # Centralized mock data for testing
+    advice/            # Advice component mock data
+    dashboard/         # Dashboard component mock data
+    search/            # Search-related mock data
+    utils/             # Mock data generators and constants
+    index.ts           # Main export file with presets
 
 public/
   assets/...           # Static images and SVGs used by dashboard blocks
@@ -207,6 +213,7 @@ npm run test:coverage
 Key config: `jest.config.js`
 - DOM mocks: `jest.setup.js` (IntersectionObserver, ResizeObserver, matchMedia, geolocation)
 - 2GIS MapGL is mocked for deterministic tests
+- Centralized mock data in `src/__mocks__/` for consistent test data
 - Coverage thresholds (current):
   - Global: 30%
   - `src/components/map/`: 30%
@@ -219,6 +226,28 @@ E2E tests are temporarily removed while we redesign them for mobile map + gestur
 - Current status: disabled scripts (`test:e2e*`) return a no-op message
 - Config: `playwright.config.ts` is retained as a template
 - Strategy doc: see `docs/e2e-testing-strategy.md`
+
+### Mock Data
+
+Centralized mock data is available in `src/__mocks__/` for consistent testing:
+
+```typescript
+// Import preset combinations
+import { fullAppMockData, emptyAppMockData } from '@/__mocks__'
+
+// Component-specific mocks
+import { mockStories } from '@/__mocks__/dashboard'
+import { mockMetaItems } from '@/__mocks__/advice'
+import { mockSavedAddresses } from '@/__mocks__/search'
+
+// Use generators for dynamic data
+import { generateMockStories, generateMockMarkers } from '@/__mocks__/utils/generators'
+
+const stories = generateMockStories(20, 0.3) // 20 stories, 30% viewed
+const markers = generateMockMarkers(100)     // 100 map markers
+```
+
+See `src/__mocks__/README.md` for detailed usage guide.
 
 ## Usage examples
 
@@ -245,7 +274,11 @@ const Demo = () => {
 ```tsx
 import { BottomSheet } from '@/components/bottom-sheet'
 
-<BottomSheet snapPoints={[10, 50, 90]} onSnapChange={(s) => console.log(s)}>
+<BottomSheet 
+  snapPoints={[10, 50, 90]} 
+  onSnapChange={(s) => console.log(s)}
+  headerBackground="#F1F1F1" // Optional: customize header/drag area background
+>
   {/* your content */}
 </BottomSheet>
 
@@ -271,6 +304,40 @@ import { MapProvider, MapContainer } from '@/components/map'
 import { Dashboard } from '@/components/dashboard'
 
 <Dashboard onSearch={(q) => console.log('search:', q)} />
+```
+
+### SearchBar Component
+
+```tsx
+import { SearchBar } from '@/components/dashboard/SearchBar'
+
+// Three variants available:
+<SearchBar 
+  variant="dashboard"  // Default: white bg, menu button
+  variant="suggest"    // White bg, clear (X) button
+  variant="results"    // Gray (#F1F1F1) bg, white input, clear button
+  onSearch={(query) => handleSearch(query)}
+  onClear={() => navigateToDashboard()}
+/>
+```
+
+### Screen Management
+
+```tsx
+import { ScreenManagerProvider, ScreenType } from '@/components/screen-manager'
+
+// Wrap your app with the provider
+<ScreenManagerProvider 
+  initialScreen={ScreenType.DASHBOARD}
+  initialQuery="Initial search"
+>
+  <MobileMapShell />
+</ScreenManagerProvider>
+
+// Available screens:
+// - ScreenType.DASHBOARD (main screen)
+// - ScreenType.SEARCH_SUGGESTIONS (search input focused)
+// - ScreenType.SEARCH_RESULTS (search results with gray background)
 ```
 
 ## Accessibility, performance, and styling

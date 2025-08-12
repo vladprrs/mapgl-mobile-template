@@ -77,7 +77,6 @@ src/
 │   │   │   ├── Cover.tsx          # Collection covers
 │   │   │   ├── RD.tsx             # Advertiser cards
 │   │   │   ├── types.ts           # TypeScript interfaces
-│   │   │   ├── mockData.ts        # Sample data
 │   │   │   └── index.ts           # Exports
 │   │   └── index.ts       # Dashboard exports
 │   ├── map/               # MapContainer, MapProvider
@@ -90,6 +89,12 @@ src/
 │   ├── mapgl/            # Map config & utilities
 │   ├── config/           # Environment config
 │   └── icons/            # Icon definitions and mappings
+├── __mocks__/            # Centralized mock data for testing
+│   ├── advice/           # Advice component mock data
+│   ├── dashboard/        # Dashboard component mock data
+│   ├── search/           # Search-related mock data
+│   ├── utils/            # Mock data generators and constants
+│   └── index.ts          # Main export file with presets
 ├── src/__tests__/        # Component tests (co-located with source)
 │   └── components/
 │       ├── bottom-sheet/  # BottomSheet tests
@@ -204,10 +209,11 @@ import { Dashboard } from '@/components/dashboard';
 - Integrated drag handle (6px from top edge)
 - Search input with icon
 - Voice assistant (Salut) button with actual Figma asset
-- Two variants:
-  - `dashboard`: Menu burger icon on right
-  - `suggest`: X/Clear button on right (clears search and returns to dashboard)
-- Identical padding/spacing in both modes
+- Three variants:
+  - `dashboard`: White background, menu burger icon on right
+  - `suggest`: White background, X/Clear button on right (clears search)
+  - `results`: Gray (#F1F1F1) background, white input field, X/Clear button (returns to dashboard)
+- Identical padding/spacing in all modes
 - Bottom padding creates 16px gap to next component
 
 #### QuickAccessPanel  
@@ -271,8 +277,12 @@ import { BottomSheet } from '@/components/bottom-sheet';
 // Basic usage
 <BottomSheet>{/* your content */}</BottomSheet>
 
-// With custom snap points
-<BottomSheet snapPoints={[15, 60, 95]} onSnapChange={(snap) => console.log(snap)}>
+// With custom snap points and header background
+<BottomSheet 
+  snapPoints={[15, 60, 95]} 
+  onSnapChange={(snap) => console.log(snap)}
+  headerBackground="#F1F1F1" // Customize drag handle area background
+>
   {/* your content */}
 </BottomSheet>
 
@@ -316,6 +326,19 @@ import { BottomSheet, BottomSheetClient } from '@/components/bottom-sheet';
 ```bash
 npm run test:watch          # During development
 npm run test:coverage       # Check coverage (min 80%)
+```
+
+**Use centralized mock data:**
+```typescript
+// Import preset combinations for testing
+import { fullAppMockData, emptyAppMockData } from '@/__mocks__'
+
+// Component-specific mocks
+import { mockStories } from '@/__mocks__/dashboard'
+import { mockMetaItems, mockCovers } from '@/__mocks__/advice'
+
+// Generate dynamic test data
+import { generateMockStories, generateMockMarkers } from '@/__mocks__/utils/generators'
 ```
 
 **Mock 2GIS in tests:**
@@ -501,6 +524,22 @@ git add src/ && git commit -m "feat: implement marker clustering"
 5. If content scrolls instead of dragging: FIXED - Added conditional disableScroll based on snap position
 
 ## 🔧 Recent Updates (January 2025)
+
+### SearchResults Screen Color Scheme Fix ✅
+- **Fixed** Entire SearchResults screen background to #F1F1F1
+- **Added** `headerBackground` prop to BottomSheet for dynamic backgrounds
+- **Updated** SearchBar with `results` variant: gray background, white input field
+- **Removed** Redundant back arrow button - only X button for navigation
+- **Ensured** Consistent color scheme across drag handle, header, and content areas
+- **Synced** Search query state between ScreenManager and MobileMapShell
+
+### Centralized Mock Data Organization ✅
+- **Refactored** All mock data from component files to `src/__mocks__/` directory
+- **Created** Structured organization: `/advice`, `/dashboard`, `/search` subdirectories
+- **Added** Data generators in `/utils/generators.ts` for dynamic test data
+- **Implemented** Preset combinations (fullAppMockData, emptyAppMockData, minimalAppMockData)
+- **Benefits**: Consistent test data across all tests, easier maintenance, better discoverability
+- **Documentation**: Added comprehensive `src/__mocks__/README.md` with usage examples
 
 ### Fixed Inconsistent Drag Behavior in Expanded State ✅
 - **Fixed** Advice section now allows sheet dragging when expanded (90%), matching stories behavior
