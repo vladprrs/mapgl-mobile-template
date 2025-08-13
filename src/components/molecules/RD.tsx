@@ -76,22 +76,20 @@ export function RD({
       data-item-id={id}
     >
       {/* Gallery section - exactly 100px height */}
-      {displayImages.length > 0 && (
+      {displayImages.length > 0 && displayImages[0] && (
         <div className="absolute top-2 left-2 right-2 h-[100px] flex gap-px">
           {/* First image - takes remaining space */}
-          {displayImages[0] && (
-            <div className="flex-1 relative rounded-l-lg overflow-hidden">
-              <Image
-                src={displayImages[0]}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 50vw, 33vw"
-                className="object-cover"
-                unoptimized
-              />
-              <div className="absolute inset-0 border-[0.5px] border-[rgba(137,137,137,0.3)] rounded-l-lg pointer-events-none" />
-            </div>
-          )}
+          <div className="flex-1 relative rounded-l-lg overflow-hidden">
+            <Image
+              src={displayImages[0]}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 50vw, 33vw"
+              className="object-cover"
+              unoptimized
+            />
+            <div className="absolute inset-0 border-[0.5px] border-[rgba(137,137,137,0.3)] rounded-l-lg pointer-events-none" />
+          </div>
           
           {/* Second image or counter */}
           {displayImages[1] && (
@@ -123,7 +121,7 @@ export function RD({
       {/* Content section - positioned below gallery */}
       <div className={`
         absolute inset-x-0 bottom-0 flex flex-col justify-between
-        ${displayImages.length > 0 ? 'top-[116px] pb-3 px-4' : 'top-0 p-4'}
+        ${displayImages.length > 0 && displayImages[0] ? 'top-[116px] pb-3 px-4' : 'top-0 p-4'}
       `}>
         {/* Top section with title and info */}
         <div className="flex-1 flex flex-col">

@@ -80,7 +80,7 @@ export function StoriesPanel({
           <StoryItem
             key={story.id}
             id={story.id}
-            imageUrl={story.imageUrl}
+            image={story.imageUrl}
             label={story.label}
             isViewed={story.isViewed}
             onClick={() => handleStoryClick(story)}

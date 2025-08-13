@@ -200,7 +200,7 @@ export function Icon({
       {icons[name] ?? (() => {
         const normalized = name.toUpperCase().replace(/-/g, '_');
         const path = (ICON_SVGS as Record<string, string>)[normalized];
-        if (path) {
+        if (path && path.trim() !== '') {
           return (
             <Image
               src={path}

@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 interface StoryItemProps {
   id: string;
-  image: string;
+  image?: string;
   label: string;
   isViewed?: boolean;
   onClick?: () => void;
@@ -31,13 +31,15 @@ export function StoryItem({
       } ${className}`}
     >
       {/* Background Image */}
-      <Image
-        src={image}
-        alt={label}
-        fill
-        className="object-cover"
-        sizes="96px"
-      />
+      {image && (
+        <Image
+          src={image}
+          alt={label}
+          fill
+          className="object-cover"
+          sizes="96px"
+        />
+      )}
       
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

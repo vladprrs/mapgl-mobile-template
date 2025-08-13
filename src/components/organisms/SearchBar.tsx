@@ -109,12 +109,16 @@ export function SearchBar({
           className="w-10 h-10 p-0"
           aria-label="Голосовой помощник"
         >
-          <Image
-            src={IMAGES.SALUT_ASSISTANT}
-            alt="Salut"
-            width={40}
-            height={40}
-          />
+          {IMAGES.SALUT_ASSISTANT ? (
+            <Image
+              src={IMAGES.SALUT_ASSISTANT}
+              alt="Salut"
+              width={40}
+              height={40}
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500" />
+          )}
         </Button>
 
         {/* Menu/Clear Button */}
