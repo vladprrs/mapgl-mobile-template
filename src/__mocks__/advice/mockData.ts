@@ -1,4 +1,4 @@
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 /**
  * Real data from Figma mockup for advice components
@@ -10,13 +10,13 @@ export const mockAdviceItems: AdviceItem[] = [
     type: 'interesting',
     id: 'guide-city',
     title: 'Гид по городу',
-    description: '37 подборок',
+    subtitle: '37 подборок',
     imageUrl: '/assets/advice/b84cad0c5a3abfaa17c4ee4fbc61536ad9c33781.png',
     featureId: 'city-guide',
     theme: 'Light',
   },
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'sunday-brunch',
     title: 'Воскресные бранчи',
     subtitle: '156 мест',
@@ -26,7 +26,7 @@ export const mockAdviceItems: AdviceItem[] = [
     theme: 'Light',
   },
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'atm',
     title: 'Банкоматы',
     subtitle: 'Number',
@@ -39,15 +39,14 @@ export const mockAdviceItems: AdviceItem[] = [
     type: 'cover',
     id: 'repair-goods',
     title: 'Товары для ремонта',
-    imageUrl: '/assets/advice/4295bcc0ff3c5fd0b0b5cfe36d50701084688dc5.png',
-    collectionId: 'repair-goods',
-    itemCount: 13,
-    state: 'Default',
+    subtitle: '13 товаров',
+    images: ['/assets/advice/4295bcc0ff3c5fd0b0b5cfe36d50701084688dc5.png'],
+    variant: 'default',
   },
   
   // Right column items
   {
-    type: 'meta-item-ad',
+    type: 'meta_item_ad',
     id: 'xiaomi-ad',
     title: 'Xiaomi',
     logoUrl: '/assets/advice/74f7e8baab90184b05499ea80dce96f157e67779.png',
@@ -59,7 +58,7 @@ export const mockAdviceItems: AdviceItem[] = [
     isSponsored: true,
   },
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'school-uniform',
     title: 'Школьная форма',
     subtitle: '112 мест',
@@ -77,7 +76,7 @@ export const mockAdviceItems: AdviceItem[] = [
       '/assets/advice/f24b81b9f69b94fda4e5da97e97749387406ae95.png',
       '/assets/advice/1b05043773971df7e57c1383b3943d78bf6b5aff.png',
     ],
-    rating: '4.6',
+    rating: 4.6,
     distance: '1.4 км',
     address: 'Тверская 32/12, БЦ Апельсин, 1 этаж',
     establishmentIds: ['geraldine-tverskaya'],
@@ -86,7 +85,7 @@ export const mockAdviceItems: AdviceItem[] = [
     isVerified: true,
   },
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'all-categories',
     title: 'Все рубрики',
     subtitle: '3 256 567 мест',

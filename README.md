@@ -1,395 +1,259 @@
-# MapGL Mobile Bottom Sheet App
+# 2GIS MapGL Mobile App
 
-Mobile-first Next.js application that integrates 2GIS MapGL with a performant, gesture-driven Bottom Sheet and a dashboard UI (search, quick actions, stories, and advice blocks). Optimized for mobile devices with robust unit, integration, and E2E testing.
+A mobile-first map application with a draggable bottom sheet interface, built using Atomic Design principles.
 
-## Table of contents
+## 🏗️ Architecture
 
-- Overview
-- Tech stack
-- Architecture
-- Directory structure
-- Getting started
-- Environment configuration
-- Available scripts
-- Testing
-- Usage examples (Map, Bottom Sheet, Dashboard)
-- Accessibility, performance, and styling
-- Troubleshooting
-- Roadmap and docs
+This application follows **Atomic Design** methodology with a clear component hierarchy:
+- **Atoms** → **Molecules** → **Organisms** → **Templates** → **Pages**
 
-## Overview
+## 🛠️ Technology Stack
 
-- **Goal**: Provide a mobile UX similar to native maps apps: full-screen map, draggable bottom sheet with snap points, and content dashboard.
-- **Key features**:
-  - 2GIS MapGL map with markers and programmatic camera controls
-  - Draggable Bottom Sheet with snap points (10/50/90)
-  - Dashboard blocks: Search Bar, Quick Access Panel, Stories, Advice section
-  - Mobile gesture support (touch, wheel, drag) with strict scroll-boundary logic
-  - Type-safe APIs and comprehensive automated tests
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Zustand** - Lightweight state management (8KB)
+- **Tailwind CSS** - Utility-first styling
+- **2GIS MapGL** - Interactive map rendering
+- **react-modal-sheet** - Bottom sheet functionality
+- **Design Tokens** - Centralized style system
 
-## Tech stack
+## 📁 Project Structure
 
-- **Framework**: Next.js 15 (App Router)
-- **UI**: React 19, TypeScript 5, Tailwind CSS 4
-- **Maps**: 2GIS MapGL (`@2gis/mapgl`)
-- **Bottom Sheet**: react-modal-sheet 4.4 (gesture-driven with snap points)
-- **Screen Management**: Custom context-based navigation system with smooth transitions
-- **Testing**: Jest 30 + Testing Library, Playwright for E2E
-- **Linting**: ESLint 9 + Next presets, Prettier via lint-staged
-
-## Architecture
-
-High-level flow:
-
-```text
-App layout (src/app/layout.tsx)
-  └─ Home page (src/app/page.tsx)
-       └─ MapProvider (context)
-            ├─ MapContainer (creates 2GIS Map)
-            └─ MobileMapShell (app-shell integration)
-                 └─ ScreenManager (navigation context)
-                      ├─ SearchBar (sticky header with back navigation)
-                      └─ ScreenRenderer
-                           ├─ Dashboard (default screen)
-                           ├─ SearchSuggestions
-                           └─ SearchResults
 ```
-
-- **App layout** (`src/app/layout.tsx`): Sets viewport meta, disables page scroll, and locks the app to the viewport for mobile UX.
-- **MapProvider** (`src/components/map/MapProvider.tsx`): React Context that exposes the 2GIS map instance and helpers: `addMarker`, `removeMarker`, `clearMarkers`, `centerOnLocation`, `centerOnMarker`.
-  - Communicates with `MapContainer` via a small bridge (`window.__setMapInstance(map)`).
-- **MapContainer** (`src/components/map/MapContainer.tsx`): Dynamically loads `@2gis/mapgl`, validates API key, and initializes the map using `MAP_CONFIG`.
-- **MobileMapShell** (`src/components/app-shell/MobileMapShell.tsx`): Main app integration component that combines:
-  - Bottom sheet with gesture handling (via react-modal-sheet)
-  - Screen management system
-  - Search bar with navigation
-  - Map center adjustments based on sheet position
-- **Bottom sheet** (`src/components/bottom-sheet`)
-  - `BottomSheet`: Main component using react-modal-sheet 4.4.0 for gesture handling
-  - `BottomSheetClient`: SSR-safe version available in same export
-  - All types consolidated in `BottomSheet.types.ts`
-- **Screen Manager** (`src/components/screen-manager`): Separate navigation system for screens within the sheet
-  - Context-based navigation between Dashboard, SearchSuggestions, and SearchResults
-  - Smooth transitions and back navigation support
-- **Dashboard** (`src/components/dashboard`): Composed UI (SearchBar, QuickAccessPanel, StoriesPanel, AdviceSection with card types `MetaItem`, `MetaItemAd`, `Cover`, `Interesting`, `RD`).
-- **Configuration**
-  - Env: `src/lib/config/env.ts` strongly validates `NEXT_PUBLIC_2GIS_API_KEY` and exposes getters.
-  - Map defaults: `src/lib/mapgl/config.ts` (center, zoom, style, animation, markers, mobile settings).
-
-### Data flow & state management
-
-- Map state and operations are provided via React Context (`useMapGL`).
-- Bottom sheet state is managed internally by react-modal-sheet.
-- Screen navigation state is managed by ScreenManager context.
-- No backend/API calls in this template; all demo data is local.
-
-## Directory structure
-
-```text
 src/
-  app/                 # Next.js App Router entrypoints
-    layout.tsx         # Global layout/viewport
-    page.tsx           # Home: Map + MobileMapShell
-  components/
-    app-shell/         # Main app integration
-      MobileMapShell.tsx # Integrated map + bottom sheet + screens
-      index.ts         # Exports
-    bottom-sheet/      # Core bottom sheet component
-      BottomSheet.tsx  # Main sheet component (includes SSR handling)
-      BottomSheet.types.ts # All bottom sheet types
-      bottom-sheet.css # Styles and overrides
-      index.ts         # Clean exports
-    screen-manager/    # Screen navigation system
-      ScreenManagerContext.tsx # Navigation state management
-      ScreenRenderer.tsx # Screen switching logic
-      SearchSuggestions.tsx # Search suggestions screen
-      SearchResults.tsx # Search results screen
-      types.ts         # Screen types and interfaces
-      index.ts         # Exports
-    dashboard/         # Dashboard and blocks (advice, stories, search, quick actions)
-      advice/          # Advice section components (MetaItem, Cover, RD, etc.)
-    icons/             # Icon system with Figma-extracted SVGs
-    map/               # MapProvider + MapContainer
-  hooks/
-    useMapGL.ts        # Map context hook + types
-  lib/
-    config/env.ts      # Env getters + validation
-    mapgl/config.ts    # Map defaults and helpers
-    icons/             # Icon definitions and constants
-    logging.ts         # Debug logging utilities
-  types/
-    env.d.ts           # Env var typings
-    mapgl.d.ts         # 2GIS MapGL global types
-  __mocks__/           # Centralized mock data for testing
-    advice/            # Advice component mock data
-    dashboard/         # Dashboard component mock data
-    search/            # Search-related mock data
-    utils/             # Mock data generators and constants
-    index.ts           # Main export file with presets
-
-public/
-  assets/...           # Static images and SVGs used by dashboard blocks
-
-src/__tests__/         # Component tests (co-located with source)
-  components/
-    bottom-sheet/      # BottomSheet tests
-    dashboard/         # Dashboard component tests
-      advice/          # Advice component tests
-
-__tests__/             # Integration and E2E tests
-  integration/         # Integration test suite
-  unit/               # Unit test suite
-  components/
-    screen-manager/    # Screen manager tests
+├── app/                    # Next.js app router
+├── components/
+│   ├── atoms/             # Basic UI elements (Button, Badge, Text, Icon)
+│   ├── molecules/         # Combinations of atoms (SearchResultItem, QuickAction)
+│   ├── organisms/         # Complex components (SearchBar, SearchResultsList, BottomSheet)
+│   ├── templates/         # Page layouts (MobileMapShell, ScreenRenderer)
+│   └── pages/            # Full pages (DashboardPage, SearchResultsPage)
+├── stores/                # Zustand state management
+│   ├── index.ts          # Main store with middleware
+│   ├── slices/           # Map, Search, UI state slices
+│   ├── selectors/        # Atomic selectors for performance
+│   └── types.ts          # TypeScript interfaces
+├── lib/
+│   └── ui/
+│       └── tokens.ts     # Design tokens (colors, spacing, typography)
+├── __mocks__/            # Mock data for development
+└── assets/               # Static assets (images, icons)
 ```
 
-## Getting started
+## 🎨 Design Principles
+
+### 1. Atomic Design Hierarchy
+- Components can only import from layers below
+- Atoms have no dependencies on other components
+- Strict separation of concerns at each level
+
+### 2. Design Tokens
+- All styling uses centralized tokens from `lib/ui/tokens.ts`
+- No hardcoded colors, spacing, or typography values
+- Consistent visual language throughout the app
+
+### 3. Zustand State Management
+- **Single Store**: All application state in one Zustand store
+- **Atomic Selectors**: Components only re-render when specific data changes
+- **Cross-Slice Actions**: Coordinated actions across map, search, and UI state
+- **Performance Optimized**: Direct map control without React overhead
+
+### 4. Minimal Complexity
+- Clean, semantic HTML structure
+- No unnecessary animations or wrappers
+- Maximum 2-3 levels of DOM nesting
+
+## 🚀 Getting Started
 
 ### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- 2GIS API key
 
-- Node.js 18+ (recommended 20+)
-- npm 9+ (or pnpm/yarn/bun) 
-
-### Install
+### Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+
+# Install dependencies
 npm install
+
+# Set up environment variables
+# Create .env.local and add your 2GIS API key:
+# NEXT_PUBLIC_2GIS_API_KEY=your_api_key_here
 ```
 
-### Configure environment
-
-Create `.env.local` in the project root:
+### Development
 
 ```bash
-NEXT_PUBLIC_2GIS_API_KEY=your_mapgl_api_key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-Get an API key: see 2GIS MapGL docs (`https://docs.2gis.com/en/mapgl/overview#how-to-get-an-api-key`).
-
-### Bottom Sheet Implementation
-
-The application uses react-modal-sheet for the bottom sheet component, providing:
-- Native-like gesture handling with snap points
-- Smooth 60fps animations
-- Proper scroll boundary detection
-- SSR-safe rendering with hydration support
-- Mobile-optimized touch and wheel event handling
-
-### Run dev server
-
-```bash
+# Start development server
 npm run dev
+# Opens at http://localhost:3000
 ```
 
-Open `http://localhost:3000`.
-
-## Available scripts
-
-- `dev`: Start Next.js with Turbopack
-- `build`: Production build
-- `start`: Start production server
-- `lint`: ESLint
-- `type-check`: TypeScript type checking
-- `test`: Run all Jest tests
-- `test:unit`, `test:integration`: Scoped Jest runs
-- `test:e2e`: Run Playwright tests
-- `test:e2e:mobile`: Playwright on mobile projects
-- `test:e2e:ui`: Playwright UI runner
-- `test:coverage`: Jest coverage
-- `test:map`, `test:sheet`: Filtered Jest runs
-
-## Testing
-
-### Unit/Integration (Jest + Testing Library)
+### Production Build
 
 ```bash
-npm run test          # all
-npm run test:unit     # unit only
-npm run test:integration
-npm run test:coverage
+# Create production build
+npm run build
+
+# Run production server
+npm start
 ```
 
-Key config: `jest.config.js`
-- DOM mocks: `jest.setup.js` (IntersectionObserver, ResizeObserver, matchMedia, geolocation)
-- 2GIS MapGL is mocked for deterministic tests
-- Centralized mock data in `src/__mocks__/` for consistent test data
-- Coverage thresholds (current):
-  - Global: 30%
-  - `src/components/map/`: 30%
-  - `src/hooks/`: 30%
+## 📝 Common Commands
 
-### End-to-end (Playwright)
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run type-check` | Run TypeScript compiler |
+| `npm run format` | Format code with Prettier |
 
-E2E tests are temporarily removed while we redesign them for mobile map + gesture scenarios.
+> **⚠️ Testing Status**: Tests are temporarily removed. All test files and configurations have been deleted while preserving code quality tools. Tests will be refactored and rewritten in a future task.
 
-- Current status: disabled scripts (`test:e2e*`) return a no-op message
-- Config: `playwright.config.ts` is retained as a template
-- Strategy doc: see `docs/e2e-testing-strategy.md`
+## 🏛️ Component Architecture
 
-### Mock Data
+### Atoms
+Basic building blocks with no dependencies:
+- `Button`, `Badge`, `Text`, `Icon`
+- `CardContainer`, `Input`
 
-Centralized mock data is available in `src/__mocks__/` for consistent testing:
+### Molecules
+Simple combinations of atoms (recently migrated to atomic design):
+- `SearchInput` - Search field with icons, voice assistant integration
+- `StoryItem` - Image + text display for story content
+- `MetaItem` - Category search card with icon, title, subtitle (116px height)
+- `MetaItemAd` - Sponsored content card with logo and gradient
+- `Cover` - Featured collection covers (116px default, 244px big variant)
+- `Interesting` - Feature promotion cards (244px double height)
+- `RD` - Business advertiser cards with gallery (244px double height)
+
+### Organisms
+Complex, self-contained components:
+- `SearchBar` - Full search interface with Zustand integration
+- `AdviceSection` - Masonry grid layout for advice cards
+- `BottomSheet` - Draggable sheet container with snap points
+- `MapContainer` - Map instance wrapper with direct store access
+
+### Templates
+Page layouts and navigation:
+- `MobileMapShell` - Main app shell with map + bottom sheet
+- `ScreenRenderer` - Screen transition handler with store selectors
+
+### Pages
+Complete screen implementations:
+- `DashboardPage` - Home screen with advice cards
+- `SearchResultsPage` - Search results display
+- `SearchSuggestionsPage` - Search suggestions
+
+## 🏪 State Management
+
+### Zustand Store Architecture
+```typescript
+// Direct store access with atomic selectors
+const search = useStore((state) => state.search);
+const ui = useStore((state) => state.ui);
+const map = useStore((state) => state.map);
+const actions = useActions();
+```
+
+### Store Slices
+- **Map Slice**: Map instance, markers, center, zoom with direct map control
+- **Search Slice**: Query, suggestions, results, history with debounced search
+- **UI Slice**: Navigation, bottom sheet, screen state with optimized updates
+- **Cross-Slice Actions**: Coordinated workflows like `performSearch()`
+
+### Performance Features
+- **Selective Re-renders**: Components only update when their data changes
+- **Persistence**: Search history and preferences saved to localStorage
+- **DevTools**: Full Redux DevTools integration for debugging
+- **Type Safety**: Complete TypeScript interfaces for all state
+
+## 🎯 Key Features
+
+- **Draggable Bottom Sheet** - 3 snap points (10%, 50%, 90%) with state persistence
+- **Interactive Map** - 2GIS MapGL with markers and navigation, direct control
+- **Smart Search System** - Real-time suggestions, debounced queries, cached results
+- **Advice Cards System** - Masonry grid with MetaItem, Cover, Interesting, RD components
+- **Atomic Design Architecture** - Recently migrated to strict component hierarchy
+- **Design Tokens** - Centralized styling system with no hardcoded values
+- **Responsive Design** - Mobile-first with safe area support
+- **State Management** - Zustand with atomic selectors and cross-slice actions
+- **Performance Optimized** - Minimal re-renders, 8KB state management overhead
+- **Code Quality** - ESLint, TypeScript, Prettier with pre-commit hooks
+
+## 📱 Mobile Optimizations
+
+- Viewport-fit cover for notched devices
+- Safe area insets for proper spacing
+- Touch-optimized interactions
+- Cooperative gestures for map
+
+## 🔧 Configuration
+
+### Environment Variables
+```env
+NEXT_PUBLIC_2GIS_API_KEY=your_api_key_here
+```
+
+### Zustand Store
+The store is automatically initialized with:
+- **Persistence**: Search history and UI preferences
+- **DevTools**: Redux DevTools integration in development
+- **Middleware**: Immer for immutable updates, subscriptions for performance
 
 ```typescript
-// Import preset combinations
-import { fullAppMockData, emptyAppMockData } from '@/__mocks__'
-
-// Component-specific mocks
-import { mockStories } from '@/__mocks__/dashboard'
-import { mockMetaItems } from '@/__mocks__/advice'
-import { mockSavedAddresses } from '@/__mocks__/search'
-
-// Use generators for dynamic data
-import { generateMockStories, generateMockMarkers } from '@/__mocks__/utils/generators'
-
-const stories = generateMockStories(20, 0.3) // 20 stories, 30% viewed
-const markers = generateMockMarkers(100)     // 100 map markers
-```
-
-See `src/__mocks__/README.md` for detailed usage guide.
-
-## Usage examples
-
-### Map context
-
-```tsx
-// Access map operations
-import { useMapGL } from '@/hooks/useMapGL'
-
-const Demo = () => {
-  const { addMarker, clearMarkers, centerOnLocation } = useMapGL()
-  return (
-    <button onClick={async () => {
-      clearMarkers()
-      await addMarker('id-1', [37.6173, 55.7558])
-      centerOnLocation([37.6173, 55.7558], 16)
-    }}>Drop marker</button>
-  )
+// Example usage in components
+function MyComponent() {
+  // Atomic selectors - only re-renders when specific data changes
+  const query = useStore((state) => state.search.query);
+  const currentScreen = useStore((state) => state.ui.currentScreen);
+  
+  // Cross-slice actions
+  const { performSearch, navigateTo } = useActions();
 }
 ```
 
-### Bottom sheet
+### Design Tokens
+Modify `src/lib/ui/tokens.ts` to customize:
+- Colors
+- Typography
+- Spacing
+- Border radius
+- Transitions
 
-```tsx
-import { BottomSheet } from '@/components/bottom-sheet'
+## 📄 License
 
-<BottomSheet 
-  snapPoints={[10, 50, 90]} 
-  onSnapChange={(s) => console.log(s)}
-  headerBackground="#F1F1F1" // Optional: customize header/drag area background
->
-  {/* your content */}
-</BottomSheet>
+[Your License Here]
 
-// For SSR issues, use BottomSheetClient
-import { BottomSheetClient } from '@/components/bottom-sheet'
-```
+## 🧪 Testing Strategy
 
-### Mobile App Shell (Main Integration)
+**Current Status**: All tests have been temporarily removed to allow for a clean architectural refactor.
 
-```tsx
-import { MobileMapShell } from '@/components/app-shell'
-import { MapProvider, MapContainer } from '@/components/map'
+**What was removed**:
+- Jest configuration and test files
+- Playwright E2E setup
+- Testing Library components
+- All `*.test.ts` and `*.spec.ts` files
 
-<MapProvider>
-  <MapContainer />
-  <MobileMapShell snapPoints={[10, 50, 90]} items={adviceItems} />
-</MapProvider>
-```
+**What remains**:
+- ✅ Full TypeScript type checking
+- ✅ ESLint with comprehensive rules
+- ✅ Prettier code formatting
+- ✅ Pre-commit hooks for quality
+- ✅ Build process validation
 
-### Dashboard
+**Future Plans**:
+Tests will be rewritten to align with the atomic design architecture, focusing on:
+- Component isolation testing at each atomic level
+- Integration testing for store interactions
+- E2E testing for critical user flows
+- Performance testing for state management
 
-```tsx
-import { Dashboard } from '@/components/dashboard'
+## 🤝 Contributing
 
-<Dashboard onSearch={(q) => console.log('search:', q)} />
-```
-
-### SearchBar Component
-
-```tsx
-import { SearchBar } from '@/components/dashboard/SearchBar'
-
-// Three variants available:
-<SearchBar 
-  variant="dashboard"  // Default: white bg, menu button
-  variant="suggest"    // White bg, clear (X) button
-  variant="results"    // Gray (#F1F1F1) bg, white input, clear button
-  onSearch={(query) => handleSearch(query)}
-  onClear={() => navigateToDashboard()}
-/>
-```
-
-### Screen Management
-
-```tsx
-import { ScreenManagerProvider, ScreenType } from '@/components/screen-manager'
-
-// Wrap your app with the provider
-<ScreenManagerProvider 
-  initialScreen={ScreenType.DASHBOARD}
-  initialQuery="Initial search"
->
-  <MobileMapShell />
-</ScreenManagerProvider>
-
-// Available screens:
-// - ScreenType.DASHBOARD (main screen)
-// - ScreenType.SEARCH_SUGGESTIONS (search input focused)
-// - ScreenType.SEARCH_RESULTS (search results with gray background)
-```
-
-## Accessibility, performance, and styling
-
-- **Accessibility**: Keyboard focus handling in components; ARIA labels for interactive elements (ongoing).
-- **Performance**: 60fps goal on interactions; `useBottomSheet` minimizes layout thrash and uses velocity/snap heuristics; map operations use animation settings from `MAP_CONFIG`.
-- **Styling**: Tailwind CSS 4 via `@tailwindcss/postcss`. Utility classes are used throughout, with inline styles for dynamic values.
-
-## Troubleshooting
-
-- **Map doesn't load / errors in console**
-  - Ensure `.env.local` has `NEXT_PUBLIC_2GIS_API_KEY`.
-  - Restart dev server after adding env vars.
-- **Bottom sheet scroll feels stuck**
-  - In expanded state (90%), content scroll takes priority
-  - Sheet only moves when content is at scroll boundaries
-  - This is expected behavior for mobile UX consistency
-- **Bottom sheet content scrolls instead of dragging at 50% snap point**
-  - FIXED (Jan 2025): Added conditional `disableScroll` based on snap position
-  - Content now only scrolls when sheet is fully expanded (90%)
-  - At 10% and 50% positions, only dragging works (no content scrolling)
-  - This prevents the scroll/drag gesture conflict on touch devices
-- **Bottom sheet content scrolls instead of dragging on mobile (legacy issue)**
-  - Check that `touchAction: "none"` is NOT set globally on body/html
-  - Only the map container should have `touchAction: "none"`
-  - Global touch-action blocks react-modal-sheet's gesture detection
-- **Layout shift on initial load**
-  - Fixed: CSS ensures consistent padding between SSR and client renders
-  - If persists, check for dynamic content loading in useEffect
-- **White borders flash on dashboard**
-  - Fixed: react-modal-sheet scroller padding removed via CSS overrides
-  - Ensure `bottom-sheet.css` is imported
-- **Snap points assertion error**
-  - react-modal-sheet expects descending order [0.9, 0.5, 0.1]
-  - The component automatically converts from our API [10, 50, 90]
-- **Hydration warnings**
-  - Use `BottomSheetClient` for dynamic import if needed
-  - Component includes SSR placeholder to prevent mismatches
-- **E2E tests time out**
-  - Verify dev server started; Playwright will launch it, but port conflicts can break tests.
-  - Run `npx playwright install` if browsers are missing.
-
-## Roadmap and docs
-
-- Product/architecture docs:
-  - `docs/bottom-sheet-architecture.md`
-  - `docs/bottom-sheet-prd.md`
-  - `docs/bottomsheet-dashboard-prd.md`
-
-Planned enhancements (from PRDs):
-- Real-time search suggestions, richer stories, dynamic advice content, and advanced map interactions.
-
----
-
-© 2025. Built with Next.js, React, Tailwind, and 2GIS MapGL.
+Please read our contributing guidelines before submitting PRs.

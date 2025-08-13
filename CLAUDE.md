@@ -1,844 +1,514 @@
-```markdown
-# 2GIS MapGL Mobile App
+# 2GIS MapGL Mobile App - Development Guidelines
 
-Mobile-first map application with draggable bottom sheet overlay and dashboard interface.
-**Stack:** Next.js 15, TypeScript, 2GIS MapGL, React 19, Tailwind CSS, react-modal-sheet
+## 🏗️ Atomic Design Architecture
 
-## Quick Start
+This codebase follows **Atomic Design** principles strictly. Components are organized in a hierarchy where each level can only depend on levels below it.
 
-```bash
-# Setup
-cp .env.example .env.local  # Add your 2GIS API key
-npm install
+### 🚀 Recent Migration Progress
 
-# Development
-# The server is launched in the next window with the command `npm run dev` you can always access it on port :3000    
+**COMPLETED**: Atomic design migration for advice card components
+- ✅ **MetaItem** - Category search cards (116px height)
+- ✅ **MetaItemAd** - Sponsored content cards with gradient
+- ✅ **Cover** - Collection covers (116px/244px variants)
+- ✅ **Interesting** - Feature promotion cards (244px double height)
+- ✅ **RD** - Business advertiser cards with gallery (244px double height)
 
-npm run test:watch          # TDD mode
-npm run test:coverage       # Check coverage
+All components now use design tokens exclusively and follow atomic design hierarchy.
 
-# Production
-npm run build && npm start
+### Component Hierarchy Rules
+
+```
+Atoms → Molecules → Organisms → Templates → Pages
 ```
 
-## Test Pages
+- **Atoms**: No dependencies on other components
+- **Molecules**: Can only import atoms
+- **Organisms**: Can import atoms and molecules
+- **Templates**: Can import atoms, molecules, and organisms
+- **Pages**: Can import from all levels below
 
-All test pages have been removed. Testing should be done directly in the main application flow.
+## ⚡ Essential Commands
 
-## Commands
+```bash
+npm run dev         # Start development server (port 3000)
+npm run build       # Production build
+npm run type-check  # TypeScript validation
+npm run lint        # ESLint checks
+npm run format      # Format code with Prettier
+```
 
-| Task | Command | Description |
-|------|---------|-------------|
-| Dev | `npm run dev` | Start development server |
-| Test | `npm test` | Run all tests |
-| TDD | `npm run test:watch` | Test watch mode |
-| Type Check | `npm run type-check` | TypeScript validation |
-| Build | `npm run build` | Production build |
-| E2E | `npm run test:e2e:mobile` | Mobile viewport tests |
+> **Note**: Tests have been temporarily removed. All test files and configurations have been deleted while preserving ESLint, TypeScript type checking, and other code quality tools. Tests will be refactored and rewritten in a future task.
 
-## Project Structure
+## 🎨 Design Token Usage
+
+### Always Use Tokens
+
+```typescript
+// ✅ CORRECT - Using design tokens
+import { tokens } from '@/lib/ui/tokens';
+
+backgroundColor: tokens.colors.background.secondary
+padding: tokens.spacing[4]
+fontSize: tokens.typography.fontSize.base
+borderRadius: tokens.borders.radius.md
+
+// ❌ WRONG - Hardcoded values
+backgroundColor: '#F1F1F1'
+padding: '16px'
+fontSize: '14px'
+borderRadius: '8px'
+```
+
+### Available Tokens
+
+- **Colors**: `tokens.colors.*` (primary, text, background, border, traffic)
+- **Spacing**: `tokens.spacing[0-10]` (0px to 40px)
+- **Typography**: `tokens.typography.*` (fontSize, fontWeight, lineHeight)
+- **Borders**: `tokens.borders.*` (radius, width)
+- **Transitions**: `tokens.transitions.*` (duration, easing)
+
+## 🎨 Figma Design References
+
+### Search Bar Components
+- **Dashboard Search Bar**: node-id `271-221631` - White background with menu button
+- **Suggestions Page Search Bar**: node-id `271-221659` - White background with X button  
+- **Search Results Search Bar**: node-id `271-221789` - Gray background (#F1F1F1) with X button
+
+### Implementation Notes
+- **Drag Handle**: Always handled by BottomSheet component, not SearchBar
+- **Background Colors**: SearchBar inherits background from parent container
+- **Atomic Design**: SearchBar organism focuses only on search functionality
+- **Top Spacing**: Exactly 16px from bottom sheet edge to search bar (all screens)
+  - Drag handle top: `pt-1.5` = 6px
+  - Drag handle height: `h-1` = 4px  
+  - Drag handle bottom: `pb-1.5` = 6px
+  - SearchBar top: no padding (0px)
+  - **Total spacing**: 6 + 4 + 6 = 16px (drag handle perfectly centered)
+- **Design Token Colors**:
+  - White backgrounds: `tokens.colors.background.primary` → `#FFFFFF`
+  - Gray backgrounds: `tokens.colors.background.secondary` → `#F1F1F1`
+  - Drag handle on white: `rgba(20, 20, 20, 0.09)`
+  - Drag handle on gray: `rgba(137, 137, 137, 0.25)`
+
+### Button Behavior and Positioning
+- **Salute Button**: Always positioned inside the search bar as rightIcon in SearchInput molecule
+  - Displays on all screens (dashboard, suggestions, search results)
+  - Uses `IMAGES.SALUT_ASSISTANT` asset with 24x24 size
+  - Search input structure: `[search icon] [text input] [salute button]`
+- **Burger/Cross Button**: 
+  - Positioned OUTSIDE the search input, to the right of the search bar
+  - Transforms dynamically based on `currentScreen` from Zustand store
+  - Dashboard: Shows burger menu (`ICONS.MENU`) → calls `onMenuClick`
+  - Suggestions/Search Results: Shows X icon (`ICONS.CLOSE`) → calls `onClear`
+  - Always uses `rgba(20, 20, 20, 0.06)` background color from Figma designs
+- **Clear Button Inside Search**: NEVER appears (per Figma designs)
+  - All clear functionality is handled by the X button outside the search input
+  - Search results screen: NO clear button inside search bar
+  - Suggestions screen: NO clear button inside search bar  
+  - Dashboard screen: NO clear button inside search bar
+
+### Component Structure
+```typescript
+SearchBar organism:
+├── SearchInput molecule
+│   ├── leftIcon: Search icon
+│   └── rightIcon: Salute button only
+└── Action Button: Burger/Cross with dynamic background
+    ├── Dashboard: Burger menu (opens menu)
+    └── Suggestions/Results: X icon (clears search)
+```
+
+## 📁 Project Structure
 
 ```
 src/
-├── app/                    # Next.js app router
-│   ├── page.tsx           # Main app with MobileMapShell
-│   └── layout.tsx         # Root layout with mobile optimization
 ├── components/
-│   ├── app-shell/         # Main app integration
-│   │   ├── MobileMapShell.tsx  # Integrated map + bottom sheet + screens
-│   │   └── index.ts       # Exports
-│   ├── bottom-sheet/      # Core bottom sheet component
-│   │   ├── BottomSheet.tsx      # Main sheet component (includes SSR handling)
-│   │   ├── BottomSheet.types.ts # All bottom sheet types
-│   │   ├── bottom-sheet.css     # Styles and overrides
-│   │   └── index.ts       # Clean exports
-│   ├── screen-manager/    # Screen navigation system
-│   │   ├── ScreenManagerContext.tsx  # Navigation state management
-│   │   ├── ScreenRenderer.tsx        # Screen switching logic
-│   │   ├── SearchSuggestions.tsx     # Search suggestions screen
-│   │   ├── SuggestRow.tsx            # Search suggestion row component (3 variants)
-│   │   ├── SearchResults.tsx         # Search results screen
-│   │   ├── types.ts       # Screen types and interfaces
-│   │   └── index.ts       # Exports
-│   ├── dashboard/         # Dashboard components
-│   │   ├── Dashboard.tsx  # Main dashboard container
-│   │   ├── SearchBar.tsx  # Search with voice assistant
-│   │   ├── QuickAccessPanel.tsx  # Quick action buttons
-│   │   ├── StoriesPanel.tsx  # Horizontal scrolling stories
-│   │   ├── StoryItem.tsx  # Individual story card
-│   │   ├── advice/        # Advice section components
-│   │   │   ├── AdviceSection.tsx  # Container with layout logic
-│   │   │   ├── MetaItem.tsx       # Category search cards
-│   │   │   ├── MetaItemAd.tsx     # Advertisement cards
-│   │   │   ├── Interesting.tsx    # Feature promotion cards
-│   │   │   ├── Cover.tsx          # Collection covers
-│   │   │   ├── RD.tsx             # Advertiser cards
-│   │   │   ├── types.ts           # TypeScript interfaces
-│   │   │   └── index.ts           # Exports
-│   │   └── index.ts       # Dashboard exports
-│   ├── map/               # MapContainer, MapProvider
-│   └── icons/             # Icon system
-│       ├── Icon.tsx       # Reusable icon component
-│       └── index.ts       # Icon exports
-├── hooks/
-│   └── useMapGL.ts        # Map context and operations
-├── lib/
-│   ├── mapgl/            # Map config & utilities
-│   ├── config/           # Environment config
-│   └── icons/            # Icon definitions and mappings
-├── __mocks__/            # Centralized mock data for testing
-│   ├── advice/           # Advice component mock data
-│   ├── dashboard/        # Dashboard component mock data
-│   ├── search/           # Search-related mock data
-│   ├── utils/            # Mock data generators and constants
-│   └── index.ts          # Main export file with presets
-├── src/__tests__/        # Component tests (co-located with source)
-│   └── components/
-│       ├── bottom-sheet/  # BottomSheet tests
-│       └── dashboard/     # Dashboard component tests
-│           └── advice/    # Advice component tests
-└── __tests__/            # Integration and E2E tests
-    ├── integration/      # Integration test suite
-    ├── unit/            # Unit test suite
-    └── components/      # Additional component tests
-        └── screen-manager/ # Screen manager tests
+│   ├── atoms/      # Basic UI elements
+│   ├── molecules/  # Composed from atoms  
+│   ├── organisms/  # Complex components
+│   ├── templates/  # Page layouts
+│   └── pages/      # Complete screens
+├── stores/         # Zustand state management
+│   ├── index.ts    # Main store with middleware
+│   ├── slices/     # Map, Search, UI state slices
+│   ├── selectors/  # Atomic selectors
+│   └── types.ts    # TypeScript interfaces
+└── lib/
+    └── ui/
+        └── tokens.ts  # Design tokens
 ```
 
-## Critical Patterns
+## 🚀 Component Creation Guidelines
 
-### Map Initialization (Simplified - Let 2GIS Handle Controls!)
+### Creating a New Atom
 
 ```typescript
-useEffect(() => {
-  load().then((mapgl) => {
-    const map = new mapgl.Map('map-container', {
-      key: process.env.NEXT_PUBLIC_2GIS_API_KEY,
-      center: [37.618423, 55.751244],
-      zoom: 13,
-      // Let 2GIS handle all controls automatically
-      // No manual control management needed!
-    });
-    
-    mapRef.current = map;
-  });
-  
-  return () => {
-    mapRef.current?.destroy(); // ⚠️ CRITICAL: Always cleanup
-  };
-}, []); // Empty deps array!
-```
+// src/components/atoms/MyAtom.tsx
+'use client';
 
-### 2GIS Default Controls
+import React from 'react';
+import { tokens } from '@/lib/ui/tokens';
 
-The map automatically includes zoom controls. Let 2GIS handle all control logic to prevent duplicates.
+interface MyAtomProps {
+  // Props definition
+}
 
-✅ **Built-in:** Zoom controls are added by default  
-❌ **Not available:** Geolocation control (would need custom implementation if required)
-
-### SSR Hydration Fix
-
-```typescript
-// Avoid hydration mismatches
-const [isClient, setIsClient] = useState(false);
-
-useEffect(() => {
-  setIsClient(true);
-}, []);
-
-const value = isClient 
-  ? clientSpecificValue     // e.g., window.innerHeight
-  : 'serverSafeDefault';     // e.g., '100%'
-```
-
-### Common Map Operations
-
-```typescript
-// Add marker (use async addMarker from MapProvider)
-await addMarker('marker-id', [lng, lat]);
-
-// Add marker with custom options
-await addMarker('marker-id', [lng, lat], {
-  icon: 'custom-icon.svg',
-  size: [40, 40],
-  anchor: [20, 40]
-});
-
-// Center map
-map.setCenter([lng, lat], { duration: 300 });
-map.setZoom(15);
-
-// Handle click
-map.on('click', (e) => {
-  const { lngLat } = e;
-  // Add marker at click position
-});
-
-// Remove markers
-removeMarker('marker-id');
-clearMarkers(); // Remove all markers
-```
-
-### Mobile App Shell
-
-Main app integration component that combines map, bottom sheet, and screen management.
-
-```typescript
-import { MobileMapShell } from '@/components/app-shell';
-
-// Usage in main app
-<MobileMapShell 
-  snapPoints={[10, 50, 90]}
-  items={adviceItems}
-/>
-```
-
-### Dashboard Component
-
-The main interface rendered inside the MobileMapShell, providing search and quick access features.
-
-```typescript
-import { Dashboard } from '@/components/dashboard';
-```
-
-**Components:**
-
-#### SearchBar
-- Integrated drag handle (6px from top edge)
-- Search input with icon
-- Voice assistant (Salut) button with actual Figma asset
-- Three variants:
-  - `dashboard`: White background, menu burger icon on right
-  - `suggest`: White background, X/Clear button on right (clears search)
-  - `results`: Gray (#F1F1F1) background, white input field, X/Clear button (returns to dashboard)
-- Identical padding/spacing in all modes
-- Bottom padding creates 16px gap to next component
-
-#### QuickAccessPanel  
-- Horizontally scrollable button row
-- Fade mask extends to edges (0px margins)
-- Content starts at 16px from left edge
-- Traffic indicators with color coding:
-  - 🔴 Red (#F5373C) - Heavy traffic
-  - 🟡 Yellow (#EFA701) - Moderate traffic
-  - 🟢 Green (#1BA136) - Light traffic
-
-### Icon System
-
-Centralized icon component with exact SVG icons extracted from Figma designs.
-
-```typescript
-import { Icon, ICONS, COLORS, IMAGES } from '@/components/icons';
-
-// Use Icon component - icons maintain aspect ratio in 24x24 container
-<Icon name={ICONS.HOME} size={24} color={COLORS.TEXT_PRIMARY} />
-
-// Use image assets
-<Image src={IMAGES.SALUT_ASSISTANT} alt="Voice assistant" />
-
-// Use color tokens
-style={{ backgroundColor: COLORS.BUTTON_SECONDARY_BG }}
-```
-
-**Available Icons (Exact Figma SVGs):**
-- `ICONS.SEARCH` - Search icon (19x19 natural size)
-- `ICONS.MENU` - Menu/hamburger icon (18x14 natural size)
-- `ICONS.HOME` - Home icon (22x19 natural size)
-- `ICONS.WORK` - Work/briefcase icon (20x18 natural size)  
-- `ICONS.BOOKMARK` - Bookmark icon (14x19 natural size)
-- `ICONS.LOCATION` - Location pin (generic placeholder)
-
-**Icon Implementation Details:**
-- Icons are NOT stretched to fill containers
-- Each icon maintains its original aspect ratio from Figma
-- Icons are centered within fixed-size containers (default 24x24)
-- Natural padding/margins are preserved from designs
-
-**Design Tokens:**
-```typescript
-COLORS.TEXT_PRIMARY      // #141414
-COLORS.TEXT_SECONDARY    // #898989
-COLORS.TRAFFIC_HEAVY     // #F5373C (red)
-COLORS.TRAFFIC_MODERATE  // #EFA701 (yellow)
-COLORS.TRAFFIC_LIGHT     // #1BA136 (green)
-COLORS.BUTTON_SECONDARY_BG // rgba(20, 20, 20, 0.06)
-COLORS.DRAG_HANDLE       // rgba(137, 137, 137, 0.25)
-```
-
-### Bottom Sheet Component (react-modal-sheet)
-
-Mobile-optimized draggable overlay using react-modal-sheet for smooth gesture handling.
-
-```typescript
-import { BottomSheet } from '@/components/bottom-sheet';
-
-// Basic usage
-<BottomSheet>{/* your content */}</BottomSheet>
-
-// With custom snap points and header background
-<BottomSheet 
-  snapPoints={[15, 60, 95]} 
-  onSnapChange={(snap) => console.log(snap)}
-  headerBackground="#F1F1F1" // Customize drag handle area background
->
-  {/* your content */}
-</BottomSheet>
-
-// For SSR issues, BottomSheetClient is available in the same import
-import { BottomSheet, BottomSheetClient } from '@/components/bottom-sheet';
-```
-
-**Key Features:**
-- **Snap Points**: Default [10%, 50%, 90%] positions (starts at 50%)
-- **react-modal-sheet**: Production-ready gesture handling library
-- **Smart Scrolling**: Content scrolling only when fully expanded (90%)
-- **Performance**: Hardware-accelerated 60fps animations
-- **SSR Safe**: Includes hydration guards and client-only wrapper
-
-**Implementation Details:**
-- Uses react-modal-sheet v4.4.0 for gesture handling
-- Snap points are converted to descending order for the library
-- Custom wheel handler for desktop support
-- SSR placeholder prevents hydration mismatches
-
-**Snap Points Conversion:**
-```typescript
-// Our API: [10, 50, 90] - percentages from bottom (ascending)
-// Converted to: [0.9, 0.5, 0.1] - decimals from top (descending)
-// react-modal-sheet expects descending order
-```
-
-**Note:** The `useBottomSheet` hook has been removed. All gesture logic is handled by react-modal-sheet.
-
-**Sheet States:**
-- **Collapsed (10%)**: Minimal visible state
-- **Half (50%)**: DEFAULT starting state
-- **Expanded (90%)**: Content scrollable, sheet moves only at scroll boundaries
-
-## TDD Workflow
-
-1. **Write test first** → See it fail (RED)
-2. **Implement minimal code** → Make it pass (GREEN)  
-3. **Refactor** → Keep tests green
-
-```bash
-npm run test:watch          # During development
-npm run test:coverage       # Check coverage (min 80%)
-```
-
-**Use centralized mock data:**
-```typescript
-// Import preset combinations for testing
-import { fullAppMockData, emptyAppMockData } from '@/__mocks__'
-
-// Component-specific mocks
-import { mockStories } from '@/__mocks__/dashboard'
-import { mockMetaItems, mockCovers } from '@/__mocks__/advice'
-
-// Generate dynamic test data
-import { generateMockStories, generateMockMarkers } from '@/__mocks__/utils/generators'
-```
-
-**Mock 2GIS in tests:**
-```typescript
-jest.mock('@2gis/mapgl', () => ({
-  load: jest.fn().mockResolvedValue({
-    Map: jest.fn(() => ({
-      setCenter: jest.fn(),
-      destroy: jest.fn(),
-    }))
-  })
-}));
-```
-
-**Mock Bottom Sheet in tests:**
-```typescript
-jest.mock('@/components/bottom-sheet', () => ({
-  BottomSheet: ({ children }) => <div data-testid="bottom-sheet">{children}</div>,
-  BottomSheetClient: ({ children }) => <div data-testid="bottom-sheet-client">{children}</div>,
-}));
-```
-
-## Known Issues & Solutions
-
-| Problem | Solution |
-|---------|----------|
-| **Duplicate zoom controls** | Let 2GIS handle controls automatically - don't add manually |
-| **GeoControl is not a constructor** | Geolocation not available in 2GIS by default |
-| **Hydration mismatch errors** | BottomSheet includes SSR guards; use BottomSheetClient for dynamic import |
-| **Map not cleaning up** | Always call `map.destroy()` in useEffect cleanup |
-| **Controls added multiple times** | Don't add controls manually - use 2GIS defaults |
-| **Marker creation TypeError** | Don't pass unsupported props like `label` to 2GIS markers |
-| **Snap points assertion error** | react-modal-sheet needs descending order - handled automatically |
-| **Bottom sheet not dragging** | Check react-modal-sheet is properly installed |
-| **Bottom sheet content scrolls instead of dragging** | NEVER set `touchAction: "none"` globally on body/html - only on map container. Global touch-action blocks gesture libraries |
-| **Layout shift on initial load** | Initialize state with empty arrays instead of undefined; use hardcoded colors instead of CSS variables |
-| **White borders flash** | CSS overrides remove react-modal-sheet padding; ensure bottom-sheet.css is imported |
-| **Quick Access Panel height issue** | Use conditional rendering instead of animated height transitions |
-
-## MCP Servers
-
-```json
-// .mcp.json configuration
-{
-  "mcpServers": {
-    "context7": {
-      "command": "mcp-server-context7",
-    },
-    "figma": {
-      "command": "mcp-server-figma",
-    },
-    "playwright": {
-      "command": "mcp-server-playwright"
-    },
-    "github": {
-      "command": "mcp-server-github",
-    }
-  }
+export function MyAtom({ ...props }: MyAtomProps) {
+  // Use only design tokens, no component imports, no store access
+  return <div>...</div>;
 }
 ```
 
-**Usage:**
-- **context7:** Fetch docs and examples for react.js, next.js, etc.
-- **figma:** Get design specs and tokens
-- **playwright:** Visual testing and debugging
-- **github:** PR management and version control
-
-### Figma Integration
-
-Extract assets and design specs from Figma designs:
+### Creating a New Molecule
 
 ```typescript
-// Extract component with assets
-mcp__figma-dev-mode-mcp-server__get_code({
-  nodeId: "189-220904",  // Figma node ID
-  dirForAssetWrites: "/path/to/public/assets",
-})
+// src/components/molecules/MyMolecule.tsx
+'use client';
+
+import React from 'react';
+import { tokens } from '@/lib/ui/tokens';
+// Import only atoms - NO molecule imports allowed!
+
+interface MyMoleculeProps {
+  title: string;
+  onClick?: () => void;
+  theme?: 'Light' | 'Dark';
+}
+
+export function MyMolecule({ title, onClick, theme = 'Light' }: MyMoleculeProps) {
+  // Can only import design tokens, no molecule dependencies
+  const isLight = theme === 'Light';
+  
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        backgroundColor: isLight ? tokens.colors.background.primary : 'rgba(255,255,255,0.06)',
+        borderRadius: tokens.borders.radius.lg,
+        padding: tokens.spacing[4],
+      }}
+    >
+      <h3 style={{
+        color: isLight ? tokens.colors.text.primary : tokens.colors.text.inverse,
+        fontSize: tokens.typography.fontSize.lg,
+        fontWeight: tokens.typography.fontWeight.semibold,
+      }}>
+        {title}
+      </h3>
+    </div>
+  );
+}
 ```
 
-**Figma Node IDs:**
-- SearchBar: `189-220904`
-- QuickAccessPanel: `189-220977`
-- StoryItem: `198-221026`
-- StoriesPanel: `189-221058`
-- AdviceSection: `162-220899`
-- MetaItem: `119-67226`
-- MetaItemAd: `119-66974`
-- Interesting: `119-67257`
-- Cover: `119-66903` (Default) / `119-66910` (Big)
-- RD: `119-66916`
+### Creating a New Organism with Store Access
 
-**Extracted Icon SVG Files:**
-- Search: `/assets/icons/78b4aac2c15552b8c0acc3c49dc2805e66dfdcad.svg`
-- Menu: `/assets/icons/249a5dbcdbd61303a929f5a7b0ba6f76c269ea6d.svg`
-- Bookmark: `/assets/icons/cdbfaf6779ca116ea64c455e3fba67ccc5fd425f.svg`
-- Home: `/assets/icons/ced74e330ddca8cf8d1b420c665acef342483b60.svg`
-- Work: `/assets/icons/7cef2d29c06091060ec9aba55a777bbf0fa58460.svg`
-
-**Story Images Extracted:**
-- Multiple story background images in `/assets/stories/`
-- Images include various medical/health related visuals
-- All images properly sized for 96x112px display area
-
-**Advice Component Assets Extracted (67 files):**
-- Category icons: Various SVG icons for different categories in `/assets/advice/`
-- Feature illustrations: Tourist guide, city visuals
-- Brand logos: Xiaomi and other advertiser logos
-- Gallery images: Restaurant photos for RD components
-- Gradient masks and overlays for visual effects
-- Collection cover images for Cover components
-
-**Asset Workflow:**
-1. Extract assets using MCP tool with node ID
-2. Assets saved to `public/assets/`
-3. Add to icon/image constants in `src/lib/icons/`
-4. Use in components via Icon component or Image imports
-
-See `/docs/figma-asset-workflow.md` for detailed workflow documentation.
-
-## Mobile Optimization
-
-- **Viewport:** `viewport-fit=cover` for notches
-- **Touch:** ⚠️ ONLY set `touch-action: none` on map container, NEVER globally
-- **Safe areas:** `padding-bottom: env(safe-area-inset-bottom)`
-- **Map settings:** `cooperativeGestures: false`, `pitch: 0`
-
-### Critical: Touch Action Scoping
-**NEVER** set `touchAction: "none"` globally on body or html elements. This blocks ALL touch gestures and breaks gesture-based libraries like react-modal-sheet.
-
-✅ **Correct**: Apply only to map container
-```tsx
-// MapContainer.tsx
-<div style={{ touchAction: 'none' }}> // Only for map
-```
-
-❌ **Wrong**: Global application
-```tsx
-// layout.tsx
-<body style={{ touchAction: 'none' }}> // Breaks gesture libraries!
-```
-
-## Git Workflow
-
-**Branches:** `feature/`, `fix/`, `refactor/`, `docs/`  
-**Commits:** `feat:`, `fix:`, `test:`, `docs:`, `refactor:`
-
-```bash
-# TDD commit pattern
-git add tests/ && git commit -m "test: add marker clustering tests"
-git add src/ && git commit -m "feat: implement marker clustering"
-```
-
-## Resources
-
-- [2GIS MapGL Docs](https://docs.2gis.com/en/mapgl)
-- [2GIS React Guide](https://docs.2gis.com/ru/mapgl/start/react)
-- [Next.js Docs](https://nextjs.org/docs)
-- Project Issues: Check GitHub Issues for detailed troubleshooting
-
-## Quick Debug
-
-```bash
-# Console errors?
-1. Check browser console for API key errors
-2. Verify .env.local exists and has valid key
-3. Check network tab for failed 2GIS requests
-
-# Map not showing?
-1. Check container has height (not 0px)
-2. Verify API key is valid
-3. Look for CSP errors in console
-
-# Duplicate controls?
-1. Don't add controls manually - let 2GIS handle them
-2. Verify cleanup in useEffect 
-3. Check React StrictMode (dev only)
-
-# Bottom sheet issues?
-1. Ensure react-modal-sheet is installed (v4.4.0)
-2. Check snap points are valid [10, 50, 90]
-3. For SSR issues, use BottomSheetClient component
-4. Test on actual mobile device for touch gestures
-5. If content scrolls instead of dragging: FIXED - Added conditional disableScroll based on snap position
-
-## 🔧 Recent Updates (January 2025)
-
-### Fixed Visual Borders on SearchResults Screen ✅
-- **Problem**: Unwanted gray lines/borders appearing between SearchBar and first search result card
-- **Root Cause**: Visual separation from padding and potential edge effects in react-modal-sheet components
-- **Solution**: Added explicit border removal and seamless background styling
-- **Implementation**:
-  - Removed all borders from Sheet.Header, Sheet.Content, and Sheet.Scroller
-  - Added CSS overrides to prevent react-modal-sheet from adding borders
-  - Ensured seamless background color transition between components
-  - Eliminated any pseudo-elements that could create visual lines
-- **Result**: Clean spacing between SearchBar and cards with no visible borders or dividers
-
-### Fixed Bottom Sheet Manual Dragging with Automatic Transitions ✅
-- **Problem**: Manual dragging broke after adding automatic snap point adjustments for screen changes
-- **Root Cause**: Automatic snap effect was re-triggering on every render, conflicting with manual drags
-- **Solution**: Track screen changes separately and only auto-snap when screen actually changes
-- **Implementation**:
-  - Added `previousScreenRef` to track actual screen transitions
-  - Added `isAutoSnappingRef` flag to distinguish automatic vs manual snaps
-  - Modified effect to only trigger on screen changes, not on snap changes
-  - Preserved both functionalities working together seamlessly
-- **Result**: Users can now:
-  - Manually drag the sheet to any snap point (10%, 50%, 90%)
-  - Automatic adjustments still work when switching screens
-  - Manual dragging works even after automatic adjustments
-
-### SearchResults Screen Color Scheme Fix ✅
-- **Fixed** Entire SearchResults screen background to #F1F1F1
-- **Added** `headerBackground` prop to BottomSheet for dynamic backgrounds
-- **Updated** SearchBar with `results` variant: gray background, white input field
-- **Removed** Redundant back arrow button - only X button for navigation
-- **Ensured** Consistent color scheme across drag handle, header, and content areas
-- **Synced** Search query state between ScreenManager and MobileMapShell
-
-### Centralized Mock Data Organization ✅
-- **Refactored** All mock data from component files to `src/__mocks__/` directory
-- **Created** Structured organization: `/advice`, `/dashboard`, `/search` subdirectories
-- **Added** Data generators in `/utils/generators.ts` for dynamic test data
-- **Implemented** Preset combinations (fullAppMockData, emptyAppMockData, minimalAppMockData)
-- **Benefits**: Consistent test data across all tests, easier maintenance, better discoverability
-- **Documentation**: Added comprehensive `src/__mocks__/README.md` with usage examples
-
-### Fixed Inconsistent Drag Behavior in Expanded State ✅
-- **Fixed** Advice section now allows sheet dragging when expanded (90%), matching stories behavior
-- **Implementation** Added `touchAction: 'pan-y'` to AdviceSection and Dashboard containers
-- **Behavior**: When at 90% snap and content is scrolled to top, dragging down on any content area pulls the sheet down
-- **Consistency**: Both StoriesPanel and AdviceSection now have consistent drag behavior
-
-### Fixed Excessive Spacing Between Components ✅
-- **Fixed** Removed excessive spacing between SearchBar and QuickAccessPanel 
-- **Issue** The `minHeight: 100px` on Sheet.Header drag zone was creating large gaps
-- **Solution** Removed minHeight constraint, allowing natural content sizing
-- **Result** Exact 16px spacing (8px from SearchBar bottom + 8px from QuickAccess top)
-
-### Universal Draggable Area at ALL Snap Points ✅
-- **Fixed** Extended drag area now works at ALL snap points (10%, 50%, 90%), not just collapsed state
-- **Implementation** Removed conditional logic - Sheet.Header always wraps content area for consistent dragging
-- **Behavior**: 
-  - At 10% snap: Drag from anywhere in the visible area (SearchBar, handle, etc.)
-  - At 50% snap: Drag from anywhere in the visible content (SearchBar, QuickAccess, Stories, etc.)
-  - At 90% snap: Drag from anywhere when scrolled to top; normal scrolling when not at top
-- **Interactive elements** remain clickable (search input focus, buttons) through proper pointer-events management
-
-### Critical Scroll/Drag Fix ✅
-- **Fixed** Bottom sheet content scrolling instead of dragging at 50% snap point
-- **Added** Conditional `disableScroll` prop to Sheet.Scroller based on current snap position
-- **Behavior**: Content now only scrolls when sheet is fully expanded (90%)
-- **At 10% and 50%**: Only dragging works, content scrolling is disabled
-- **Prevents** Scroll/drag gesture conflict on touch devices
-
-### Critical Touch Action Fix ✅ 
-- **Fixed** Bottom sheet scroll vs drag detection on mobile devices
-- **Moved** `touchAction: "none"` from global body to map container only
-- **Resolved** Gesture conflict between react-modal-sheet and global touch blocking
-- **Important**: Never set touchAction globally - it breaks gesture libraries
-
-### Screen Management System ✅
-- **Added** ScreenManager context for navigation between screens
-- **Implemented** Dashboard, SearchSuggestions, and SearchResults screens
-- **Created** ScreenRenderer with smooth transitions between screens
-- **Added** Back navigation button when not on dashboard
-- **Integrated** SearchBar as sticky header across all screens
-- **Fixed** Quick Access Panel rendering issues with conditional display
-
-### Layout Stability Improvements ✅
-- **Fixed** Dashboard layout shift on initial load
-- **Fixed** White borders flash on dashboard content
-- **Optimized** SSR/client render consistency
-- **Removed** unnecessary padding from react-modal-sheet scroller
-- **Improved** initial state handling to prevent content pop-in
-
-### Bottom Sheet Migration to react-modal-sheet ✅
-- **Replaced** custom gesture implementation with react-modal-sheet v4.4.0
-- **Fixed** React hydration mismatches with SSR guards
-- **Fixed** snap points ordering (now properly converts to descending order)
-- **Removed** legacy feature flags and duplicate implementations
-- **Added** BottomSheetClient for dynamic import option
-- **Maintained** backward-compatible API
-
-### Testing react-modal-sheet Integration
-```bash
-# Run bottom sheet specific tests
-npm test -- BottomSheet
-
-# Check SSR and hydration
-npm test -- hydration
-npm test -- ssr
-
-# Verify gesture handling
-npm test -- sheet-scroll
-```
-
-### Dashboard Implementation ✅
-- **SearchBar**: Search input with voice assistant and menu
-- **QuickAccessPanel**: Horizontally scrollable quick actions with traffic indicators
-- **StoriesPanel**: Horizontally scrollable story cards with viewed state
-- **StoryItem**: Individual story cards (96x112px) with image backgrounds and labels
-- **Icon System**: Exact SVG icons from Figma with proper aspect ratios
-- **Design Tokens**: Colors, fonts, and spacing from Figma
-- **AdviceSection**: Container for rendering advice cards in various layouts (single/double/triple/mixed)
-  - **MetaItem**: Category/rubric search cards with icon (116px height, Light/Dark themes)
-  - **MetaItemAd**: Advertisement cards with gradient mask and logo (Xiaomi example)
-  - **Interesting**: Feature promotion cards with illustration (Tourist layer example)
-  - **Cover**: Featured collection covers (placeholder)
-  - **RD**: Advertiser cards (placeholder)
-
-### Icon System Implementation ✅
-- Icons maintain natural aspect ratios from Figma designs
-- Each icon centered in fixed-size container (default 24x24)
-- Original padding/margins preserved
-
-### Story Components ✅
-- **StoryItem**: 96x112px with gradient overlay, viewed state border
-- **StoriesPanel**: Horizontal scroll with fade gradients
-
-
-### Advice Section Implementation ✅
-**Complete Advice Section with 2-Column Masonry Layout** (from Figma node 162-220899):
-- Title: "Советы к месту" (19px Semibold, -0.38px tracking)
-- Background: #F1F1F1
-- **Masonry Layout**: Always 2 columns, variable component heights
-- Components maintain fixed column positions, never span across
-
-**All 5 Components Completed**:
-- **MetaItem**: Category/rubric search cards (always 116px height)
-- **MetaItemAd**: Advertisement cards with gradient mask (always 116px height)
-- **Interesting**: Feature promotion cards with illustration (always 244px height)
-- **Cover**: Collection covers with gradient overlay (116px default / 244px big)
-- **RD**: Advertiser cards with 100px gallery + content (always 244px height)
-
-**Masonry Grid Height Rules**:
-- **Single Height (116px)**: MetaItem, MetaItemAd, Cover (default state)
-- **Double Height (244px)**: Interesting, RD, Cover (big state)
-- Components placed in shorter column for balanced layout
-- No horizontal spanning - components stay in their column
-
-**RD Component Specifications**:
-- Total height: 244px (double height in masonry)
-- Gallery section: Exactly 100px height
-- Content positioned at top-[116px] to prevent overlap
-- Gallery images: Main image + counter badge for additional photos
-
-**Design Specifications**:
-- Border radius: 12px (rounded-xl) for all components
-- Typography: 16px Medium for titles, 13-14px for subtitles
-- Theme support: Light and Dark variants for all components
-- Active states: scale-95 transform on press
-- Masonry algorithm places items in shorter column dynamically
-
-## 🔧 Recent Updates (January 2025)
-
-### Screen Management System ✅
-- **Added** ScreenManager context for navigation between screens
-- **Implemented** Dashboard, SearchSuggestions, and SearchResults screens
-- **Created** ScreenRenderer with smooth transitions between screens
-- **Added** Back navigation button when not on dashboard
-- **Integrated** SearchBar as sticky header across all screens
-- **Fixed** Quick Access Panel rendering issues with conditional display
-
-### Layout Stability Improvements ✅
-- **Fixed** Dashboard layout shift on initial load
-- **Fixed** White borders flash on dashboard content
-- **Optimized** SSR/client render consistency
-- **Removed** unnecessary padding from react-modal-sheet scroller
-- **Improved** initial state handling to prevent content pop-in
-
-### Bottom Sheet Migration to react-modal-sheet ✅
-- **Replaced** custom gesture implementation with react-modal-sheet v4.4.0
-- **Fixed** React hydration mismatches with SSR guards
-- **Fixed** snap points ordering (now properly converts to descending order)
-- **Removed** legacy feature flags and duplicate implementations
-- **Added** BottomSheetClient for dynamic import option
-- **Maintained** backward-compatible API
-
-### Testing react-modal-sheet Integration
-```bash
-# Run bottom sheet specific tests
-npm test -- BottomSheet
-
-# Check SSR and hydration
-npm test -- hydration
-npm test -- ssr
-
-# Verify gesture handling
-npm test -- sheet-scroll
-```
-
-# Marker errors?
-1. Don't pass unsupported options like 'label' to 2GIS markers
-2. Use async/await with addMarker function
-3. Verify coordinates are [lng, lat] format
-4. Check map instance exists before adding markers
-```
-
-### SuggestRow Component ✅
-Search suggestion row component with three variants matching Figma designs:
-
-**Variants:**
-1. **Saved Address** (home/work icons)
-   - Shows saved locations with title, address, and distance
-   - Icons: Home or Work
-   
-2. **Organization** (search results)
-   - Shows business/organization with highlighted search match
-   - Bold text for matched query, gray for rest
-   
-3. **Category/Rubric** (category search)
-   - Shows category name with branch count
-   - Optional matched text highlighting
-
-**Usage:**
 ```typescript
-import { SuggestRow, SuggestType } from '@/components/screen-manager';
+// src/components/organisms/MyOrganism.tsx
+'use client';
 
-<SuggestRow
-  type={SuggestType.SAVED_ADDRESS}
-  title="Дом"
-  subtitle="Красный проспект, 49"
-  distance="5 км"
-  icon="home"
-  onClick={() => handleSelect()}
-/>
+import React from 'react';
+import { Button, Text } from '@/components/atoms';
+import useStore from '@/stores';
+import { useActions } from '@/stores';
 
-<SuggestRow
-  type={SuggestType.ORGANIZATION}
-  title="МЕСТО, инвест-апарты"
-  subtitle="Красный проспект, 49"
-  highlightedText="МЕС"
-  onClick={() => handleSelect()}
-/>
-
-<SuggestRow
-  type={SuggestType.CATEGORY}
-  title="Аквапарки/Водные аттракционы"
-  branchCount="6 филиалов"
-  highlightedText="Места отдыха"
-  onClick={() => handleSelect()}
-/>
+export function MyOrganism() {
+  // Atomic selectors - only re-render when specific data changes
+  const query = useStore((state) => state.search.query);
+  const actions = useActions();
+  
+  return (
+    <div>
+      <Text>{query}</Text>
+      <Button onClick={() => actions.performSearch('test')}>Search</Button>
+    </div>
+  );
+}
 ```
 
+### Creating a New Page
 
-### SearchBar Component ✅
-Search bar component with two visual modes for different contexts:
-
-**Variants:**
-1. **Dashboard mode** (default)
-   - Shows menu burger icon on the right
-   - Used on the main dashboard screen
-   
-2. **Suggest mode** 
-   - Shows X/clear button on the right
-   - Used on search suggestions and results screens
-   - Clear button clears input and returns to dashboard
-
-**Usage:**
 ```typescript
-import { SearchBar, SearchBarVariant } from '@/components/dashboard';
+// src/components/pages/MyPage.tsx
+'use client';
 
-// Dashboard mode (default)
-<SearchBar
-  onSearch={(query) => handleSearch(query)}
-  onMenuClick={() => openMenu()}
-  variant="dashboard"
-/>
+import React from 'react';
+import { MyOrganism } from '@/components/organisms';
+import useStore from '@/stores';
 
-// Suggest mode with clear functionality
-<SearchBar
-  value={searchQuery}
-  onChange={(value) => setSearchQuery(value)}
-  onClear={() => {
-    setSearchQuery('');
-    navigateToDashboard();
-  }}
-  variant="suggest"
-/>
+export function MyPage() {
+  const ui = useStore((state) => state.ui);
+  
+  return (
+    <div className="min-h-full bg-background-primary">
+      <MyOrganism />
+    </div>
+  );
+}
 ```
 
-**Features:**
-- Identical padding and spacing in both modes
-- Smooth transitions between modes
-- Voice assistant button (Salut) in both modes
-- Focus/blur handling for search interactions
-- Controlled and uncontrolled value support
+## 🗺️ State Management
+
+### Zustand Store - Single Source of Truth
+
+```typescript
+// All state through Zustand store
+import useStore from '@/stores';
+import { useActions } from '@/stores';
+
+// Atomic selectors - only re-render when specific data changes
+const search = useStore((state) => state.search);
+const ui = useStore((state) => state.ui);
+const map = useStore((state) => state.map);
+const actions = useActions();
+
+// Navigate to screen
+ui.navigateTo(ScreenType.SEARCH_RESULTS);
+
+// Never manage state locally when it exists in store
+// ❌ const [currentScreen, setCurrentScreen] = useState();
 ```
 
-## Important Development Guidelines
+### Store Architecture
 
-### Testing Approach
-**NEVER create test pages** (e.g., `/test-feature`, `/test-fix`, `/test-border-fix`, etc.)
-- Always test fixes directly in the main application flow
-- Use the development server (`npm run dev`) with the actual app
-- Test features in their real context within existing screens
-- Rely on git for rollback if changes need to be reverted
-- Test pages add unnecessary clutter to the project
+The Zustand store is organized into slices:
 
-### Proper Testing Workflow
-1. Make changes to the actual components
-2. Test in the running application at `http://localhost:3000`
-3. Use existing screens and navigation to verify fixes
-4. Run automated tests with `npm test`
-5. If issues arise, use `git reset` or `git checkout` to revert
+- **Map Slice**: Map instance, markers, center, zoom, direct map control
+- **Search Slice**: Query, suggestions, results, history with debounced operations
+- **UI Slice**: Navigation, bottom sheet state, screen transitions
+- **Cross-Slice Actions**: Complex workflows that coordinate multiple slices
+
+### Atomic Selector Best Practices
+
+```typescript
+// ✅ CORRECT - Atomic selectors for performance
+const query = useStore((state) => state.search.query);
+const currentScreen = useStore((state) => state.ui.currentScreen);
+const markers = useStore((state) => state.map.markers);
+
+// ❌ WRONG - Subscribes to entire store
+const store = useStore();
+const query = store.search.query;
+```
+
+### Cross-Slice Actions
+
+```typescript
+// Use actions for complex workflows
+const { performSearch, selectLocation, focusSearchBar } = useActions();
+
+// Performs coordinated updates across search, UI, and map
+await performSearch('restaurants near me');
+```
+
+### Store Persistence
+
+```typescript
+// Search history and UI preferences automatically persist
+// Configure in src/stores/index.ts:
+persist(
+  // ...store slices
+  {
+    name: 'mapgl-app-storage',
+    partialize: (state) => ({
+      search: { history: state.search.history },
+      ui: { currentScreen: state.ui.currentScreen }
+    })
+  }
+)
+```
+
+## 🎯 Styling Best Practices
+
+### CSS Classes
+
+```typescript
+// ✅ Use Tailwind utilities with design token classes
+className="bg-background-secondary p-4 rounded-lg"
+
+// ✅ Use design token CSS variables
+style={{ backgroundColor: tokens.colors.background.secondary }}
+
+// ❌ Never use hardcoded values
+style={{ backgroundColor: '#F1F1F1' }}
+```
+
+### Component Styling
+
+1. Use Tailwind utilities where possible
+2. Reference design tokens for all values
+3. Avoid `!important` declarations
+4. Keep specificity low
+5. Remove unused styles regularly
+
+## 🏛️ Common Patterns
+
+### Map Operations
+
+```typescript
+// Always use Zustand store
+const map = useStore((state) => state.map);
+const actions = useActions();
+
+// Add marker
+await map.addMarker('marker-id', [lng, lat]);
+
+// Center map
+map.instance.setCenter([lng, lat], { duration: 300 });
+
+// Clean up
+map.clearMarkers();
+
+// Cross-slice actions for complex workflows
+await actions.performSearch('restaurants'); // Updates search, UI, and map
+```
+
+### Bottom Sheet Integration
+
+```typescript
+// All screens wrapped in BottomSheet through MobileMapShell
+// Zustand manages bottom sheet state and screen-specific backgrounds
+const ui = useStore((state) => state.ui);
+const currentScreen = ui.currentScreen;
+
+// Search results uses secondary background
+headerBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.background.secondary : 'white'}
+contentBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.background.secondary : 'white'}
+```
+
+## ⚠️ Critical Rules
+
+### Never Do This
+
+- ❌ Import from higher atomic levels
+- ❌ Use hardcoded colors or spacing
+- ❌ Manage state outside Zustand store
+- ❌ Create circular dependencies
+- ❌ Nest buttons inside buttons
+- ❌ Use more than 3 levels of DOM nesting
+- ❌ Add complex animations without purpose
+- ❌ Use `any` types in store slices
+- ❌ Bypass atomic selectors with `.getState()`
+
+### Always Do This
+
+- ✅ Follow atomic design hierarchy
+- ✅ Use design tokens for all styling
+- ✅ Use Zustand atomic selectors for performance
+- ✅ Keep components single-responsibility
+- ✅ Use TypeScript strictly (no `any` without justification)
+- ✅ Clean up resources in useEffect
+- ✅ Handle loading and error states
+- ✅ Use cross-slice actions for complex workflows
+- ✅ Call `map.destroy()` in cleanup
+
+## 🐛 Known Issues & Solutions
+
+| Problem | Solution |
+|---------|----------|
+| Hydration mismatch | Use dynamic imports with `ssr: false` for client-only components |
+| Map not cleaning up | Always call `map.destroy()` in cleanup |
+| Bottom sheet not dragging | Check react-modal-sheet v4.4.0 installed |
+| Phantom borders | Use consistent background colors through props |
+| Atomic design violations | Never import molecules from other molecules - use design tokens only |
+| Theme inconsistency | Always use 'Light'/'Dark' format, not 'light'/'dark' |
+| Hardcoded styling | Replace ALL hardcoded values with tokens.* references |
+
+## 🎯 Atomic Design Best Practices
+
+### ✅ Do This
+- Import only design tokens in molecules: `import { tokens } from '@/lib/ui/tokens'`
+- Use 'Light'/'Dark' theme format consistently
+- All colors: `tokens.colors.*`, spacing: `tokens.spacing[*]`, typography: `tokens.typography.*`
+- Follow exact Figma specifications from Dev Mode
+- Test visual verification after changes
+- Document fixes in separate markdown files
+
+### ❌ Never Do This
+- Import molecules from other molecules
+- Use hardcoded colors, spacing, or font sizes
+- Mix 'light'/'dark' with 'Light'/'Dark' theme formats
+- Skip visual verification after component changes
+- Commit without running type-check and lint
+
+## 📝 Code Quality Standards
+
+### TypeScript Requirements
+
+```typescript
+// ✅ Proper typing
+interface Props {
+  title: string;
+  onClick: () => void;
+}
+
+// ❌ Avoid any
+const data: any = fetch();
+```
+
+### Component Requirements
+
+- Must be client components (`'use client'`)
+- Props must have TypeScript interfaces
+- Must handle edge cases (empty states, errors)
+- Follow naming conventions (PascalCase for components)
+
+## 🔄 Git Workflow
+
+```bash
+# Branch naming
+feature/feature-name
+fix/bug-description
+refactor/component-name
+
+# Commit messages
+feat: add new component with Zustand integration
+fix: resolve hydration error
+refactor: migrate to Zustand store
+docs: update README with Zustand architecture
+```
+
+## 🧪 Testing Status
+
+**Currently Removed**: All tests have been temporarily removed from this project to allow for a clean refactor. This includes:
+
+- All test files (`*.test.ts`, `*.test.tsx`, `*.spec.ts`, `*.spec.tsx`)
+- Test configuration files (`jest.config.js`, `jest.setup.js`, `playwright.config.ts`)
+- Test dependencies (`@testing-library/*`, `jest`, `@playwright/test`, etc.)
+- Test scripts in `package.json`
+
+**Preserved**: All code quality tools remain operational:
+- ✅ ESLint (`npm run lint`)
+- ✅ TypeScript type checking (`npm run type-check`)
+- ✅ Prettier formatting (`npm run format`)
+- ✅ Git pre-commit hooks
+- ✅ Build process (`npm run build`)
+
+**Future Plan**: Tests will be rewritten using modern testing patterns that align with the atomic design architecture.
+
+## 📚 Quick Reference
+
+### File Naming
+- Components: `PascalCase.tsx`
+- Utilities: `camelCase.ts`
+- Types: `types.ts` or `ComponentName.types.ts`
+
+### Import Order
+1. React imports
+2. External libraries
+3. Store imports (useStore, useActions)
+4. Atoms
+5. Molecules
+6. Organisms
+7. Templates
+8. Utils and hooks
+9. Types
+
+### Performance Guidelines
+- Lazy load heavy components
+- Use atomic selectors to prevent unnecessary re-renders
+- Memoize expensive calculations with React.useMemo
+- Use React.memo for pure components
+- Leverage Zustand's selective subscriptions
+- Direct map operations bypass React reconciliation
+- Optimize images with Next.js Image
+- Minimize bundle size (Zustand adds only 8KB)

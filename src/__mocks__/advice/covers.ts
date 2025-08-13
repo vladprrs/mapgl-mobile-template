@@ -1,4 +1,4 @@
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 /**
  * Mock Cover components for featured collection cards
@@ -10,10 +10,9 @@ export const mockCovers: AdviceItem[] = [
     type: 'cover',
     id: 'repair-goods',
     title: 'Товары для ремонта',
-    imageUrl: '/assets/advice/4295bcc0ff3c5fd0b0b5cfe36d50701084688dc5.png',
-    collectionId: 'repair-goods',
-    itemCount: 13,
-    state: 'Default',
+    subtitle: '13 товаров',
+    images: ['/assets/advice/4295bcc0ff3c5fd0b0b5cfe36d50701084688dc5.png'],
+    variant: 'default',
   },
 ];
 
@@ -21,20 +20,18 @@ export const mockCoverBig: AdviceItem = {
   type: 'cover',
   id: 'restaurants-new',
   title: 'Новые рестораны',
-  imageUrl: '/assets/advice/restaurant-cover.png',
-  collectionId: 'new-restaurants',
-  itemCount: 25,
-  state: 'Big',
+  subtitle: '25 ресторанов',
+  images: ['/assets/advice/restaurant-cover.png'],
+  variant: 'big',
 };
 
 export const mockCoverSmall: AdviceItem = {
   type: 'cover',
   id: 'coffee-shops',
   title: 'Кофейни',
-  imageUrl: '/assets/advice/coffee-cover.png',
-  collectionId: 'coffee-shops',
-  itemCount: 48,
-  state: 'Default',
+  subtitle: '48 кофеен',
+  images: ['/assets/advice/coffee-cover.png'],
+  variant: 'default',
 };
 
 // Export different states

@@ -1,0 +1,66 @@
+/* 
+ * Bottom Sheet Styles - Minimal Overrides
+ * Only essential overrides for react-modal-sheet library
+ */
+
+/* Core positioning */
+[data-rsbs-root] {
+  z-index: 50;
+  --rsbs-transition-duration: var(--duration);
+}
+
+[data-rsbs-overlay] {
+  z-index: 49;
+}
+
+/* Drag interaction */
+[data-rsbs-header] {
+  cursor: grab;
+}
+
+[data-rsbs-header]:active {
+  cursor: grabbing;
+}
+
+/* Remove default padding */
+[data-rsbs-scroll] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Sheet container */
+.react-modal-sheet-container {
+  z-index: 51;
+}
+
+/* Extended drag header interaction */
+[data-testid="drag-header-extended"]:active {
+  cursor: grabbing;
+}
+
+/* Touch behavior for different snap states */
+[data-sheet-state] {
+  touch-action: pan-x;
+}
+
+/* Preserve interactive elements in drag zone */
+[data-testid="drag-header-extended"] input,
+[data-testid="drag-header-extended"] button {
+  position: relative;
+  z-index: 1;
+}
+
+/* Clean presentation - remove library defaults */
+[data-rsbs-root],
+[data-rsbs-root] * {
+  border: 0;
+  outline: 0;
+}
+
+/* Remove pseudo-elements that create visual artifacts */
+[data-rsbs-header]::before,
+[data-rsbs-header]::after,
+[data-rsbs-content]::before,
+[data-rsbs-content]::after {
+  display: none;
+}

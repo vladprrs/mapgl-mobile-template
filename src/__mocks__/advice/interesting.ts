@@ -1,4 +1,4 @@
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 /**
  * Mock Interesting components for feature promotion cards
@@ -10,7 +10,7 @@ export const mockInteresting: AdviceItem[] = [
     type: 'interesting',
     id: 'guide-city',
     title: 'Гид по городу',
-    description: '37 подборок',
+    subtitle: '37 подборок',
     imageUrl: '/assets/advice/b84cad0c5a3abfaa17c4ee4fbc61536ad9c33781.png',
     featureId: 'city-guide',
     theme: 'Light',
@@ -21,7 +21,7 @@ export const mockInterestingTourist: AdviceItem = {
   type: 'interesting',
   id: 'tourist-layer',
   title: 'Туристический слой',
-  description: 'Достопримечательности города',
+  subtitle: 'Достопримечательности города',
   imageUrl: '/assets/advice/tourist-layer.png',
   featureId: 'tourist-layer',
   theme: 'Light',
@@ -31,7 +31,7 @@ export const mockInterestingDark: AdviceItem = {
   type: 'interesting',
   id: 'night-mode',
   title: 'Ночной режим',
-  description: 'Работает до утра',
+  subtitle: 'Работает до утра',
   imageUrl: '/assets/advice/night-mode.png',
   featureId: 'night-mode',
   theme: 'Dark',

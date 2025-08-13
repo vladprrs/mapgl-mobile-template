@@ -1,4 +1,4 @@
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 /**
  * Mock MetaItem components for category/rubric search cards
@@ -7,7 +7,7 @@ import type { AdviceItem } from '@/components/dashboard/advice/types';
 
 export const mockMetaItems: AdviceItem[] = [
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'sunday-brunch',
     title: 'Воскресные бранчи',
     subtitle: '156 мест',
@@ -17,7 +17,7 @@ export const mockMetaItems: AdviceItem[] = [
     theme: 'Light',
   },
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'atm',
     title: 'Банкоматы',
     subtitle: 'Number',
@@ -27,7 +27,7 @@ export const mockMetaItems: AdviceItem[] = [
     theme: 'Light',
   },
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'school-uniform',
     title: 'Школьная форма',
     subtitle: '112 мест',
@@ -37,7 +37,7 @@ export const mockMetaItems: AdviceItem[] = [
     theme: 'Light',
   },
   {
-    type: 'meta-item',
+    type: 'meta_item',
     id: 'all-categories',
     title: 'Все рубрики',
     subtitle: '3 256 567 мест',
@@ -49,7 +49,7 @@ export const mockMetaItems: AdviceItem[] = [
 ];
 
 export const mockMetaItemDark: AdviceItem = {
-  type: 'meta-item',
+  type: 'meta_item',
   id: 'pharmacy-dark',
   title: 'Аптеки',
   subtitle: '1234 места',

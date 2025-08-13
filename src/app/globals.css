@@ -1,42 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --bg-muted: #F1F1F1;
-  --text-primary: #141414;
-  --text-secondary: #898989;
-  --traffic-heavy: #F5373C;
-  --traffic-moderate: #EFA701;
-  --traffic-light: #1BA136;
-  --button-secondary-bg: rgba(20, 20, 20, 0.06);
-  --drag-handle: rgba(137, 137, 137, 0.25);
+  /* Design Token System - Colors */
+  --color-primary-default: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-active: #1E40AF;
+  --color-text-primary: #141414;
+  --color-text-secondary: #898989;
+  --color-text-tertiary: #B8B8B8;
+  --color-text-inverse: #FFFFFF;
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F1F1F1;
+  --color-background-tertiary: #F7F7F7;
+  --color-background-overlay: rgba(20, 20, 20, 0.06);
+  --color-background-overlay-dark: rgba(20, 20, 20, 0.12);
+  --color-border-default: rgba(137, 137, 137, 0.3);
+  --color-border-light: rgba(137, 137, 137, 0.15);
+  --color-border-dark: rgba(137, 137, 137, 0.5);
+  --color-ui-drag-handle: rgba(137, 137, 137, 0.25);
+  --color-ui-button-secondary: rgba(20, 20, 20, 0.06);
+  --color-ui-button-secondary-hover: rgba(20, 20, 20, 0.08);
+  --color-ui-button-secondary-active: rgba(20, 20, 20, 0.10);
+  --color-traffic-heavy: #F5373C;
+  --color-traffic-moderate: #EFA701;
+  --color-traffic-light: #1BA136;
+  
+  /* Design Token System - Spacing */
+  --spacing-0: 0px;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  
+  /* Design Token System - Typography */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  
+  /* Design Token System - Borders */
+  --radius: 8px;
+  --radius-sm: 4px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  --border-width: 1px;
+  
+  /* Design Token System - Transitions */
+  --duration: 300ms;
+  --duration-fast: 150ms;
+  --duration-slow: 500ms;
+  --easing: ease-in-out;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-bg-muted: var(--bg-muted);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-traffic-heavy: var(--traffic-heavy);
-  --color-traffic-moderate: var(--traffic-moderate);
-  --color-traffic-light: var(--traffic-light);
-  --color-button-secondary-bg: var(--button-secondary-bg);
-  --color-drag-handle: var(--drag-handle);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
   font-family: Arial, Helvetica, sans-serif;
 }
