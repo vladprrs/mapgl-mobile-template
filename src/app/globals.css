@@ -1,18 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* Legacy variable mappings for backward compatibility */
-  --background: #ffffff;
-  --foreground: #171717;
-  --bg-muted: #F1F1F1;
-  --text-primary: #141414;
-  --text-secondary: #898989;
-  --traffic-heavy: #F5373C;
-  --traffic-moderate: #EFA701;
-  --traffic-light: #1BA136;
-  --button-secondary-bg: rgba(20, 20, 20, 0.06);
-  --drag-handle: rgba(137, 137, 137, 0.25);
-  
   /* Design Token System - Colors */
   --color-primary-default: #2563EB;
   --color-primary-hover: #1D4ED8;
@@ -45,9 +33,7 @@
   --spacing-4: 16px;
   --spacing-5: 20px;
   --spacing-6: 24px;
-  --spacing-7: 28px;
   --spacing-8: 32px;
-  --spacing-9: 36px;
   --spacing-10: 40px;
   
   /* Design Token System - Typography */
@@ -75,29 +61,12 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-bg-muted: var(--bg-muted);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-traffic-heavy: var(--traffic-heavy);
-  --color-traffic-moderate: var(--traffic-moderate);
-  --color-traffic-light: var(--traffic-light);
-  --color-button-secondary-bg: var(--button-secondary-bg);
-  --color-drag-handle: var(--drag-handle);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
   font-family: Arial, Helvetica, sans-serif;
 }

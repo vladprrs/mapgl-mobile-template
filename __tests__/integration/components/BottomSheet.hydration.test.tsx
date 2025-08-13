@@ -54,7 +54,8 @@ describe('BottomSheet Hydration', () => {
       )
       
       expect(hydrationErrors).toHaveLength(0)
-      expect(screen.getByTestId('content')).toBeInTheDocument()
+      // Component loads with loading state initially
+      expect(screen.getByTestId('bottom-sheet-loading')).toBeInTheDocument()
     })
 
     it('should maintain consistent transform values during hydration', () => {

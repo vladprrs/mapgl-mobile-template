@@ -24,66 +24,47 @@ const BottomSheetComponent = forwardRef<
   },
   ref
 ) {
-  // Only render the sheet after client-side hydration to prevent mismatches
   const [isMounted, setIsMounted] = useState(false);
-  // CRITICAL: Sheet must ALWAYS remain open to prevent disappearing off-screen
-  // We handle "closing" by snapping to minimum position instead
-  const isOpen = true; // Always true - never allow complete closure
+  const isOpen = true;
   const sheetRef = useRef<SheetRef | undefined>(undefined);
   
-  // Convert percentage snap points to decimals for react-modal-sheet
-  // react-modal-sheet expects snap points where:
-  // - Values between 0-1 represent percentages (0.5 = 50% of sheet height)
-  // - Prefer using 1 for fully visible sheet (not 0.9)
-  // Our API: [10, 50, 90] -> react-modal-sheet: [0.9, 0.5, 0.1]
-  const sheetSnapPoints = snapPoints.map(p => {
-    // 90% visible = 0.9, 50% = 0.5, 10% = 0.1
-    return p / 100;
-  }).reverse(); // Reverse for descending order
+  // Convert percentage snap points to decimals
+  const sheetSnapPoints = snapPoints.map(p => p / 100).reverse();
   
-  // Find initial snap index (accounting for reversed array)
-  const initialSnapValue = initialSnap ?? snapPoints[1]; // Default to middle
+  // Find initial snap index
+  const initialSnapValue = initialSnap ?? snapPoints[1];
   const originalIndex = snapPoints.indexOf(initialSnapValue);
   const initialSnapIndex = originalIndex !== -1 
-    ? snapPoints.length - 1 - originalIndex // Reverse the index
-    : snapPoints.length - 2; // Default to middle in reversed array
+    ? snapPoints.length - 1 - originalIndex
+    : snapPoints.length - 2;
   
-  // Track current snap for state management
   const [currentSnapIndex, setCurrentSnapIndex] = useState(initialSnapIndex);
   
   const handleSnap = useCallback((snapIndex: number) => {
     setCurrentSnapIndex(snapIndex);
-    // Convert back to original snap point value
     const originalIndex = snapPoints.length - 1 - snapIndex;
     const snapValue = snapPoints[originalIndex];
-    if (onSnapChange) {
-      onSnapChange(snapValue);
-    }
+    onSnapChange?.(snapValue);
   }, [snapPoints, onSnapChange]);
   
-  // Ensure component only renders on client to prevent hydration mismatch
   useEffect(() => {
     setIsMounted(true);
-    // Call onSnapChange with initial value after mount
     if (onSnapChange) {
       const originalIndex = snapPoints.length - 1 - initialSnapIndex;
       onSnapChange(snapPoints[originalIndex]);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Expose snapTo method
   useImperativeHandle(ref, () => ({
     snapTo: (snapValue: number) => {
       const originalIndex = snapPoints.indexOf(snapValue);
       if (originalIndex !== -1 && sheetRef.current) {
-        // Convert to reversed index for react-modal-sheet
         const reversedIndex = snapPoints.length - 1 - originalIndex;
         sheetRef.current.snapTo(reversedIndex);
       }
     }
   }), [snapPoints]);
   
-  // Determine state for data attribute (based on original snap point values)
   const originalSnapIndex = snapPoints.length - 1 - currentSnapIndex;
   const stateLabel = originalSnapIndex === 0
     ? 'collapsed'
@@ -91,8 +72,7 @@ const BottomSheetComponent = forwardRef<
     ? 'half'
     : 'expanded';
   
-  
-  // Render placeholder during SSR to prevent hydration mismatch
+  // Render placeholder during SSR
   if (!isMounted) {
     return (
       <div 
@@ -135,18 +115,15 @@ const BottomSheetComponent = forwardRef<
       ref={sheetRef}
       isOpen={isOpen}
       onClose={() => {
-        // CRITICAL FIX: Never close the sheet, snap to minimum position instead
-        // This prevents the sheet from disappearing off-screen
-        const minSnapIndex = sheetSnapPoints.length - 1; // Last index is minimum position
+        const minSnapIndex = sheetSnapPoints.length - 1;
         sheetRef.current?.snapTo(minSnapIndex);
       }}
       snapPoints={sheetSnapPoints}
       initialSnap={initialSnapIndex}
       onSnap={handleSnap}
       disableDrag={false}
-      // Make it harder to trigger close by increasing thresholds
-      dragCloseThreshold={0.9} // Must drag 90% off screen to trigger close (which we prevent)
-      dragVelocityThreshold={1000} // Require very fast swipe to trigger close
+      dragCloseThreshold={0.9}
+      dragVelocityThreshold={1000}
     >
       <Sheet.Container
         className={`bg-white rounded-t-2xl ${className}`}
@@ -154,89 +131,71 @@ const BottomSheetComponent = forwardRef<
         data-sheet-state={stateLabel}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom)',
-          // Remove all shadows to prevent border-like visual artifacts
-          boxShadow: 'none',
-          border: 'none',
-          outline: 'none',
         }}
       >
         <Sheet.Header>
-          {/* Extended drag area for ALL snap points */}
           <div 
             className="w-full relative"
             style={{ 
               cursor: 'grab',
               backgroundColor: headerBackground,
-              // No blur needed with solid background
-              backdropFilter: 'none',
-              WebkitBackdropFilter: 'none',
-              // Remove any visual separation between header sections
-              margin: 0,
-              padding: 0,
             }}
             data-testid="drag-header-extended"
           >
-            {/* Drag handle at top - hide on gray background screens */}
             <div 
               className="flex justify-center pt-1.5 pb-1.5" 
               data-testid="drag-handle" 
               style={{ 
                 backgroundColor: headerBackground,
-                // Ensure no borders or edges
-                border: 'none',
-                margin: 0,
               }}
             >
               <div 
                 className="w-10 h-1 rounded-md" 
                 style={{
-                  // Drag handle visibility based on background
                   backgroundColor: headerBackground === '#F1F1F1' 
-                    ? 'rgba(137, 137, 137, 0.4)' // Slightly darker on gray
-                    : 'rgba(137, 137, 137, 0.25)', // Normal on white
+                    ? 'rgba(137, 137, 137, 0.4)'
+                    : 'rgba(137, 137, 137, 0.25)',
                 }}
               />
             </div>
             
-            {/* Include sticky header in drag area at ALL snap points */}
-            {stickyHeader && (
+            {header && (
               <div 
-                className="pointer-events-none" 
+                className="bg-transparent" 
                 style={{ 
+                  touchAction: 'manipulation',
                   backgroundColor: headerBackground,
-                  // Ensure seamless connection
-                  marginTop: 0,
-                  marginBottom: 0,
-                  border: 'none',
-                  borderBottom: 'none',
-                  paddingBottom: 0,
                 }}
               >
-                <div className="pointer-events-auto" style={{ border: 'none', margin: 0 }}>
-                  {stickyHeader}
-                </div>
+                {header}
               </div>
             )}
           </div>
         </Sheet.Header>
         
-        {/* Custom headers outside of Sheet.Content */}
-        {header && (
-          <div className="bg-white" style={{ touchAction: 'manipulation' }}>
-            {header}
+        {stickyHeader && (
+          <div className="bg-white sticky top-0 z-10">
+            {stickyHeader}
           </div>
         )}
         
-        <Sheet.Content style={{ border: 'none', margin: 0, padding: 0 }}>
-          <Sheet.Scroller 
-            draggableAt="both" 
-            autoPadding
-            disableScroll={snapPoints[snapPoints.length - 1 - currentSnapIndex] !== 90}
-            style={{ border: 'none', margin: 0 }}
+        <Sheet.Content 
+          className="bg-white"
+          data-testid="bottom-sheet-content"
+          style={{
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            overflowY: stateLabel === 'expanded' ? 'auto' : 'hidden',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <Sheet.Scroller
+            draggableAt="both"
+            style={{
+              paddingBottom: 'env(safe-area-inset-bottom)',
+            }}
           >
-            <div data-testid="bottom-sheet-content" style={{ border: 'none', margin: 0 }}>
-              {children}
-            </div>
+            {children}
           </Sheet.Scroller>
         </Sheet.Content>
       </Sheet.Container>
@@ -244,36 +203,32 @@ const BottomSheetComponent = forwardRef<
   );
 });
 
-// Loading placeholder that maintains layout during SSR
-const BottomSheetPlaceholder = () => (
-  <div 
-    className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50"
-    style={{
-      height: '50vh', // Default middle position
-      transform: 'translateY(0)',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-    }}
-    data-testid="bottom-sheet-placeholder"
-  >
-    <div className="flex justify-center py-2">
-      <div className="w-12 h-1 rounded-full bg-gray-300" />
-    </div>
-    <div className="p-4">
-      {/* Content will be loaded after hydration */}
-    </div>
-  </div>
-);
-
-// Export the main component directly
-export const BottomSheet = BottomSheetComponent;
-
-// Export a client-only version for cases where SSR issues occur
-export const BottomSheetClient = dynamic(
-  () => Promise.resolve({ default: BottomSheetComponent }),
+// Export with dynamic loading for SSR
+export const BottomSheet = dynamic(
+  () => Promise.resolve(BottomSheetComponent),
   {
     ssr: false,
-    loading: () => <BottomSheetPlaceholder />,
+    loading: () => (
+      <div 
+        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50"
+        style={{
+          height: '50vh',
+          transform: 'translateY(0)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+        data-testid="bottom-sheet-loading"
+      >
+        <div className="flex justify-center py-2">
+          <div 
+            className="w-10 h-1 rounded-md"
+            style={{
+              backgroundColor: 'rgba(137, 137, 137, 0.25)',
+            }}
+          />
+        </div>
+      </div>
+    ),
   }
-) as typeof BottomSheetComponent;
+);
 
 export default BottomSheet;

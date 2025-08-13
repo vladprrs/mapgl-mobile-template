@@ -3,7 +3,7 @@
 import React from 'react';
 import { SearchInput } from '@/components/molecules';
 import { Button } from '@/components/atoms';
-import { Icon, ICONS, IMAGES, COLORS } from '@/components/icons';
+import { Icon, ICONS, IMAGES } from '@/components/icons';
 import { tokens } from '@/lib/ui/tokens';
 import Image from 'next/image';
 
@@ -54,22 +54,21 @@ export function SearchBar({
     onChange?.(e.target.value);
   };
 
-  // Determine if this is the results variant (different background)
   const isResults = variant === 'results';
+  const showClearButton = variant === 'suggest' || variant === 'results';
   
   return (
     <div 
       className={`${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}
       style={{
-        backgroundColor: isResults ? tokens.colors.transparent : tokens.colors.background.primary,
-        border: 'none',
-        outline: 'none',
-        boxShadow: 'none',
-        margin: 0,
-        padding: 0,
+        backgroundColor: isResults ? tokens.colors.background.secondary : tokens.colors.background.primary,
       }}>
-      {/* Drag Handle - exact dimensions from Figma */}
-      <div className="flex justify-center py-1.5" style={{ backgroundColor: isResults ? tokens.colors.background.secondary : tokens.colors.transparent }}>
+      {/* Drag Handle */}
+      <div 
+        className="flex justify-center py-1.5"
+        style={{ 
+          backgroundColor: isResults ? tokens.colors.background.secondary : tokens.colors.transparent 
+        }}>
         <div 
           className="w-9 h-1 rounded-full"
           style={{ backgroundColor: tokens.colors.ui.dragHandle }}
@@ -77,7 +76,11 @@ export function SearchBar({
       </div>
       
       {/* Search Bar Container */}
-      <div className="flex flex-row items-start gap-3 px-4 pb-2" style={{ backgroundColor: isResults ? tokens.colors.background.secondary : tokens.colors.transparent }}>
+      <div 
+        className="flex flex-row items-start gap-3 px-4 pb-2"
+        style={{ 
+          backgroundColor: isResults ? tokens.colors.background.secondary : tokens.colors.transparent 
+        }}>
         {/* Search Input */}
         <div className="flex-1 min-w-0">
           <form onSubmit={handleSubmit}>
@@ -88,8 +91,8 @@ export function SearchBar({
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={onBlur}
-              onClear={variant === 'suggest' || variant === 'results' ? onClear : undefined}
-              showClearButton={variant === 'suggest' || variant === 'results'}
+              onClear={showClearButton ? onClear : undefined}
+              showClearButton={showClearButton}
               variant={isResults ? 'filled' : 'default'}
               className="h-10"
               style={{
@@ -126,7 +129,7 @@ export function SearchBar({
           </Button>
         )}
         
-        {(variant === 'suggest' || variant === 'results') && (
+        {showClearButton && (
           <Button
             variant="icon"
             onClick={onClear}
@@ -134,7 +137,12 @@ export function SearchBar({
             aria-label="Очистить поиск"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6L18 18" stroke={tokens.colors.text.primary} strokeWidth="2" strokeLinecap="round"/>
+              <path 
+                d="M18 6L6 18M6 6L18 18" 
+                stroke={tokens.colors.text.primary} 
+                strokeWidth="2" 
+                strokeLinecap="round"
+              />
             </svg>
           </Button>
         )}

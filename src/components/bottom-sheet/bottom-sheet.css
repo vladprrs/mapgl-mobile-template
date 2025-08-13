@@ -1,18 +1,19 @@
-/* Override react-modal-sheet defaults to match current styles */
+/* 
+ * Bottom Sheet Styles - Minimal Overrides
+ * Only essential overrides for react-modal-sheet library
+ */
+
+/* Core positioning */
 [data-rsbs-root] {
-  z-index: 50 !important;
-  /* Remove any default borders */
-  border: none !important;
-  outline: none !important;
+  z-index: 50;
+  --rsbs-transition-duration: var(--duration);
 }
 
 [data-rsbs-overlay] {
-  z-index: 49 !important;
-  /* Remove overlay borders */
-  border: none !important;
-  outline: none !important;
+  z-index: 49;
 }
 
+/* Drag interaction */
 [data-rsbs-header] {
   cursor: grab;
 }
@@ -21,173 +22,45 @@
   cursor: grabbing;
 }
 
-/* Ensure smooth animations */
-[data-rsbs-content] {
-  will-change: transform;
-}
-
-/* Fix initial padding-bottom flash */
+/* Remove default padding */
 [data-rsbs-scroll] {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  padding-left: 0;
+  padding-right: 0;
 }
 
-/* Match current animation timing */
-[data-rsbs-root] {
-  --rsbs-transition-duration: 260ms;
-}
-
-/* CRITICAL: Enhanced visibility to prevent sheet from seeming "lost" */
+/* Sheet container */
 .react-modal-sheet-container {
-  /* Remove ALL shadows to prevent border-like effects */
-  box-shadow: none !important;
-  /* Ensure sheet is always above other content */
-  z-index: 51 !important;
+  z-index: 51;
 }
 
-/* Make drag handle more prominent when sheet is collapsed */
-[data-sheet-state="collapsed"] .react-modal-sheet-drag-indicator {
-  background-color: rgba(20, 20, 20, 0.5) !important;
-  height: 4px !important;
-  width: 48px !important;
-}
-
-/* Visual feedback for extended drag header when grabbing */
+/* Extended drag header interaction */
 [data-testid="drag-header-extended"]:active {
-  cursor: grabbing !important;
+  cursor: grabbing;
 }
 
-/* Ensure smooth interaction at ALL snap states */
-[data-sheet-state="collapsed"],
-[data-sheet-state="half"],
-[data-sheet-state="expanded"] {
-  /* Allow vertical dragging while preserving horizontal scroll */
-  touch-action: pan-x !important;
+/* Touch behavior for different snap states */
+[data-sheet-state] {
+  touch-action: pan-x;
 }
 
-/* Ensure interactive elements within drag zone remain clickable */
+/* Preserve interactive elements in drag zone */
 [data-testid="drag-header-extended"] input,
 [data-testid="drag-header-extended"] button {
   position: relative;
   z-index: 1;
 }
 
-/* Remove any borders or dividers from react-modal-sheet components */
-[data-rsbs-header],
-[data-rsbs-content],
-[data-rsbs-scroll] {
-  border: none !important;
-  border-top: none !important;
-  border-bottom: none !important;
-  outline: none !important;
+/* Clean presentation - remove library defaults */
+[data-rsbs-root],
+[data-rsbs-root] * {
+  border: 0;
+  outline: 0;
 }
 
-/* Ensure seamless background on SearchResults screen */
-[data-rsbs-header] > div,
-[data-rsbs-content] > div {
-  border: none !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-/* Remove any default outlines or focus rings */
-[data-rsbs-header]:focus,
-[data-rsbs-content]:focus,
-[data-rsbs-scroll]:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Remove any box-shadow that might create visual lines */
-[data-rsbs-header]::after,
-[data-rsbs-header]::before,
-[data-rsbs-content]::after,
-[data-rsbs-content]::before {
-  content: none !important;
-  display: none !important;
-}
-
-/* Specific rules for SearchResults screen to ensure clean layout */
-[data-sheet-state="half"] [data-rsbs-header],
-[data-sheet-state="half"] [data-rsbs-content] {
-  box-shadow: none !important;
-  border: none !important;
-}
-
-/* Remove any potential divider lines between header and content */
-[data-rsbs-header] + [data-rsbs-content] {
-  margin-top: 0 !important;
-  border-top: none !important;
-}
-
-/* Ensure SearchBar on results screen has no bottom border */
-.bg-\[\#F1F1F1\] {
-  border-bottom: none !important;
-}
-
-/* Clean transitions between sections */
-[data-rsbs-header] > * {
-  border-bottom: none !important;
-  box-shadow: none !important;
-}
-
-/* Special handling for SearchResults screen to remove ALL artifacts */
-[data-testid="bottom-sheet"][data-sheet-state] {
-  overflow: hidden !important;
-  box-shadow: none !important;
-  border: none !important;
-  outline: none !important;
-}
-
-/* Hide ANY shadows or borders when header background is gray */
-[data-testid="drag-header-extended"] {
-  box-shadow: none !important;
-  border: none !important;
-  outline: none !important;
-}
-
-/* Remove all borders and shadows from Sheet container itself */
-[data-rsbs-root] .react-modal-sheet-container {
-  box-shadow: none !important;
-  border: none !important;
-  outline: none !important;
-}
-
-/* Keep rounded corners as per Figma design */
-
-/* Hide the container shadow completely on gray background */
-.react-modal-sheet-container {
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-/* Remove any pseudo-elements that might create lines */
+/* Remove pseudo-elements that create visual artifacts */
 [data-rsbs-header]::before,
 [data-rsbs-header]::after,
 [data-rsbs-content]::before,
-[data-rsbs-content]::after,
-[data-testid="drag-header-extended"]::before,
-[data-testid="drag-header-extended"]::after,
-[data-rsbs-scroll]::before,
-[data-rsbs-scroll]::after,
-[data-rsbs-root]::before,
-[data-rsbs-root]::after {
-  display: none !important;
-  content: none !important;
-}
-
-/* Simplified rules - let inline styles handle specifics */
-[data-rsbs-root] * {
-  border: 0 !important;
-  outline: 0 !important;
-}
-
-/* Clean up any lingering artifacts */
-[data-sheet-state] [data-rsbs-header],
-[data-sheet-state] [data-rsbs-content],
-[data-sheet-state] [data-rsbs-scroll] {
-  border: 0 !important;
-  box-shadow: none !important;
-  outline: 0 !important;
-  background-image: none !important;
+[data-rsbs-content]::after {
+  display: none;
 }
