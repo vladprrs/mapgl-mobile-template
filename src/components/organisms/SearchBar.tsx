@@ -3,7 +3,7 @@
 import React from 'react';
 import { SearchInput } from '@/components/molecules';
 import { Button } from '@/components/atoms';
-import { Icon, ICONS, IMAGES } from '@/components/icons';
+import { Icon, ICONS, IMAGES } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
 import Image from 'next/image';
 

@@ -2,7 +2,7 @@
 
 import React, { forwardRef } from 'react';
 import { Input } from '@/components/atoms';
-import { Icon, ICONS } from '@/components/icons';
+import { Icon, ICONS } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
 
 interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {

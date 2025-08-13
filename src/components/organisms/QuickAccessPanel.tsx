@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Icon, ICONS, COLORS } from '@/components/icons';
+import { Icon, ICONS, COLORS } from '@/components/atoms';
 
 export interface QuickAction {
   id: string;

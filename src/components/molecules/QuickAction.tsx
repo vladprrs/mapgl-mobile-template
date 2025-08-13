@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/atoms';
-import { Icon, ICONS } from '@/components/icons';
+import { Icon, ICONS } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
 
 interface QuickActionProps {

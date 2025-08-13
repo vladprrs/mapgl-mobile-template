@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Icon, ICONS, COLORS } from '@/components/icons';
+import { Icon, ICONS, COLORS } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
 
 // Icons extracted from Figma - unused for now, using Icon component instead
