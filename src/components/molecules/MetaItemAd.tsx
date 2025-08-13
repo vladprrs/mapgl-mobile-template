@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { MetaItemAdProps } from './types';
-import { AdviceCardContainer, AdviceTitle, AdviceLogoCircle } from './primitives';
+import { AdviceCardContainer, AdviceCardText } from '@/components/molecules';
 
 /**
  * MetaItemAd Component
@@ -69,16 +69,16 @@ export function MetaItemAd({
 
       {logoUrl && (
         <div className="absolute bottom-3 right-4">
-          <AdviceLogoCircle>
+          <AdviceCardContainer>
             <Image src={logoUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
-          </AdviceLogoCircle>
+          </AdviceCardContainer>
         </div>
       )}
 
       <div className="absolute inset-0 px-4 pt-2.5 pb-[13px] flex flex-col justify-between">
-        <AdviceTitle theme={theme} className="text-left">
+        <AdviceCardText theme={theme} className="text-left">
           {title}
-        </AdviceTitle>
+        </AdviceCardText>
         {isSponsored && (
           <p
             className={`text-[11px] leading-[14px] tracking-[-0.176px] text-left ${

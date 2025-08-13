@@ -1,4 +1,4 @@
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 /**
  * Mock Interesting components for feature promotion cards

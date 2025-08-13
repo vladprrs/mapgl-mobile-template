@@ -3,7 +3,7 @@
 import React from 'react';
 import { debugLog } from '@/lib/logging';
 import { CoverProps } from './types';
-import { AdviceCardContainer } from './primitives';
+import { AdviceCardContainer } from '@/components/molecules';
 
 /**
  * Cover Component

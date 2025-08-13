@@ -3,7 +3,7 @@ import {
   RDFeatures, 
   NonRDFeatures,
   Friend
-} from '@/components/search-results/SearchResultCard';
+} from '@/components/organisms/SearchResultCard.types';
 
 // Mock friends data
 export const mockFriends: Friend[] = [

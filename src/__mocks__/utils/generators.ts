@@ -1,6 +1,6 @@
-import type { Story } from '@/components/dashboard/StoriesPanel';
+import type { Story } from '@/components/organisms/StoriesPanel';
 import type { SearchResult } from '@/__mocks__/search/results';
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 /**
  * Generator functions for creating dynamic mock data

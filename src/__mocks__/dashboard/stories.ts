@@ -1,4 +1,4 @@
-import type { Story } from '@/components/dashboard/StoriesPanel';
+import type { Story } from '@/components/organisms/StoriesPanel';
 
 /**
  * Mock Story data for the StoriesPanel component

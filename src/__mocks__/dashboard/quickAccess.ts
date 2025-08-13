@@ -1,4 +1,4 @@
-import type { QuickAction } from '@/components/dashboard/QuickAccessPanel';
+import type { QuickAction } from '@/components/organisms/QuickAccessPanel';
 import { COLORS } from '@/lib/icons';
 
 /**

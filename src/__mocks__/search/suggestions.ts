@@ -1,4 +1,4 @@
-import { SuggestType } from '@/components/screen-manager/SuggestRow';
+import { SuggestType } from '@/components/molecules/SuggestRow';
 
 /**
  * Mock search suggestion data for the SearchSuggestions component

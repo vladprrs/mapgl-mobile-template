@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { MetaItemProps } from './types';
-import { AdviceCardContainer, AdviceIconCircle, AdviceTitle, AdviceSubtitle } from './primitives';
+import { AdviceCardContainer, AdviceCardText } from '@/components/molecules';
 
 /**
  * MetaItem Component
@@ -48,19 +48,19 @@ export function MetaItem({
       data-item-id={id}
     >
       <div className="flex flex-col items-start">
-        <AdviceTitle theme={theme} className="text-left line-clamp-2">
+        <AdviceCardText theme={theme} className="text-left line-clamp-2">
           {title}
-        </AdviceTitle>
+        </AdviceCardText>
         {subtitle && (
-          <AdviceSubtitle className="text-left mt-0.5">{subtitle}</AdviceSubtitle>
+          <AdviceCardText className="text-left mt-0.5">{subtitle}</AdviceCardText>
         )}
       </div>
 
       {iconUrl && (
         <div className="flex justify-end">
-          <AdviceIconCircle isLight={isLight}>
+          <AdviceCardContainer isLight={isLight}>
             <Image src={iconUrl} alt="" width={32} height={32} className="w-8 h-8" unoptimized />
-          </AdviceIconCircle>
+          </AdviceCardContainer>
         </div>
       )}
     </AdviceCardContainer>

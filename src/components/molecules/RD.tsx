@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { RDProps } from './types';
-import { AdviceCardContainer, AdviceBodyText, AdviceTitle } from './primitives';
+import { AdviceCardContainer, AdviceCardText } from '@/components/molecules';
 
 /**
  * RD (РекламоДатель/Advertiser) Component
@@ -129,15 +129,15 @@ export function RD({
         <div className="flex-1 flex flex-col">
           {/* Title with verified badge */}
           <div className="flex items-center">
-            <AdviceTitle theme={theme} className="font-semibold">
+            <AdviceCardText theme={theme} className="font-semibold">
               {advertiserName}
-            </AdviceTitle>
+            </AdviceCardText>
             {crownIcon}
           </div>
           
           {/* Subtitle */}
           {subtitle && (
-            <AdviceBodyText className="mt-0.5">{subtitle}</AdviceBodyText>
+            <AdviceCardText className="mt-0.5">{subtitle}</AdviceCardText>
           )}
 
           {/* Rating and distance row */}
@@ -163,7 +163,7 @@ export function RD({
 
         {/* Address at bottom */}
         {address && (
-          <AdviceBodyText>{address}</AdviceBodyText>
+          <AdviceCardText>{address}</AdviceCardText>
         )}
       </div>
 
