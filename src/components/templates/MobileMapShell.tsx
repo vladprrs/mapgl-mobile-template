@@ -142,6 +142,11 @@ function MobileMapShellContent({
     return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
   };
 
+  // Determine content background based on screen
+  const getContentBackground = () => {
+    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
+  };
+
   // Use BottomSheet wrapper for all screens for consistency
   return (
     <BottomSheet
@@ -151,6 +156,7 @@ function MobileMapShellContent({
       initialSnap={initialSnap}
       onSnapChange={handleSnapChange}
       headerBackground={getHeaderBackground()}
+      contentBackground={getContentBackground()}
       stickyHeader={
         <SearchBar
           onSearch={handleSearch}

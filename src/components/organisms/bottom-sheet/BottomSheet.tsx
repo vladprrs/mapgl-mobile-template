@@ -20,7 +20,8 @@ const BottomSheetComponent = forwardRef<
     snapPoints = [10, 50, 90],
     initialSnap,
     onSnapChange,
-    headerBackground = 'white'
+    headerBackground = 'white',
+    contentBackground = 'white'
   },
   ref
 ) {
@@ -99,7 +100,7 @@ const BottomSheetComponent = forwardRef<
           </div>
         )}
         {stickyHeader && (
-          <div className="bg-white sticky top-0 z-10">
+          <div className="sticky top-0 z-10" style={{ backgroundColor: contentBackground }}>
             {stickyHeader}
           </div>
         )}
@@ -174,15 +175,15 @@ const BottomSheetComponent = forwardRef<
         </Sheet.Header>
         
         {stickyHeader && (
-          <div className="bg-white sticky top-0 z-10">
+          <div className="sticky top-0 z-10" style={{ backgroundColor: contentBackground }}>
             {stickyHeader}
           </div>
         )}
         
         <Sheet.Content 
-          className="bg-white"
           data-testid="bottom-sheet-content"
           style={{
+            backgroundColor: contentBackground,
             paddingBottom: 'env(safe-area-inset-bottom)',
             overflowY: stateLabel === 'expanded' ? 'auto' : 'hidden',
             overflowX: 'hidden',
