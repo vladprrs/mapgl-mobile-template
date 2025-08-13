@@ -9,16 +9,9 @@ export { MetaItem } from './MetaItem';
 export { MetaItemAd } from './MetaItemAd';
 export { RD } from './RD';
 
-// Search Result Molecules
-export { ADSection } from './ADSection';
+// Search Result Molecules (removed - rebuilding from scratch)
 export { AddressLine } from './AddressLine';
-export { DASection } from './DASection';
-export { Friends } from './Friends';
-export { Gallery } from './Gallery';
-export { HeaderNavBar } from './HeaderNavBar';
 export { SecondaryLine } from './SecondaryLine';
-export { WorkTime } from './WorkTime';
-export { ZMKSection } from './ZMKSection';
 
 // UI Molecules
 export { QuickAction } from './QuickAction';

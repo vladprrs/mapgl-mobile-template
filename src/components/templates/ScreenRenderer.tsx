@@ -4,7 +4,6 @@ import React from 'react';
 import { useScreenManager } from './ScreenManagerContext';
 import { ScreenType } from './types';
 import { SearchSuggestionsPage } from '@/components/pages/SearchSuggestionsPage';
-import { SearchResultsPage, type SearchResult } from '@/components/pages/SearchResultsPage';
 import { DashboardPage } from '@/components/pages/DashboardPage';
 import { debugLog } from '@/lib/logging';
 import { tokens } from '@/lib/ui/tokens';
@@ -21,14 +20,10 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
 
   const handleSelectSuggestion = (suggestion: string) => {
     debugLog('Suggestion selected:', suggestion);
-    navigateTo(ScreenType.SEARCH_RESULTS, suggestion);
+    // Temporarily redirect to dashboard until search results are rebuilt
+    navigateTo(ScreenType.DASHBOARD, suggestion);
   };
 
-  const handleSelectResult = (result: SearchResult) => {
-    debugLog('Result selected:', result);
-    // Handle result selection (e.g., show on map, navigate to details)
-    navigateTo(ScreenType.DASHBOARD);
-  };
 
   const handleQuickAction = (actionId: string) => {
     debugLog('Quick action clicked:', actionId);
@@ -58,12 +53,12 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
         );
       
       case ScreenType.SEARCH_RESULTS:
+        // Temporarily show placeholder until search results are rebuilt
         return (
-          <SearchResultsPage
-            query={searchQuery || ''}
-            onSelectResult={handleSelectResult}
-            className=""
-          />
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            <p className="text-gray-600 text-base">Search results coming soon</p>
+            <p className="mt-2 text-gray-400 text-sm">Rebuilding with clean architecture</p>
+          </div>
         );
       
       default:
@@ -71,10 +66,6 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
     }
   };
 
-  // For search results, render directly without wrapper
-  if (currentScreen === ScreenType.SEARCH_RESULTS) {
-    return renderScreen();
-  }
 
   // For other screens, include Quick Access Panel if needed
   return (
