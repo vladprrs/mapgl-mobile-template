@@ -79,14 +79,19 @@ export function SearchBar({
       className={`${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}
       style={{
         backgroundColor: isResults ? 'transparent' : 'white',
-        // Ensure no borders or visual separations
+        // Absolutely NO borders or visual separations
         border: 'none',
         borderTop: 'none',
         borderBottom: 'none',
+        borderLeft: 'none',
+        borderRight: 'none',
+        outline: 'none',
+        boxShadow: 'none',
         margin: 0,
+        padding: 0,
       }}>
-      {/* Search Bar Container - 8px bottom padding for spacing to next element */}
-      <div className="flex flex-row items-start gap-3 px-4 pb-2">
+      {/* Search Bar Container - consistent padding */}
+      <div className="flex flex-row items-start gap-3 px-4 pb-2" style={{ backgroundColor: isResults ? '#F1F1F1' : 'transparent' }}>
         {/* Search Input */}
         <div className="flex-1 min-w-0">
           <form onSubmit={handleSubmit}>

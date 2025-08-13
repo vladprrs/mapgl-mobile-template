@@ -1,10 +1,16 @@
 /* Override react-modal-sheet defaults to match current styles */
 [data-rsbs-root] {
   z-index: 50 !important;
+  /* Remove any default borders */
+  border: none !important;
+  outline: none !important;
 }
 
 [data-rsbs-overlay] {
   z-index: 49 !important;
+  /* Remove overlay borders */
+  border: none !important;
+  outline: none !important;
 }
 
 [data-rsbs-header] {
@@ -33,8 +39,8 @@
 
 /* CRITICAL: Enhanced visibility to prevent sheet from seeming "lost" */
 .react-modal-sheet-container {
-  /* Stronger shadow for better edge visibility */
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+  /* Remove ALL shadows to prevent border-like effects */
+  box-shadow: none !important;
   /* Ensure sheet is always above other content */
   z-index: 51 !important;
 }
@@ -81,6 +87,16 @@
 [data-rsbs-content] > div {
   border: none !important;
   margin: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Remove any default outlines or focus rings */
+[data-rsbs-header]:focus,
+[data-rsbs-content]:focus,
+[data-rsbs-scroll]:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Remove any box-shadow that might create visual lines */
@@ -119,12 +135,23 @@
 /* Special handling for SearchResults screen to remove ALL artifacts */
 [data-testid="bottom-sheet"][data-sheet-state] {
   overflow: hidden !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 /* Hide ANY shadows or borders when header background is gray */
 [data-testid="drag-header-extended"] {
   box-shadow: none !important;
   border: none !important;
+  outline: none !important;
+}
+
+/* Remove all borders and shadows from Sheet container itself */
+[data-rsbs-root] .react-modal-sheet-container {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 /* Keep rounded corners as per Figma design */
@@ -140,7 +167,27 @@
 [data-rsbs-content]::before,
 [data-rsbs-content]::after,
 [data-testid="drag-header-extended"]::before,
-[data-testid="drag-header-extended"]::after {
+[data-testid="drag-header-extended"]::after,
+[data-rsbs-scroll]::before,
+[data-rsbs-scroll]::after,
+[data-rsbs-root]::before,
+[data-rsbs-root]::after {
   display: none !important;
   content: none !important;
+}
+
+/* Simplified rules - let inline styles handle specifics */
+[data-rsbs-root] * {
+  border: 0 !important;
+  outline: 0 !important;
+}
+
+/* Clean up any lingering artifacts */
+[data-sheet-state] [data-rsbs-header],
+[data-sheet-state] [data-rsbs-content],
+[data-sheet-state] [data-rsbs-scroll] {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  background-image: none !important;
 }

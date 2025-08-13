@@ -96,7 +96,7 @@ const BottomSheetComponent = forwardRef<
   if (!isMounted) {
     return (
       <div 
-        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl z-50 ${className}`}
+        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 ${className}`}
         style={{
           height: `${snapPoints[initialSnapIndex ?? 1]}vh`,
           transform: 'translateY(0)',
@@ -154,8 +154,10 @@ const BottomSheetComponent = forwardRef<
         data-sheet-state={stateLabel}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom)',
-          // Always keep rounded corners as per Figma design
-          boxShadow: headerBackground?.includes('241') ? 'none' : '0 -10px 25px rgba(0, 0, 0, 0.15)',
+          // Remove all shadows to prevent border-like visual artifacts
+          boxShadow: 'none',
+          border: 'none',
+          outline: 'none',
         }}
       >
         <Sheet.Header>
@@ -165,9 +167,9 @@ const BottomSheetComponent = forwardRef<
             style={{ 
               cursor: 'grab',
               backgroundColor: headerBackground,
-              // Add blur effect for SearchResults screen
-              backdropFilter: headerBackground?.includes('241') ? 'blur(10px)' : 'none',
-              WebkitBackdropFilter: headerBackground?.includes('241') ? 'blur(10px)' : 'none',
+              // No blur needed with solid background
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               // Remove any visual separation between header sections
               margin: 0,
               padding: 0,
@@ -188,8 +190,10 @@ const BottomSheetComponent = forwardRef<
               <div 
                 className="w-10 h-1 rounded-md" 
                 style={{
-                  // Drag handle should always be visible as per Figma
-                  backgroundColor: 'rgba(137, 137, 137, 0.25)',
+                  // Drag handle visibility based on background
+                  backgroundColor: headerBackground === '#F1F1F1' 
+                    ? 'rgba(137, 137, 137, 0.4)' // Slightly darker on gray
+                    : 'rgba(137, 137, 137, 0.25)', // Normal on white
                 }}
               />
             </div>
@@ -243,7 +247,7 @@ const BottomSheetComponent = forwardRef<
 // Loading placeholder that maintains layout during SSR
 const BottomSheetPlaceholder = () => (
   <div 
-    className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl z-50"
+    className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50"
     style={{
       height: '50vh', // Default middle position
       transform: 'translateY(0)',

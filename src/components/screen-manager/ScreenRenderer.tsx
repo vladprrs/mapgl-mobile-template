@@ -15,8 +15,8 @@ interface ScreenRendererProps {
 }
 
 export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
-  const { screenState, navigateTo, isTransitioning } = useScreenManager();
-  const { currentScreen, searchQuery } = screenState;
+  const { screenState, searchQuery, navigateTo, isTransitioning } = useScreenManager();
+  const { currentScreen } = screenState;
 
   const handleSelectSuggestion = (suggestion: string) => {
     debugLog('Suggestion selected:', suggestion);
@@ -61,7 +61,7 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
           <SearchResults
             query={searchQuery || ''}
             onSelectResult={handleSelectResult}
-            className={className}
+            className=""
           />
         );
       
@@ -80,10 +80,14 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       className="flex flex-col h-full"
       style={{ 
         backgroundColor: getBackgroundColor(),
-        // Ensure no borders or visual separations
+        // Remove ALL borders and ensure clean background
         border: 'none',
+        borderTop: 'none',
+        borderBottom: 'none',
+        outline: 'none',
         margin: 0,
         padding: 0,
+        boxShadow: 'none',
       }}
     >
       {/* Quick Access Panel - only show on dashboard */}
@@ -99,9 +103,13 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
           isTransitioning ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
         }`}
         style={{
-          // Ensure the content area also has the correct background
+          // Ensure the content area has clean background with NO borders
           backgroundColor: currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'transparent',
           border: 'none',
+          borderTop: 'none', 
+          borderBottom: 'none',
+          outline: 'none',
+          boxShadow: 'none',
           margin: 0,
           padding: 0,
         }}

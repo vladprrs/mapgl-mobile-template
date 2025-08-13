@@ -186,7 +186,7 @@ describe('ScreenManagerContext', () => {
 
         expect(result.current.screenState.currentScreen).toBe(ScreenType.DASHBOARD);
         expect(result.current.screenState.screenHistory).toEqual([ScreenType.DASHBOARD]);
-        expect(result.current.screenState.searchQuery).toBeUndefined();
+        expect(result.current.screenState.searchQuery).toBe('');
         expect(result.current.screenState.previousScreen).toBeUndefined();
       });
     });

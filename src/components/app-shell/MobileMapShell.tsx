@@ -24,23 +24,24 @@ function MobileMapShellContent({
   onSnapChange,
   items,
 }: MobileMapShellProps) {
-  const { screenState, navigateTo } = useScreenManager();
+  // Get all navigation and search handlers from unified ScreenManager
+  const { 
+    screenState, 
+    searchQuery,
+    handleSearch,
+    handleSearchFocus,
+    handleSearchBlur,
+    handleSearchChange,
+    handleClearSearch
+  } = useScreenManager();
+  
   const { adjustCenterForBottomSheet, map } = useMapGL();
-  const [searchQuery, setSearchQuery] = useState(screenState.searchQuery || '');
-  const [searchFocused, setSearchFocused] = useState(false);
   const [currentSnap, setCurrentSnap] = useState<number>(initialSnap ?? snapPoints[1]);
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
   const bottomSheetRef = useRef<BottomSheetRef>(null);
   const previousScreenRef = useRef<ScreenType>(screenState.currentScreen);
   const isAutoSnappingRef = useRef<boolean>(false);
-  
-  // Sync local search query with screen manager state
-  useEffect(() => {
-    if (screenState.searchQuery !== undefined) {
-      setSearchQuery(screenState.searchQuery);
-    }
-  }, [screenState.searchQuery]);
   
   // Automatically adjust snap point ONLY when screen changes
   useEffect(() => {
@@ -86,37 +87,6 @@ function MobileMapShellContent({
     }
   }, [map, adjustCenterForBottomSheet]);
 
-  const handleSearch = useCallback((query: string) => {
-    debugLog('Search query:', query);
-    setSearchQuery(query);
-    if (query.trim()) {
-      navigateTo(ScreenType.SEARCH_RESULTS, query);
-    }
-  }, [navigateTo]);
-
-  const handleSearchFocus = useCallback(() => {
-    setSearchFocused(true);
-    navigateTo(ScreenType.SEARCH_SUGGESTIONS, searchQuery);
-  }, [navigateTo, searchQuery]);
-
-  const handleSearchBlur = useCallback(() => {
-    setSearchFocused(false);
-    // Don't navigate away immediately to allow clicking on suggestions
-    setTimeout(() => {
-      if (!searchFocused && screenState.currentScreen === ScreenType.SEARCH_SUGGESTIONS && !searchQuery) {
-        navigateTo(ScreenType.DASHBOARD);
-      }
-    }, 200);
-  }, [navigateTo, screenState.currentScreen, searchQuery, searchFocused]);
-
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchQuery(value);
-    if (screenState.currentScreen === ScreenType.SEARCH_SUGGESTIONS) {
-      // Update suggestions as user types
-      navigateTo(ScreenType.SEARCH_SUGGESTIONS, value);
-    }
-  }, [navigateTo, screenState.currentScreen]);
-
   const handleMenuClick = useCallback(() => {
     debugLog('Menu clicked');
     // Could open a menu screen in the future
@@ -126,12 +96,6 @@ function MobileMapShellContent({
     debugLog('Voice assistant clicked');
     // Could trigger voice search
   }, []);
-
-  const handleClearSearch = useCallback(() => {
-    debugLog('Clear search clicked');
-    setSearchQuery('');
-    navigateTo(ScreenType.DASHBOARD);
-  }, [navigateTo]);
 
   const handleSnapChange = useCallback((snap: number) => {
     // Update current snap state
@@ -172,9 +136,9 @@ function MobileMapShellContent({
     }
   };
 
-  // Determine header background based on screen - match Figma exactly
+  // Determine header background based on screen - use solid color to prevent artifacts
   const getHeaderBackground = () => {
-    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? 'rgba(241, 241, 241, 0.7)' : 'white';
+    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
   };
 
   return (
