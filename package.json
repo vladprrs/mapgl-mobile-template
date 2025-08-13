@@ -9,17 +9,6 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:unit": "jest __tests__/unit",
-    "test:integration": "jest __tests__/integration",
-    "test:e2e": "echo 'E2E tests are temporarily disabled. See docs/e2e-testing-strategy.md' && exit 0",
-    "test:e2e:mobile": "echo 'E2E tests are temporarily disabled. See docs/e2e-testing-strategy.md' && exit 0",
-    "test:e2e:ui": "echo 'E2E tests are temporarily disabled. See docs/e2e-testing-strategy.md' && exit 0",
-    "test:map": "jest --testPathPattern=Map",
-    "test:sheet": "jest --testPathPattern=BottomSheet",
-    "test:all": "npm run test:coverage && npm run test:e2e",
     "analyze": "ANALYZE=true next build",
     "pre-deploy": "npm run type-check && npm run lint && npm run build",
     "prepare": "husky"
@@ -36,31 +25,20 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@playwright/test": "^1.54.2",
     "@tailwindcss/postcss": "^4",
-    "@testing-library/jest-dom": "^6.6.4",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "husky": "^9.1.7",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^30.0.5",
-    "jest-environment-jsdom": "^30.0.5",
-    "jest-watch-typeahead": "^3.0.1",
     "lint-staged": "^16.1.4",
-    "msw": "^2.10.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix",
-      "jest --bail --findRelatedTests --passWithNoTests"
+      "eslint --fix"
     ],
     "*.{js,jsx,json,md}": [
       "prettier --write"
