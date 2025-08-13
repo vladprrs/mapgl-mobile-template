@@ -6,6 +6,7 @@ import { ScreenManagerProvider, ScreenRenderer, useScreenManager } from '@/compo
 import { ScreenType } from '@/components/templates/types';
 import { debugLog } from '@/lib/logging';
 import { useMapGL } from '@/hooks/useMapGL';
+import { tokens } from '@/lib/ui/tokens';
 import type { AdviceItem } from '@/__mocks__/advice/types';
 
 interface MobileMapShellProps {
@@ -141,6 +142,33 @@ function MobileMapShellContent({
     return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
   };
 
+  // For search results, render without BottomSheet wrapper
+  if (screenState.currentScreen === ScreenType.SEARCH_RESULTS) {
+    return (
+      <div 
+        className="fixed bottom-0 left-0 right-0 top-0 flex flex-col z-50"
+        style={{ backgroundColor: tokens.colors.background.secondary }}
+      >
+        <SearchBar
+          onSearch={handleSearch}
+          onMenuClick={handleMenuClick}
+          onVoiceClick={handleVoiceClick}
+          onFocus={handleSearchFocus}
+          onBlur={handleSearchBlur}
+          onChange={handleSearchChange}
+          onClear={handleClearSearch}
+          value={searchQuery}
+          noTopRadius
+          variant="results"
+        />
+        <div className="flex-1 overflow-y-auto">
+          <ScreenRenderer items={items} />
+        </div>
+      </div>
+    );
+  }
+
+  // For other screens, use BottomSheet
   return (
     <BottomSheet
       ref={bottomSheetRef}

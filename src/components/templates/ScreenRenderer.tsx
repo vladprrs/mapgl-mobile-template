@@ -71,16 +71,9 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
     }
   };
 
-  // For search results, apply background directly to content
+  // For search results, render directly without wrapper
   if (currentScreen === ScreenType.SEARCH_RESULTS) {
-    return (
-      <div 
-        className="flex-1"
-        style={{ backgroundColor: tokens.colors.background.secondary }}
-      >
-        {renderScreen()}
-      </div>
-    );
+    return renderScreen();
   }
 
   // For other screens, include Quick Access Panel if needed
