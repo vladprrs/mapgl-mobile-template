@@ -1,5 +1,5 @@
 import React from 'react';
-import { ADSection as ADSectionType } from '../SearchResultCard.types';
+import { ADSection as ADSectionType } from '@/components/organisms/SearchResultCard.types';
 
 interface ADSectionProps {
   data: ADSectionType;

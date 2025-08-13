@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useContext } from 'react';
 import { MapContext } from '@/hooks/useMapGL';
 import type { Map, Marker } from '@2gis/mapgl/global';
 import { MAP_CONFIG } from '@/lib/mapgl/config';
@@ -203,3 +203,11 @@ export function MapProvider({ children }: MapProviderProps) {
     </MapContext.Provider>
   );
 }
+
+export const useMapContext = () => {
+  const context = useContext(MapContext);
+  if (!context) {
+    throw new Error('useMapContext must be used within MapProvider');
+  }
+  return context;
+};

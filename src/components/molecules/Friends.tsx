@@ -1,5 +1,5 @@
 import React from 'react';
-import { Friend } from '../SearchResultCard.types';
+import { Friend } from '@/components/organisms/SearchResultCard.types';
 
 interface FriendsProps {
   friends: Friend[];

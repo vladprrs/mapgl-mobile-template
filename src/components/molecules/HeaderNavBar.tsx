@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardVariant } from '../SearchResultCard.types';
+import { CardVariant } from '@/components/organisms/SearchResultCard.types';
 
 interface HeaderNavBarProps {
   title: string;

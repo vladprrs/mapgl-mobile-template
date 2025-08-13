@@ -1,5 +1,5 @@
 import React from 'react';
-import { GalleryData } from '../SearchResultCard.types';
+import { GalleryData } from '@/components/organisms/SearchResultCard.types';
 
 interface GalleryProps {
   data: GalleryData;

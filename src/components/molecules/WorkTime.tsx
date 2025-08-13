@@ -1,5 +1,5 @@
 import React from 'react';
-import { WorkingHours } from '../SearchResultCard.types';
+import { WorkingHours } from '@/components/organisms/SearchResultCard.types';
 
 interface WorkTimeProps {
   workingHours: WorkingHours;

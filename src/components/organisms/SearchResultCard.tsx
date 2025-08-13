@@ -14,7 +14,7 @@ import {
   ADSection,
   DASection,
   ZMKSection
-} from './components';
+} from '@/components/molecules';
 
 export const SearchResultCard: React.FC<SearchResultCardProps> = ({
   variant,

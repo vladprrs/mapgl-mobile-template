@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdditionalInfo } from '../SearchResultCard.types';
+import { AdditionalInfo } from '@/components/organisms/SearchResultCard.types';
 
 interface DASectionProps {
   data: AdditionalInfo;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NonRDFeatures } from '../SearchResultCard.types';
+import { NonRDFeatures } from '@/components/organisms/SearchResultCard.types';
 
 interface ZMKSectionProps {
   deliveryButton?: NonRDFeatures['deliveryButton'];
