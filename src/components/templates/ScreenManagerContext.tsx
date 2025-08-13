@@ -20,9 +20,6 @@ interface ScreenManagerContextValue {
   handleSearchBlur: () => void;
   handleSearchChange: (value: string) => void;
   handleClearSearch: () => void;
-  
-  // Transition state
-  isTransitioning: boolean;
 }
 
 const ScreenManagerContext = createContext<ScreenManagerContextValue | undefined>(undefined);
@@ -46,12 +43,9 @@ export function ScreenManagerProvider({
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [searchFocused, setSearchFocused] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Core navigation method
   const navigateTo = useCallback((screen: ScreenType, query?: string) => {
-    setIsTransitioning(true);
-    
     // Update search query if provided
     if (query !== undefined) {
       setSearchQuery(query);
@@ -62,10 +56,7 @@ export function ScreenManagerProvider({
       previousScreen: prev.currentScreen,
       history: [...prev.history, screen],
     }));
-    
-    // Reset transition state after animation
-    setTimeout(() => setIsTransitioning(false), 300);
-  }, [searchQuery]);
+  }, []);
 
   const navigateBack = useCallback(() => {
     setScreenState(prev => {
@@ -77,16 +68,13 @@ export function ScreenManagerProvider({
       newHistory.pop(); // Remove current screen
       const previousScreen = newHistory[newHistory.length - 1];
       
-      setIsTransitioning(true);
-      setTimeout(() => setIsTransitioning(false), 300);
-      
       return {
         currentScreen: previousScreen,
         previousScreen: prev.currentScreen,
         history: newHistory,
       };
     });
-  }, [searchQuery]);
+  }, []);
 
   const clearHistory = useCallback(() => {
     setScreenState({
@@ -153,7 +141,6 @@ export function ScreenManagerProvider({
     handleSearchBlur,
     handleSearchChange,
     handleClearSearch,
-    isTransitioning,
   };
 
   return (

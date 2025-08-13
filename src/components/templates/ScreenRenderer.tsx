@@ -7,6 +7,7 @@ import { SearchSuggestionsPage } from '@/components/pages/SearchSuggestionsPage'
 import { SearchResultsPage, type SearchResult } from '@/components/pages/SearchResultsPage';
 import { DashboardPage } from '@/components/pages/DashboardPage';
 import { debugLog } from '@/lib/logging';
+import { tokens } from '@/lib/ui/tokens';
 import type { AdviceItem } from '@/__mocks__/advice/types';
 
 interface ScreenRendererProps {
@@ -15,7 +16,7 @@ interface ScreenRendererProps {
 }
 
 export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
-  const { screenState, searchQuery, navigateTo, isTransitioning } = useScreenManager();
+  const { screenState, searchQuery, navigateTo } = useScreenManager();
   const { currentScreen } = screenState;
 
   const handleSelectSuggestion = (suggestion: string) => {
@@ -70,19 +71,12 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
     }
   };
 
-  // Determine background color based on screen
-  const getBackgroundColor = () => {
-    return currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'transparent';
-  };
-
   // For search results, apply background directly to content
   if (currentScreen === ScreenType.SEARCH_RESULTS) {
     return (
       <div 
-        className={`flex-1 transition-all duration-300 ease-in-out ${
-          isTransitioning ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
-        }`}
-        style={{ backgroundColor: '#F1F1F1' }}
+        className="flex-1"
+        style={{ backgroundColor: tokens.colors.background.secondary }}
       >
         {renderScreen()}
       </div>
@@ -99,12 +93,8 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
         </div>
       )}
 
-      {/* Screen content with smooth transition */}
-      <div 
-        className={`flex-1 transition-all duration-300 ease-in-out ${
-          isTransitioning ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
-        }`}
-      >
+      {/* Screen content */}
+      <div className="flex-1">
         {renderScreen()}
       </div>
     </>
