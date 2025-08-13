@@ -31,9 +31,13 @@ export function SearchResultItem({
   onActionClick,
 }: SearchResultItemProps) {
   return (
-    <div role="article" aria-label={`Search result: ${title}`}>
+    <div 
+      role="article" 
+      aria-label={`Search result: ${title}`}
+      onClick={onClick}
+      className="cursor-pointer"
+    >
       <CardContainer
-        onClick={onClick}
         variant="outlined"
         padding="md"
         radius="lg"
