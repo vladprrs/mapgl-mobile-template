@@ -14,7 +14,6 @@ export interface InterestingProps {
   title: string;
   subtitle: string;
   imageUrl?: string;
-  images?: string[];
   featureId?: string;
   onClick?: () => void;
   className?: string;
