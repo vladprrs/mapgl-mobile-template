@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { BottomSheet, BottomSheetRef } from '@/components/bottom-sheet';
-import { SearchBar } from '@/components/dashboard/SearchBar';
+import { SearchBar } from '@/components/organisms';
 import { ScreenManagerProvider, ScreenRenderer, useScreenManager, ScreenType } from '@/components/screen-manager';
 import { debugLog } from '@/lib/logging';
 import { useMapGL } from '@/hooks/useMapGL';

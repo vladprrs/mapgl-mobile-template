@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { SuggestRow, SuggestType } from './SuggestRow';
+import { SuggestRow, SuggestType } from '@/components/molecules';
 
 interface SearchSuggestionsProps {
   query: string;

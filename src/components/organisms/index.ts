@@ -1,0 +1,1 @@
+export { SearchBar, type SearchBarVariant } from './SearchBar';
