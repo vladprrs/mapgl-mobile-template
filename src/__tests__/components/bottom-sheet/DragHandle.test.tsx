@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
+import { BottomSheet } from '@/components/organisms/bottom-sheet/BottomSheet';
 
 describe('DragHandle (inline in BottomSheet)', () => {
   it('renders with default styling', () => {

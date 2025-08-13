@@ -62,7 +62,7 @@ export function generateMockSearchResults(count: number): SearchResult[] {
  * Generate mock advice items
  */
 export function generateMockAdviceItems(count: number): AdviceItem[] {
-  const types: AdviceItem['type'][] = ['meta-item', 'cover', 'interesting', 'rd', 'meta-item-ad'];
+  const types: AdviceItem['type'][] = ['meta_item', 'cover', 'interesting', 'rd', 'meta_item_ad'];
   const titles = ['Аптеки', 'Рестораны', 'Кафе', 'Магазины', 'Парки'];
   
   return Array.from({ length: count }, (_, i) => {
@@ -73,7 +73,7 @@ export function generateMockAdviceItems(count: number): AdviceItem[] {
     };
     
     switch (type) {
-      case 'meta-item':
+      case 'meta_item':
         return {
           ...baseItem,
           type,
@@ -88,17 +88,16 @@ export function generateMockAdviceItems(count: number): AdviceItem[] {
           ...baseItem,
           type,
           title: `Подборка ${i + 1}`,
-          imageUrl: `/assets/advice/cover-${i}.png`,
-          collectionId: `collection-${i}`,
-          itemCount: Math.floor(Math.random() * 50) + 5,
-          state: 'Default',
+          subtitle: `${Math.floor(Math.random() * 50) + 5} товаров`,
+          images: [`/assets/advice/cover-${i}.png`],
+          variant: Math.random() > 0.5 ? 'big' : 'default',
         };
       case 'interesting':
         return {
           ...baseItem,
           type,
           title: `Интересное ${i + 1}`,
-          description: `${Math.floor(Math.random() * 100)} подборок`,
+          subtitle: `${Math.floor(Math.random() * 100)} подборок`,
           imageUrl: `/assets/advice/interesting-${i}.png`,
           featureId: `feature-${i}`,
         };
@@ -109,14 +108,14 @@ export function generateMockAdviceItems(count: number): AdviceItem[] {
           advertiserName: `Заведение ${i + 1}`,
           subtitle: 'Ресторан',
           images: [`/assets/advice/rd-${i}-1.png`, `/assets/advice/rd-${i}-2.png`],
-          rating: (3 + Math.random() * 2).toFixed(1),
+          rating: Number((3 + Math.random() * 2).toFixed(1)),
           distance: `${(Math.random() * 5).toFixed(1)} км`,
           address: `Улица ${i + 1}, дом ${(i % 50) + 1}`,
           establishmentIds: [`establishment-${i}`],
           organizationId: `org-${i}`,
           isVerified: Math.random() > 0.5,
         };
-      case 'meta-item-ad':
+      case 'meta_item_ad':
         return {
           ...baseItem,
           type,

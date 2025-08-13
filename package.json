@@ -26,11 +26,13 @@
   },
   "dependencies": {
     "@2gis/mapgl": "^1.62.0",
+    "immer": "^10.1.1",
     "motion": "^12.23.12",
     "next": "15.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-modal-sheet": "^4.4.0"
+    "react-modal-sheet": "^4.4.0",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

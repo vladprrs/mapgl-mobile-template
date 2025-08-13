@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { StoreProvider } from "@/stores/StoreProvider";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -36,7 +37,9 @@ export default function RootLayout({
           position: "fixed",
         }}
       >
-        {children}
+        <StoreProvider>
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );

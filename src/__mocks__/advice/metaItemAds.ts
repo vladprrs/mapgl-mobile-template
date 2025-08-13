@@ -7,7 +7,7 @@ import type { AdviceItem } from '@/__mocks__/advice/types';
 
 export const mockMetaItemAds: AdviceItem[] = [
   {
-    type: 'meta-item-ad',
+    type: 'meta_item_ad',
     id: 'xiaomi-ad',
     title: 'Xiaomi',
     logoUrl: '/assets/advice/74f7e8baab90184b05499ea80dce96f157e67779.png',
@@ -21,7 +21,7 @@ export const mockMetaItemAds: AdviceItem[] = [
 ];
 
 export const mockMetaItemAdDark: AdviceItem = {
-  type: 'meta-item-ad',
+  type: 'meta_item_ad',
   id: 'samsung-ad',
   title: 'Samsung',
   logoUrl: '/assets/advice/samsung-logo.png',

@@ -5,6 +5,7 @@ import { MAP_CONFIG } from '@/lib/mapgl/config';
 import { safeDestroyMap } from '@/lib/mapgl/lifecycle';
 import { debugLog } from '@/lib/logging';
 import { config, ConfigError, isTestHooksEnabled } from '@/lib/config/env';
+import useStore from '@/stores';
 
 interface MapContainerProps {
   className?: string;
@@ -14,6 +15,9 @@ export function MapContainer({ className = '' }: MapContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<InstanceType<typeof import('@2gis/mapgl/global').Map> | null>(null);
   const initializingRef = useRef(false);
+  
+  // Set map instance directly in Zustand store
+  const setMapInstance = useStore((state) => state.map.setMapInstance);
 
   useEffect(() => {
     if (!containerRef.current || initializingRef.current) return;
@@ -65,10 +69,8 @@ export function MapContainer({ className = '' }: MapContainerProps) {
           } catch {}
         }
 
-        // Set map instance in provider if needed
-        if ((window as unknown as { __setMapInstance?: (map: unknown) => void }).__setMapInstance) {
-          (window as unknown as { __setMapInstance: (map: unknown) => void }).__setMapInstance(map);
-        }
+        // Set map instance in Zustand store
+        setMapInstance(map);
 
         // Handle map events (with safety check)
         if (map && typeof map.on === 'function') {
@@ -99,7 +101,7 @@ export function MapContainer({ className = '' }: MapContainerProps) {
       safeDestroyMap(mapInstanceRef.current, 'Failed to destroy map instance');
       mapInstanceRef.current = null;
     };
-  }, []);
+  }, [setMapInstance]);
 
   return (
     <div 

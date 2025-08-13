@@ -1,12 +1,11 @@
 'use client';
 
-import { MapProvider, MapContainer } from '@/components/organisms';
+import { MapContainer } from '@/components/organisms';
 import { MobileMapShell } from '@/components/templates';
 import { useEffect, useState } from 'react';
 import type { AdviceItem } from '@/__mocks__/advice/types';
 
-// Inner component that has access to MapContext
-function MapWithBottomSheet() {
+export default function Home() {
   const [devItems, setDevItems] = useState<AdviceItem[]>([]);
 
   useEffect(() => {
@@ -29,13 +28,5 @@ function MapWithBottomSheet() {
         items={devItems}
       />
     </main>
-  );
-}
-
-export default function Home() {
-  return (
-    <MapProvider>
-      <MapWithBottomSheet />
-    </MapProvider>
   );
 }

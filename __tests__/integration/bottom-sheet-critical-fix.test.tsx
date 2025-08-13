@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet';
+import { BottomSheet } from '@/components/organisms/bottom-sheet/BottomSheet';
 
 describe('BottomSheet Critical Fix - Prevent Disappearing', () => {
   it('should never allow sheet to close completely', () => {

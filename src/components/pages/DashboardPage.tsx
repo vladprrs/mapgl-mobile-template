@@ -64,7 +64,6 @@ export function DashboardPage({
             onSearch={handleSearch}
             onMenuClick={handleMenuClick}
             onVoiceClick={handleVoiceClick}
-            noTopRadius
           />
         </div>
       )}

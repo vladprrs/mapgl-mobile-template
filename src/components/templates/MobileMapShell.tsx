@@ -2,12 +2,13 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { BottomSheet, BottomSheetRef, SearchBar } from '@/components/organisms';
-import { ScreenManagerProvider, ScreenRenderer, useScreenManager } from '@/components/templates';
+import { ScreenRenderer } from '@/components/templates';
 import { ScreenType } from '@/components/templates/types';
 import { debugLog } from '@/lib/logging';
-import { useMapGL } from '@/hooks/useMapGL';
-import { tokens } from '@/lib/ui/tokens';
+// tokens import removed - not used
 import type { AdviceItem } from '@/__mocks__/advice/types';
+import useStore from '@/stores';
+import { useActions } from '@/stores';
 
 interface MobileMapShellProps {
   className?: string;
@@ -17,26 +18,38 @@ interface MobileMapShellProps {
   items?: AdviceItem[];
 }
 
-// Inner component that uses the ScreenManager context
-function MobileMapShellContent({
+export function MobileMapShell({
   className = '',
   snapPoints = [10, 50, 90],
   initialSnap,
   onSnapChange,
   items,
 }: MobileMapShellProps) {
-  // Get all navigation and search handlers from unified ScreenManager
-  const { 
-    screenState, 
-    searchQuery,
-    handleSearch,
-    handleSearchFocus,
-    handleSearchBlur,
-    handleSearchChange,
-    handleClearSearch
-  } = useScreenManager();
+  // Get state and actions directly from Zustand store
+  const search = useStore((state) => state.search);
+  const ui = useStore((state) => state.ui);
+  const map = useStore((state) => state.map);
+  const actions = useActions();
   
-  const { adjustCenterForBottomSheet, map } = useMapGL();
+  // Create screen state object for compatibility
+  const screenState = {
+    currentScreen: ui.currentScreen,
+    previousScreen: ui.previousScreen,
+    history: ui.screenHistory,
+  };
+  
+  const searchQuery = search.query;
+  const adjustCenterForBottomSheet = map.adjustCenterForBottomSheet;
+  
+  // Action handlers
+  const handleSearch = actions.performSearch;
+  const handleSearchFocus = actions.focusSearchBar;
+  const handleSearchBlur = actions.blurSearchBar;
+  const handleSearchChange = search.setQuery;
+  const handleClearSearch = () => {
+    search.clearSearch();
+    ui.navigateTo(ScreenType.DASHBOARD);
+  };
   const [currentSnap, setCurrentSnap] = useState<number>(initialSnap ?? snapPoints[1]);
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
@@ -82,11 +95,11 @@ function MobileMapShellContent({
   
   // Execute pending adjustments when map becomes available
   useEffect(() => {
-    if (map && pendingAdjustmentRef.current) {
+    if (map.instance && pendingAdjustmentRef.current) {
       adjustCenterForBottomSheet(pendingAdjustmentRef.current.old, pendingAdjustmentRef.current.new);
       pendingAdjustmentRef.current = null;
     }
-  }, [map, adjustCenterForBottomSheet]);
+  }, [map.instance, adjustCenterForBottomSheet]);
 
   const handleMenuClick = useCallback(() => {
     debugLog('Menu clicked');
@@ -110,7 +123,7 @@ function MobileMapShellContent({
     
     // Adjust map center to keep the same point visible
     if (previousSnapRef.current !== snap) {
-      if (map) {
+      if (map.instance) {
         adjustCenterForBottomSheet(previousSnapRef.current, snap);
       } else {
         // Queue adjustment for when map becomes available
@@ -123,7 +136,7 @@ function MobileMapShellContent({
     if (onSnapChange) {
       onSnapChange(snap);
     }
-  }, [adjustCenterForBottomSheet, onSnapChange, map]);
+  }, [adjustCenterForBottomSheet, onSnapChange, map.instance]);
 
   // Determine the search bar variant based on current screen
   const getSearchBarVariant = () => {
@@ -167,7 +180,6 @@ function MobileMapShellContent({
           onChange={handleSearchChange}
           onClear={handleClearSearch}
           value={searchQuery}
-          noTopRadius
           variant={getSearchBarVariant()}
         />
       }
@@ -177,11 +189,3 @@ function MobileMapShellContent({
   );
 }
 
-// Main component that provides the ScreenManager context
-export function MobileMapShell(props: MobileMapShellProps) {
-  return (
-    <ScreenManagerProvider initialScreen={ScreenType.DASHBOARD}>
-      <MobileMapShellContent {...props} />
-    </ScreenManagerProvider>
-  );
-}

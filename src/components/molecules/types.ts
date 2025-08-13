@@ -4,41 +4,45 @@ export interface CoverProps {
   subtitle: string;
   images?: string[];
   isGoodAdvisor?: boolean;
-  isHorizontal?: boolean;
+  variant?: 'default' | 'big';
   onClick?: () => void;
   className?: string;
-  theme?: 'light' | 'dark';
+  theme?: 'Light' | 'Dark';
 }
 
 export interface InterestingProps {
   title: string;
   subtitle: string;
+  imageUrl?: string;
   images?: string[];
+  featureId?: string;
   onClick?: () => void;
   className?: string;
-  theme?: 'light' | 'dark';
+  theme?: 'Light' | 'Dark';
 }
 
 export interface MetaItemProps {
-  category: string;
-  count: number;
-  image?: string;
+  title: string;
+  subtitle: string;
+  iconUrl?: string;
   backgroundColor?: string;
   onClick?: () => void;
   className?: string;
-  theme?: 'light' | 'dark';
+  theme?: 'Light' | 'Dark';
 }
 
 export interface MetaItemAdProps {
-  category: string;
-  companyName: string;
-  subtitle: string;
-  image?: string;
+  title: string;
+  logoUrl?: string;
+  gradientColor?: string;
+  gradientMaskUrl?: string;
+  searchPhrase?: string;
+  advertiserId?: string;
+  isSponsored?: boolean;
   backgroundColor?: string;
-  gradientColors?: [string, string];
   onClick?: () => void;
   className?: string;
-  theme?: 'light' | 'dark';
+  theme?: 'Light' | 'Dark';
 }
 
 export interface RDProps {
@@ -49,9 +53,11 @@ export interface RDProps {
   address?: string;
   images?: string[];
   isVerified?: boolean;
+  establishmentIds?: string[];
+  organizationId?: string;
   onClick?: () => void;
   className?: string;
-  theme?: 'light' | 'dark';
+  theme?: 'Light' | 'Dark';
 }
 
 // Additional helper components for advice cards

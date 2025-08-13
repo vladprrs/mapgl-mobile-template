@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
+import { tokens } from '@/lib/ui/tokens';
 import { debugLog } from '@/lib/logging';
 import { CoverProps } from './types';
-import { AdviceCardContainer } from '@/components/molecules';
 
 /**
  * Cover Component
@@ -12,7 +12,7 @@ import { AdviceCardContainer } from '@/components/molecules';
  * Design specs from Figma:
  * - Default state: 116px height (single height in masonry)
  * - Big state: 244px height (double height in masonry)
- * - Rounded: 12px (rounded-xl)
+ * - Rounded: 12px (tokens.borders.radius.lg)
  * - Background image with gradient overlay
  * - Title: 16px, Medium, -0.24px tracking, white
  * - Subtitle: 13px, Regular, -0.234px tracking, white
@@ -25,7 +25,7 @@ export function Cover({
   subtitle,
   images = [],
   isGoodAdvisor = false,
-  isHorizontal = false,
+  variant = 'default',
   onClick,
   className = '',
 }: CoverProps) {
@@ -34,43 +34,111 @@ export function Cover({
     onClick?.();
   };
 
-  const isBig = isHorizontal;
+  const isBig = variant === 'big';
   const height = isBig ? 'h-[244px]' : 'h-[116px]';
 
   // Use first image as background
   const backgroundImage = images.length > 0 ? images[0] : undefined;
 
   return (
-    <AdviceCardContainer
+    <div
       onClick={handleClick}
-      className={`${className}`}
-      heightClassName={height}
+      className={`relative cursor-pointer overflow-hidden ${height} ${className}`}
+      style={{
+        borderRadius: tokens.borders.radius.lg,
+        backgroundColor: variant === 'default' ? tokens.colors.white : 'transparent',
+      }}
       aria-label={`Collection: ${title}`}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
     >
+      {/* Background Image */}
       {backgroundImage && (
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImage}')` }} />
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+          style={{ 
+            backgroundImage: `url('${backgroundImage}')`,
+            borderRadius: tokens.borders.radius.lg,
+          }} 
+        />
       )}
 
-      {isBig ? (
-        <div className="absolute inset-0 rounded-xl bg-black/40" />
+      {/* Overlay */}
+      {variant === 'big' ? (
+        <div 
+          className="absolute inset-0" 
+          style={{
+            borderRadius: tokens.borders.radius.lg,
+          }}
+        />
       ) : (
         <div
-          className="absolute inset-0 rounded-xl"
+          className="absolute inset-0"
           style={{
             background:
               'linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.28) 42.336%, rgba(0, 0, 0, 0) 100%)',
+            borderRadius: tokens.borders.radius.lg,
           }}
         />
       )}
 
-      <div className="absolute inset-0 px-4 pt-2.5 pb-0 flex flex-col">
-        <h3 className="font-medium text-[16px] leading-5 tracking-[-0.24px] text-white text-left">{title}</h3>
+      {/* Text Content */}
+      <div 
+        className="absolute inset-0 flex flex-col"
+        style={{
+          paddingLeft: tokens.spacing[4],
+          paddingRight: tokens.spacing[4],
+          paddingTop: '10px', // Figma-specific value (pt-2.5)
+          paddingBottom: '0px',
+        }}
+      >
+        <div className="pb-0.5 pt-2.5">
+          <h3 
+            className="text-left"
+            style={{
+              fontWeight: tokens.typography.fontWeight.medium,
+              fontSize: tokens.typography.fontSize.lg,
+              lineHeight: '20px',
+              letterSpacing: '-0.24px',
+              color: tokens.colors.text.inverse,
+            }}
+          >
+            {title}
+          </h3>
+        </div>
         {subtitle && (
-          <p className="text-[13px] leading-4 tracking-[-0.234px] text-white text-left mt-0.5">{subtitle}</p>
+          <div className="py-px">
+            <p 
+              className="text-left"
+              style={{
+                fontWeight: tokens.typography.fontWeight.normal,
+                fontSize: tokens.typography.fontSize.sm,
+                lineHeight: '16px',
+                letterSpacing: '-0.234px',
+                color: tokens.colors.text.inverse,
+              }}
+            >
+              {subtitle}
+            </p>
+          </div>
         )}
       </div>
 
-      <div className="absolute inset-0 border-[0.5px] border-[rgba(137,137,137,0.3)] rounded-xl pointer-events-none" aria-hidden="true" />
-    </AdviceCardContainer>
+      {/* Border */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{
+          border: `0.5px solid ${tokens.colors.border.DEFAULT}`,
+          borderRadius: tokens.borders.radius.lg,
+        }}
+        aria-hidden="true" 
+      />
+    </div>
   );
 }

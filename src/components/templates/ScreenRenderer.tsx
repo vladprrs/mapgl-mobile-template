@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { useScreenManager } from './ScreenManagerContext';
+import useStore from '@/stores';
 import { ScreenType } from './types';
 import { SearchSuggestionsPage } from '@/components/pages/SearchSuggestionsPage';
 import { SearchResultsPage } from '@/components/pages/SearchResultsPage';
 import type { SearchResultItemProps } from '@/components/molecules/SearchResultItem';
 import { DashboardPage } from '@/components/pages/DashboardPage';
 import { debugLog } from '@/lib/logging';
-import { tokens } from '@/lib/ui/tokens';
+// tokens import removed - not used
 import type { AdviceItem } from '@/__mocks__/advice/types';
 
 interface ScreenRendererProps {
@@ -17,18 +17,21 @@ interface ScreenRendererProps {
 }
 
 export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
-  const { screenState, searchQuery, navigateTo } = useScreenManager();
-  const { currentScreen } = screenState;
+  const ui = useStore((state) => state.ui);
+  const search = useStore((state) => state.search);
+  const searchQuery = search.query;
+  const currentScreen = ui.currentScreen;
 
   const handleSelectSuggestion = (suggestion: string) => {
     debugLog('Suggestion selected:', suggestion);
-    navigateTo(ScreenType.SEARCH_RESULTS, suggestion);
+    search.setQuery(suggestion);
+    ui.navigateTo(ScreenType.SEARCH_RESULTS);
   };
 
   const handleSelectResult = (result: SearchResultItemProps) => {
     debugLog('Result selected:', result);
     // Handle result selection (e.g., show on map, navigate to details)
-    navigateTo(ScreenType.DASHBOARD);
+    ui.navigateTo(ScreenType.DASHBOARD);
   };
 
 

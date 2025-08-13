@@ -7,27 +7,36 @@ export interface BaseAdviceItem {
 
 export interface MetaItemData extends BaseAdviceItem {
   type: 'meta_item';
-  category: string;
-  count: number;
-  image?: string;
+  title: string;
+  subtitle: string;
+  iconUrl?: string;
+  categoryId?: string;
+  searchQuery?: string;
+  theme?: 'Light' | 'Dark';
   backgroundColor?: string;
 }
 
 export interface MetaItemAdData extends BaseAdviceItem {
   type: 'meta_item_ad';
-  category: string;
-  companyName: string;
-  subtitle: string;
-  image?: string;
+  title: string;
+  logoUrl?: string;
+  gradientColor?: string;
+  gradientMaskUrl?: string;
+  searchPhrase?: string;
+  advertiserId?: string;
+  theme?: 'Light' | 'Dark';
+  isSponsored?: boolean;
   backgroundColor?: string;
-  gradientColors?: [string, string];
 }
 
 export interface InterestingData extends BaseAdviceItem {
   type: 'interesting';
   title: string;
   subtitle: string;
+  imageUrl?: string;
   images?: string[];
+  featureId?: string;
+  theme?: 'Light' | 'Dark';
 }
 
 export interface CoverData extends BaseAdviceItem {
@@ -36,7 +45,7 @@ export interface CoverData extends BaseAdviceItem {
   subtitle: string;
   images?: string[];
   isGoodAdvisor?: boolean;
-  isHorizontal?: boolean;
+  variant?: 'default' | 'big';
 }
 
 export interface RDData extends BaseAdviceItem {
@@ -48,6 +57,9 @@ export interface RDData extends BaseAdviceItem {
   address?: string;
   images?: string[];
   isVerified?: boolean;
+  establishmentIds?: string[];
+  organizationId?: string;
+  theme?: 'Light' | 'Dark';
 }
 
 export type AdviceItem = MetaItemData | MetaItemAdData | InterestingData | CoverData | RDData;

@@ -86,11 +86,13 @@ const BottomSheetComponent = forwardRef<
         data-testid="bottom-sheet"
         data-sheet-state={stateLabel}
       >
-        <div className="flex justify-center py-2" data-testid="drag-handle">
+        <div className="flex justify-center pt-1.5 pb-1.5" data-testid="drag-handle">
           <div 
             className="w-10 h-1 rounded-md" 
             style={{
-              backgroundColor: 'rgba(137, 137, 137, 0.25)',
+              backgroundColor: headerBackground === '#F1F1F1' 
+                ? 'rgba(137, 137, 137, 0.25)'
+                : 'rgba(20, 20, 20, 0.09)',
             }}
           />
         </div>
@@ -154,8 +156,8 @@ const BottomSheetComponent = forwardRef<
                 className="w-10 h-1 rounded-md" 
                 style={{
                   backgroundColor: headerBackground === '#F1F1F1' 
-                    ? 'rgba(137, 137, 137, 0.4)'
-                    : 'rgba(137, 137, 137, 0.25)',
+                    ? 'rgba(137, 137, 137, 0.25)'
+                    : 'rgba(20, 20, 20, 0.09)',
                 }}
               />
             </div>
@@ -223,7 +225,7 @@ export const BottomSheet = dynamic(
           <div 
             className="w-10 h-1 rounded-md"
             style={{
-              backgroundColor: 'rgba(137, 137, 137, 0.25)',
+              backgroundColor: 'rgba(20, 20, 20, 0.09)',
             }}
           />
         </div>

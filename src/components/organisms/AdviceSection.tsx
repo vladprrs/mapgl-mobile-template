@@ -91,8 +91,8 @@ export function AdviceSection({
       }
       
       if (item.type === 'cover') {
-        // Cover can be single or double based on state
-        return item.isHorizontal ? 2 : 1;
+        // Cover can be single or double based on variant
+        return item.variant === 'big' ? 2 : 1;
       }
       
       return 1; // Default

@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import { hydrateRoot } from 'react-dom/client'
 import { act } from 'react-dom/test-utils'
-import { BottomSheet } from '@/components/bottom-sheet/BottomSheet'
+import { BottomSheet } from '@/components/organisms/bottom-sheet/BottomSheet'
 
 describe('BottomSheet Hydration', () => {
   let container: HTMLDivElement
