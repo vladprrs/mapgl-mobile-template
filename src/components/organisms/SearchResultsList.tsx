@@ -25,7 +25,7 @@ export function SearchResultsList({
   // Empty state
   if (results.length === 0) {
     return (
-      <div className={`flex flex-col items-center justify-center py-12 px-4 ${className}`}>
+      <div className={`flex flex-col items-center justify-center py-12 px-4 bg-background-secondary ${className}`}>
         <Text size="lg" color="secondary" className="text-center">
           No results found
         </Text>

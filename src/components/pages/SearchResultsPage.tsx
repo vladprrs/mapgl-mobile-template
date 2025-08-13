@@ -99,7 +99,7 @@ export function SearchResultsPage({
   };
 
   return (
-    <div className={`search-results-page min-h-full ${className}`}>
+    <div className={`search-results-page min-h-full bg-background-secondary ${className}`}>
       <SearchResultsList
         results={filteredResults}
         onResultClick={handleResultClick}
