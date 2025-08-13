@@ -21,33 +21,24 @@ import { AdviceCardContainer } from '@/components/molecules';
  * - Light theme only (always white text on image)
  */
 export function Cover({
-  id,
   title,
   subtitle,
-  imageUrl,
-  collectionId,
-  itemCount,
-  author,
-  state = 'Default',
+  images = [],
+  isGoodAdvisor = false,
+  isHorizontal = false,
   onClick,
   className = '',
 }: CoverProps) {
   const handleClick = () => {
-    debugLog('Cover clicked:', { collectionId });
+    debugLog('Cover clicked:', { title });
     onClick?.();
   };
 
-  const isBig = state === 'Big';
+  const isBig = isHorizontal;
   const height = isBig ? 'h-[244px]' : 'h-[116px]';
 
-  // Format subtitle text
-  const getSubtitleText = () => {
-    const parts = [];
-    if (subtitle) parts.push(subtitle);
-    if (itemCount) parts.push(`${itemCount} ${itemCount === 1 ? 'место' : itemCount < 5 ? 'места' : 'мест'}`);
-    if (author) parts.push(author);
-    return parts.join(' · ');
-  };
+  // Use first image as background
+  const backgroundImage = images.length > 0 ? images[0] : undefined;
 
   return (
     <AdviceCardContainer
@@ -55,11 +46,9 @@ export function Cover({
       className={`${className}`}
       heightClassName={height}
       aria-label={`Collection: ${title}`}
-      data-collection-id={collectionId}
-      data-item-id={id}
     >
-      {imageUrl && (
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${imageUrl}')` }} />
+      {backgroundImage && (
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImage}')` }} />
       )}
 
       {isBig ? (
@@ -76,8 +65,8 @@ export function Cover({
 
       <div className="absolute inset-0 px-4 pt-2.5 pb-0 flex flex-col">
         <h3 className="font-medium text-[16px] leading-5 tracking-[-0.24px] text-white text-left">{title}</h3>
-        {getSubtitleText() && (
-          <p className="text-[13px] leading-4 tracking-[-0.234px] text-white text-left mt-0.5">{getSubtitleText()}</p>
+        {subtitle && (
+          <p className="text-[13px] leading-4 tracking-[-0.234px] text-white text-left mt-0.5">{subtitle}</p>
         )}
       </div>
 

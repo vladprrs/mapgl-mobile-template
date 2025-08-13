@@ -61,12 +61,8 @@ export function AdviceSection({
 
   const getGridClassName = () => {
     switch (layout) {
-      case 'single':
-        return 'grid grid-cols-1 gap-3';
-      case 'double':
-        return 'grid grid-cols-2 gap-3';
-      case 'triple':
-        return 'grid grid-cols-3 gap-3';
+      case 'horizontal':
+        return 'flex gap-3 overflow-x-auto';
       case 'mixed':
         // Mixed layout: Cover takes full width, others adapt
         return 'flex flex-col gap-3';
@@ -86,7 +82,7 @@ export function AdviceSection({
       // - Interesting, RD: always 2 units
       // - Cover: can be 1 or 2 units based on state
       
-      if (item.type === 'meta-item' || item.type === 'meta-item-ad') {
+      if (item.type === 'meta_item' || item.type === 'meta_item_ad') {
         return 1; // Always single height
       }
       
@@ -96,7 +92,7 @@ export function AdviceSection({
       
       if (item.type === 'cover') {
         // Cover can be single or double based on state
-        return item.state === 'Big' ? 2 : 1;
+        return item.isHorizontal ? 2 : 1;
       }
       
       return 1; // Default

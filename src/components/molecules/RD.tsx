@@ -25,26 +25,24 @@ import { AdviceCardContainer, AdviceTitle, AdviceSubtitle, AdviceBodyText } from
  * - Dark theme: rgba(255,255,255,0.06) bg, white title, #898989 subtitle
  */
 export function RD({
-  id,
   advertiserName,
   subtitle,
-  images = [],
   rating,
   distance,
   address,
-  establishmentIds,
-  organizationId,
-  theme = 'Light',
+  images = [],
   isVerified = false,
   onClick,
   className = '',
+  theme = 'light',
 }: RDProps) {
   const handleClick = () => {
-    debugLog('RD clicked:', { organizationId, establishmentIds });
+    debugLog('RD clicked:', { advertiserName });
     onClick?.();
   };
 
-  const isLight = theme === 'Light';
+  const adviceTheme = theme === 'light' ? 'Light' : 'Dark';
+  const isLight = theme === 'light';
   const displayImages = images.slice(0, 2);
   const remainingCount = images.length > 2 ? images.length - 2 : 0;
 
@@ -70,10 +68,8 @@ export function RD({
       onClick={handleClick}
       className={`${className}`}
       heightClassName="h-[244px]"
-      theme={theme}
+      theme={adviceTheme}
       aria-label={`Advertiser: ${advertiserName}`}
-      data-organization-id={organizationId}
-      data-item-id={id}
     >
       {/* Gallery section - exactly 100px height */}
       {displayImages.length > 0 && displayImages[0] && (
@@ -127,7 +123,7 @@ export function RD({
         <div className="flex-1 flex flex-col">
           {/* Title with verified badge */}
           <div className="flex items-center">
-            <AdviceTitle theme={theme} className="font-semibold">
+            <AdviceTitle theme={adviceTheme} className="font-semibold">
               {advertiserName}
             </AdviceTitle>
             {crownIcon}

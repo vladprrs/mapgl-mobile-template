@@ -20,47 +20,49 @@ import { AdviceCardContainer, AdviceTitle, AdviceSubtitle } from '@/components/m
  * - Dark theme: rgba(255,255,255,0.06) background and icon bg
  */
 export function MetaItem({
-  id,
-  title,
-  subtitle,
-  iconUrl,
-  categoryId,
-  searchQuery,
-  theme = 'Light',
+  category,
+  count,
+  image,
+  backgroundColor,
   onClick,
   className = '',
+  theme = 'light',
 }: MetaItemProps) {
   const handleClick = () => {
-    debugLog('MetaItem clicked:', { categoryId, searchQuery });
+    debugLog('MetaItem clicked:', { category, count });
     onClick?.();
   };
 
-  const isLight = theme === 'Light';
+  const adviceTheme = theme === 'light' ? 'Light' : 'Dark';
+  const isLight = theme === 'light';
 
   return (
     <AdviceCardContainer
       onClick={handleClick}
       className={`flex flex-col justify-between px-4 pb-3 pt-2.5 ${className}`}
       heightClassName="h-[116px]"
-      theme={theme}
-      aria-label={`Search in ${title}`}
-      data-category-id={categoryId}
-      data-item-id={id}
+      theme={adviceTheme}
+      aria-label={`Search in ${category}`}
+      style={backgroundColor ? { backgroundColor } : undefined}
     >
       <div className="flex flex-col items-start">
-        <AdviceTitle theme={theme} className="text-left line-clamp-2">
-          {title}
+        <AdviceTitle theme={adviceTheme} className="text-left line-clamp-2">
+          {category}
         </AdviceTitle>
-        {subtitle && (
-          <AdviceSubtitle className="text-left mt-0.5">{subtitle}</AdviceSubtitle>
+        {count > 0 && (
+          <AdviceSubtitle className="text-left mt-0.5">
+            {count} {count === 1 ? 'место' : count < 5 ? 'места' : 'мест'}
+          </AdviceSubtitle>
         )}
       </div>
 
-      {iconUrl && (
+      {image && (
         <div className="flex justify-end">
-          <AdviceCardContainer isLight={isLight}>
-            <Image src={iconUrl} alt="" width={32} height={32} className="w-8 h-8" unoptimized />
-          </AdviceCardContainer>
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+            isLight ? 'bg-[rgba(20,20,20,0.06)]' : 'bg-[rgba(255,255,255,0.06)]'
+          }`}>
+            <Image src={image} alt="" width={32} height={32} className="w-8 h-8" unoptimized />
+          </div>
         </div>
       )}
     </AdviceCardContainer>

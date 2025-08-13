@@ -45,7 +45,7 @@ const sizeMap: Record<TextSize, string> = {
   '2xl': tokens.typography.fontSize['2xl'],
 };
 
-const weightMap: Record<TextWeight, number> = {
+const weightMap: Record<TextWeight, string> = {
   normal: tokens.typography.fontWeight.normal,
   medium: tokens.typography.fontWeight.medium,
   semibold: tokens.typography.fontWeight.semibold,
@@ -65,23 +65,21 @@ export function Text({
   ...props
 }: TextProps) {
   const defaults = variantDefaults[variant];
-  const Component = as || defaults.as;
+  const Component = (as || defaults.as) as React.ElementType;
   const textSize = size || defaults.size;
   const textWeight = weight || defaults.weight;
 
-  return (
-    <Component
-      className={`${truncate ? 'truncate' : ''} ${className}`}
-      style={{
-        fontSize: sizeMap[textSize],
-        fontWeight: weightMap[textWeight],
-        color: colorMap[color],
-        lineHeight: tokens.typography.lineHeight.normal,
-        ...style,
-      }}
-      {...props}
-    >
-      {children}
-    </Component>
-  );
+  const elementProps = {
+    className: `${truncate ? 'truncate' : ''} ${className}`,
+    style: {
+      fontSize: sizeMap[textSize],
+      fontWeight: weightMap[textWeight],
+      color: colorMap[color],
+      lineHeight: tokens.typography.lineHeight.normal,
+      ...style,
+    },
+    ...props,
+  };
+
+  return React.createElement(Component, elementProps, children);
 }

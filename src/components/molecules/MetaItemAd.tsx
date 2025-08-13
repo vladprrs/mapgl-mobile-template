@@ -21,73 +21,73 @@ import { AdviceCardContainer, AdviceTitle } from '@/components/molecules';
  * - Dark theme: rgba(255,255,255,0.06) bg, rgba(255,255,255,0.3) ad label, rgba(255,255,255,0.06) border
  */
 export function MetaItemAd({
-  id,
-  title,
-  logoUrl,
-  gradientColor = '#eb6100',
-  gradientMaskUrl,
-  searchPhrase,
-  advertiserId,
-  theme = 'Light',
-  isSponsored = true,
+  category,
+  companyName,
+  subtitle,
+  image,
+  backgroundColor,
+  gradientColors,
   onClick,
   className = '',
+  theme = 'light',
 }: MetaItemAdProps) {
   const handleClick = () => {
-    debugLog('MetaItemAd clicked:', { searchPhrase, advertiserId });
+    debugLog('MetaItemAd clicked:', { category, companyName });
     onClick?.();
   };
 
-  const isLight = theme === 'Light';
+  const adviceTheme = theme === 'light' ? 'Light' : 'Dark';
+  const isLight = theme === 'light';
 
   return (
     <AdviceCardContainer
       onClick={handleClick}
       className={className}
       heightClassName="h-[116px]"
-      theme={theme}
-      aria-label={`Sponsored: ${title}`}
-      data-advertiser-id={advertiserId}
-      data-item-id={id}
+      theme={adviceTheme}
+      aria-label={`Sponsored: ${category}`}
+      style={backgroundColor ? { backgroundColor } : undefined}
     >
-      {gradientMaskUrl && (
+      {gradientColors && gradientColors.length >= 2 && (
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 rounded-xl"
           style={{
-            backgroundColor: gradientColor,
-            WebkitMaskImage: `url('${gradientMaskUrl}')`,
-            maskImage: `url('${gradientMaskUrl}')`,
-            WebkitMaskRepeat: 'no-repeat',
-            maskRepeat: 'no-repeat',
-            WebkitMaskSize: '100% 100%',
-            maskSize: '100% 100%',
-            WebkitMaskPosition: '0% 0%',
-            maskPosition: '0% 0%',
+            background: `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 100%)`,
           }}
         />
       )}
 
-      {logoUrl && (
+      {image && (
         <div className="absolute bottom-3 right-4">
-          <AdviceCardContainer>
-            <Image src={logoUrl} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
-          </AdviceCardContainer>
+          <div className="w-12 h-12 rounded-full overflow-hidden bg-white">
+            <Image src={image} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
+          </div>
         </div>
       )}
 
       <div className="absolute inset-0 px-4 pt-2.5 pb-[13px] flex flex-col justify-between">
-        <AdviceTitle theme={theme} className="text-left">
-          {title}
-        </AdviceTitle>
-        {isSponsored && (
-          <p
-            className={`text-[11px] leading-[14px] tracking-[-0.176px] text-left ${
-              isLight ? 'text-[rgba(20,20,20,0.3)]' : 'text-white/30'
-            }`}
-          >
-            Реклама
-          </p>
-        )}
+        <div>
+          <AdviceTitle theme={adviceTheme} className="text-left">
+            {category}
+          </AdviceTitle>
+          {companyName && (
+            <p className="text-[13px] leading-4 tracking-[-0.234px] text-left mt-0.5">
+              {companyName}
+            </p>
+          )}
+          {subtitle && (
+            <p className="text-[11px] leading-[14px] tracking-[-0.176px] text-left mt-0.5">
+              {subtitle}
+            </p>
+          )}
+        </div>
+        <p
+          className={`text-[11px] leading-[14px] tracking-[-0.176px] text-left ${
+            isLight ? 'text-[rgba(20,20,20,0.3)]' : 'text-white/30'
+          }`}
+        >
+          Реклама
+        </p>
       </div>
 
       <div

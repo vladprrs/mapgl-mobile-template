@@ -141,5 +141,3 @@ export function SearchResultsPage({
     </>
   );
 }
-
-export { type SearchResult };
