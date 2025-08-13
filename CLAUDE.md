@@ -1,241 +1,292 @@
-# 2GIS MapGL Mobile App
+# 2GIS MapGL Mobile App - Development Guidelines
 
-Mobile map application with draggable bottom sheet overlay.
-**Stack:** Next.js 15, TypeScript, 2GIS MapGL, React 19, Tailwind CSS, react-modal-sheet
+## 🏗️ Atomic Design Architecture
 
-## Quick Start
+This codebase follows **Atomic Design** principles strictly. Components are organized in a hierarchy where each level can only depend on levels below it.
+
+### Component Hierarchy Rules
+
+```
+Atoms → Molecules → Organisms → Templates → Pages
+```
+
+- **Atoms**: No dependencies on other components
+- **Molecules**: Can only import atoms
+- **Organisms**: Can import atoms and molecules
+- **Templates**: Can import atoms, molecules, and organisms
+- **Pages**: Can import from all levels below
+
+## ⚡ Essential Commands
 
 ```bash
-cp .env.example .env.local  # Add your 2GIS API key
-npm install
-npm run dev                 # Start on port 3000
+npm run dev         # Start development server (port 3000)
+npm run build       # Production build
+npm run type-check  # TypeScript validation
+npm run lint        # ESLint checks
+npm test           # Run test suite
 ```
 
-## Essential Commands
+## 🎨 Design Token Usage
 
-| Task | Command | Description |
-|------|---------|-------------|
-| Dev | `npm run dev` | Start development server |
-| Build | `npm run build` | Production build |
-| Test | `npm test` | Run tests |
-| Type Check | `npm run type-check` | TypeScript validation |
-
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js app router
-├── components/
-│   ├── app-shell/         # Main app integration
-│   ├── bottom-sheet/      # Draggable overlay (react-modal-sheet)
-│   ├── screen-manager/    # Screen navigation
-│   ├── dashboard/         # Dashboard UI components
-│   │   └── advice/        # Advice cards masonry layout
-│   ├── map/               # Map components
-│   └── icons/             # Icon system
-├── hooks/                 # React hooks
-├── lib/                   # Utilities and configs
-└── __mocks__/            # Test mock data
-```
-
-## Critical Patterns
-
-### Map Initialization
+### Always Use Tokens
 
 ```typescript
-useEffect(() => {
-  load().then((mapgl) => {
-    const map = new mapgl.Map('map-container', {
-      key: process.env.NEXT_PUBLIC_2GIS_API_KEY,
-      center: [37.618423, 55.751244],
-      zoom: 13,
-      // Let 2GIS handle controls automatically
-    });
-    
-    mapRef.current = map;
-  });
-  
-  return () => {
-    mapRef.current?.destroy(); // Always cleanup
-  };
-}, []);
+// ✅ CORRECT - Using design tokens
+import { tokens } from '@/lib/ui/tokens';
+
+backgroundColor: tokens.colors.background.secondary
+padding: tokens.spacing[4]
+fontSize: tokens.typography.fontSize.base
+borderRadius: tokens.borders.radius.md
+
+// ❌ WRONG - Hardcoded values
+backgroundColor: '#F1F1F1'
+padding: '16px'
+fontSize: '14px'
+borderRadius: '8px'
 ```
 
-### SSR Hydration Fix
+### Available Tokens
+
+- **Colors**: `tokens.colors.*` (primary, text, background, border, traffic)
+- **Spacing**: `tokens.spacing[0-10]` (0px to 40px)
+- **Typography**: `tokens.typography.*` (fontSize, fontWeight, lineHeight)
+- **Borders**: `tokens.borders.*` (radius, width)
+- **Transitions**: `tokens.transitions.*` (duration, easing)
+
+## 📁 Project Structure
+
+```
+src/components/
+├── atoms/          # Basic UI elements
+├── molecules/      # Composed from atoms
+├── organisms/      # Complex components
+├── templates/      # Page layouts
+└── pages/          # Complete screens
+```
+
+## 🚀 Component Creation Guidelines
+
+### Creating a New Atom
 
 ```typescript
-const [isClient, setIsClient] = useState(false);
+// src/components/atoms/MyAtom.tsx
+'use client';
 
-useEffect(() => {
-  setIsClient(true);
-}, []);
+import React from 'react';
+import { tokens } from '@/lib/ui/tokens';
 
-const value = isClient 
-  ? clientSpecificValue     // e.g., window.innerHeight
-  : 'serverSafeDefault';     // e.g., '100%'
+interface MyAtomProps {
+  // Props definition
+}
+
+export function MyAtom({ ...props }: MyAtomProps) {
+  // Use only design tokens, no component imports
+  return <div>...</div>;
+}
 ```
+
+### Creating a New Molecule
+
+```typescript
+// src/components/molecules/MyMolecule.tsx
+'use client';
+
+import React from 'react';
+import { Button, Text } from '@/components/atoms';
+
+export function MyMolecule() {
+  // Can only import from atoms
+  return (
+    <div>
+      <Text>Label</Text>
+      <Button>Action</Button>
+    </div>
+  );
+}
+```
+
+### Creating a New Page
+
+```typescript
+// src/components/pages/MyPage.tsx
+'use client';
+
+import React from 'react';
+import { MyOrganism } from '@/components/organisms';
+
+export function MyPage() {
+  return (
+    <div className="min-h-full bg-background-primary">
+      <MyOrganism />
+    </div>
+  );
+}
+```
+
+## 🗺️ Navigation State Management
+
+### ScreenManager - Single Source of Truth
+
+```typescript
+// All navigation through ScreenManager
+const { navigateTo, screenState } = useScreenManager();
+
+// Navigate to screen
+navigateTo(ScreenType.SEARCH_RESULTS, searchQuery);
+
+// Never manage navigation state locally
+// ❌ const [currentScreen, setCurrentScreen] = useState();
+```
+
+## 🎯 Styling Best Practices
+
+### CSS Classes
+
+```typescript
+// ✅ Use Tailwind utilities with design token classes
+className="bg-background-secondary p-4 rounded-lg"
+
+// ✅ Use design token CSS variables
+style={{ backgroundColor: tokens.colors.background.secondary }}
+
+// ❌ Never use hardcoded values
+style={{ backgroundColor: '#F1F1F1' }}
+```
+
+### Component Styling
+
+1. Use Tailwind utilities where possible
+2. Reference design tokens for all values
+3. Avoid `!important` declarations
+4. Keep specificity low
+5. Remove unused styles regularly
+
+## 🏛️ Common Patterns
 
 ### Map Operations
 
 ```typescript
+// Always use MapProvider
+const { map, addMarker, clearMarkers } = useMapContext();
+
 // Add marker
 await addMarker('marker-id', [lng, lat]);
 
 // Center map
 map.setCenter([lng, lat], { duration: 300 });
-map.setZoom(15);
 
-// Remove markers
-removeMarker('marker-id');
+// Clean up
 clearMarkers();
 ```
 
-## Core Components
-
-### MobileMapShell
-Main app integration combining map, bottom sheet, and screens.
+### Bottom Sheet Integration
 
 ```typescript
-<MobileMapShell 
-  snapPoints={[10, 50, 90]}
-  items={adviceItems}
-/>
+// All screens wrapped in BottomSheet through MobileMapShell
+// Search results uses secondary background
+headerBackground={screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white'}
+contentBackground={screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white'}
 ```
 
-### Bottom Sheet (react-modal-sheet)
-Draggable overlay with gesture handling.
+## ⚠️ Critical Rules
 
-```typescript
-<BottomSheet 
-  snapPoints={[15, 60, 95]} 
-  headerBackground="#F1F1F1"
->
-  {/* content */}
-</BottomSheet>
-```
+### Never Do This
 
-**Snap Points:** 10% (collapsed), 50% (default), 90% (expanded)
-**Scrolling:** Only enabled at 90% snap point
+- ❌ Import from higher atomic levels
+- ❌ Use hardcoded colors or spacing
+- ❌ Manage navigation state outside ScreenManager
+- ❌ Create circular dependencies
+- ❌ Nest buttons inside buttons
+- ❌ Use more than 3 levels of DOM nesting
+- ❌ Add complex animations without purpose
 
-### SearchBar
-Three variants for different screens:
-- `dashboard`: White bg, menu icon
-- `suggest`: White bg, clear button
-- `results`: Gray bg (#F1F1F1), white input, clear button
+### Always Do This
 
-### Icon System
+- ✅ Follow atomic design hierarchy
+- ✅ Use design tokens for all styling
+- ✅ Keep components single-responsibility
+- ✅ Test components in isolation
+- ✅ Use TypeScript strictly (no `any` without justification)
+- ✅ Clean up resources in useEffect
+- ✅ Handle loading and error states
 
-```typescript
-import { Icon, ICONS, COLORS } from '@/components/icons';
-
-<Icon name={ICONS.HOME} size={24} color={COLORS.TEXT_PRIMARY} />
-```
-
-**Design Tokens:**
-- `TEXT_PRIMARY`: #141414
-- `TEXT_SECONDARY`: #898989
-- `TRAFFIC_HEAVY`: #F5373C
-- `TRAFFIC_MODERATE`: #EFA701
-- `TRAFFIC_LIGHT`: #1BA136
-- `BUTTON_SECONDARY_BG`: rgba(20, 20, 20, 0.06)
-
-## Known Issues & Solutions
+## 🐛 Known Issues & Solutions
 
 | Problem | Solution |
 |---------|----------|
-| Duplicate zoom controls | Let 2GIS handle controls automatically |
-| Hydration mismatch | Use BottomSheetClient for dynamic import |
+| Hydration mismatch | Use dynamic imports with `ssr: false` for client-only components |
 | Map not cleaning up | Always call `map.destroy()` in cleanup |
 | Bottom sheet not dragging | Check react-modal-sheet v4.4.0 installed |
-| Touch gestures broken | Never set `touchAction: "none"` globally - only on map container |
-| Layout shift on load | Initialize state with empty arrays, not undefined |
+| Phantom borders | Use consistent background colors through props |
 
-## MCP Servers
+## 📝 Code Quality Standards
 
-```json
-{
-  "mcpServers": {
-    "context7": { "command": "mcp-server-context7" },
-    "figma": { "command": "mcp-server-figma" },
-    "playwright": { "command": "mcp-server-playwright" },
-    "github": { "command": "mcp-server-github" }
-  }
-}
-```
-
-### Figma Integration
-
-Extract components and assets:
+### TypeScript Requirements
 
 ```typescript
-mcp__figma-dev-mode-mcp-server__get_code({
-  nodeId: "189-220904",
-  dirForAssetWrites: "/path/to/public/assets",
-})
+// ✅ Proper typing
+interface Props {
+  title: string;
+  onClick: () => void;
+}
+
+// ❌ Avoid any
+const data: any = fetch();
 ```
 
-**Component Node IDs:**
-- SearchBar: `189-220904`
-- QuickAccessPanel: `189-220977`
-- AdviceSection: `162-220899`
-- StoriesPanel: `189-221058`
+### Component Requirements
 
-## Mobile Optimization
+- Must be client components (`'use client'`)
+- Props must have TypeScript interfaces
+- Must handle edge cases (empty states, errors)
+- Should be testable in isolation
+- Follow naming conventions (PascalCase for components)
 
-- **Viewport:** `viewport-fit=cover`
-- **Touch:** Only set `touch-action: none` on map container
-- **Safe areas:** `padding-bottom: env(safe-area-inset-bottom)`
-- **Map settings:** `cooperativeGestures: false`, `pitch: 0`
-
-## Git Workflow
-
-**Branches:** `feature/`, `fix/`, `refactor/`, `docs/`
-**Commits:** `feat:`, `fix:`, `test:`, `docs:`, `refactor:`
-
-## Quick Debug
+## 🔄 Git Workflow
 
 ```bash
-# Console errors?
-- Check browser console for API key errors
-- Verify .env.local exists with valid key
+# Branch naming
+feature/feature-name
+fix/bug-description
+refactor/component-name
 
-# Map not showing?
-- Check container has height
-- Verify API key is valid
-
-# Bottom sheet issues?
-- Ensure react-modal-sheet v4.4.0 installed
-- Check snap points are [10, 50, 90]
-- Never set touchAction globally
+# Commit messages
+feat: add new component
+fix: resolve hydration error
+refactor: migrate to atomic design
+docs: update README
 ```
 
-## Development Guidelines
+## 🧪 Testing Approach
 
-**Never create test pages** (`/test-feature`, `/test-fix`, etc.)
-- Test directly in main application flow
-- Use `npm run dev` with actual app
-- Test in real context within existing screens
+- Unit tests for atoms and molecules
+- Integration tests for organisms
+- E2E tests for critical user flows
+- Mock external dependencies
+- Test error boundaries
 
-## Component Specifics
+## 📚 Quick Reference
 
-### Dashboard Components
-- **QuickAccessPanel**: Horizontal scroll with traffic indicators
-- **StoriesPanel**: Story cards (96x112px) with viewed state
-- **AdviceSection**: 2-column masonry layout (Figma 162-220899)
-  - MetaItem: Category cards (116px height)
-  - MetaItemAd: Ad cards with gradient (116px)
-  - Interesting: Feature cards (244px)
-  - Cover: Collection covers (116px/244px)
-  - RD: Advertiser cards with gallery (244px)
+### File Naming
+- Components: `PascalCase.tsx`
+- Utilities: `camelCase.ts`
+- Types: `types.ts` or `ComponentName.types.ts`
+- Tests: `ComponentName.test.tsx`
 
-### Screen Management
-- Dashboard, SearchSuggestions, SearchResults screens
-- ScreenRenderer handles transitions
-- SearchBar stays sticky across screens
+### Import Order
+1. React imports
+2. External libraries
+3. Atoms
+4. Molecules
+5. Organisms
+6. Templates
+7. Utils and hooks
+8. Types
 
-### Recent Fixes
-- Bottom sheet manual dragging with auto-transitions
-- SearchResults screen background (#F1F1F1)
-- Extended drag area at all snap points
-- Content scroll only at 90% snap
-- Touch action scoped to map container only
+### Performance Guidelines
+- Lazy load heavy components
+- Memoize expensive calculations
+- Use React.memo for pure components
+- Optimize images with Next.js Image
+- Minimize bundle size
