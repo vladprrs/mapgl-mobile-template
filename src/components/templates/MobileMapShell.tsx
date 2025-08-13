@@ -3,10 +3,10 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { BottomSheet, BottomSheetRef, SearchBar } from '@/components/organisms';
 import { ScreenManagerProvider, ScreenRenderer, useScreenManager } from '@/components/templates';
+import { ScreenType } from '@/components/templates/types';
 import { debugLog } from '@/lib/logging';
 import { useMapGL } from '@/hooks/useMapGL';
 import type { AdviceItem } from '@/__mocks__/advice/types';
-import type { ScreenType } from '@/components/templates/types';
 
 interface MobileMapShellProps {
   className?: string;

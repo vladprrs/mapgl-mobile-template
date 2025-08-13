@@ -121,4 +121,4 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
 }
 
 // Import QuickAccessPanel here to avoid circular dependency
-import { QuickAccessPanel } from '@/components/dashboard/QuickAccessPanel';
+import { QuickAccessPanel } from '@/components/organisms';
