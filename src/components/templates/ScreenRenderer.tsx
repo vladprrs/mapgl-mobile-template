@@ -3,11 +3,11 @@
 import React from 'react';
 import { useScreenManager } from './ScreenManagerContext';
 import { ScreenType } from './types';
-import { SearchSuggestions } from './SearchSuggestions';
-import { SearchResults, type SearchResult } from './SearchResults';
-import { Dashboard } from '@/components/dashboard';
+import { SearchSuggestionsPage } from '@/components/pages/SearchSuggestionsPage';
+import { SearchResultsPage, type SearchResult } from '@/components/pages/SearchResultsPage';
+import { DashboardPage } from '@/components/pages/DashboardPage';
 import { debugLog } from '@/lib/logging';
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 interface ScreenRendererProps {
   items?: AdviceItem[];
@@ -38,7 +38,7 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
     switch (currentScreen) {
       case ScreenType.DASHBOARD:
         return (
-          <Dashboard
+          <DashboardPage
             items={items}
             showSearchBar={false}
             showQuickAccess={false}
@@ -49,7 +49,7 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       
       case ScreenType.SEARCH_SUGGESTIONS:
         return (
-          <SearchSuggestions
+          <SearchSuggestionsPage
             query={searchQuery || ''}
             onSelectSuggestion={handleSelectSuggestion}
             className={className}
@@ -58,7 +58,7 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       
       case ScreenType.SEARCH_RESULTS:
         return (
-          <SearchResults
+          <SearchResultsPage
             query={searchQuery || ''}
             onSelectResult={handleSelectResult}
             className=""

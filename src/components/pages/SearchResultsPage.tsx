@@ -1,13 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Icon, ICONS, COLORS } from '@/components/icons';
-import { SearchResultCard } from '@/components/search-results/SearchResultCard';
-import { StoriesPanel } from '@/components/dashboard/StoriesPanel';
+import { Icon, ICONS, COLORS } from '@/components/atoms';
+import { SearchResultCard, StoriesPanel } from '@/components/organisms';
 import { mockSearchResults } from '@/__mocks__/search-results/organizations';
 import { mockStories } from '@/__mocks__/dashboard/stories';
 
-interface SearchResult {
+export interface SearchResult {
   id: string;
   name: string;
   category: string;
@@ -22,7 +21,7 @@ interface SearchResultsProps {
   className?: string;
 }
 
-export function SearchResults({ 
+export function SearchResultsPage({ 
   query, 
   onSelectResult,
   className = '' 

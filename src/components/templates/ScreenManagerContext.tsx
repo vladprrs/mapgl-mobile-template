@@ -60,8 +60,7 @@ export function ScreenManagerProvider({
     setScreenState(prev => ({
       currentScreen: screen,
       previousScreen: prev.currentScreen,
-      searchQuery: query !== undefined ? query : searchQuery,
-      screenHistory: [...prev.screenHistory, screen],
+      history: [...prev.history, screen],
     }));
     
     // Reset transition state after animation
@@ -70,11 +69,11 @@ export function ScreenManagerProvider({
 
   const navigateBack = useCallback(() => {
     setScreenState(prev => {
-      if (prev.screenHistory.length <= 1) {
+      if (prev.history.length <= 1) {
         return prev;
       }
       
-      const newHistory = [...prev.screenHistory];
+      const newHistory = [...prev.history];
       newHistory.pop(); // Remove current screen
       const previousScreen = newHistory[newHistory.length - 1];
       
@@ -84,8 +83,7 @@ export function ScreenManagerProvider({
       return {
         currentScreen: previousScreen,
         previousScreen: prev.currentScreen,
-        searchQuery: searchQuery,
-        screenHistory: newHistory,
+        history: newHistory,
       };
     });
   }, [searchQuery]);

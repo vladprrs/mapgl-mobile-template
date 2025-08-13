@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { BottomSheet, BottomSheetRef } from '@/components/bottom-sheet';
-import { SearchBar } from '@/components/organisms';
-import { ScreenManagerProvider, ScreenRenderer, useScreenManager, ScreenType } from '@/components/screen-manager';
+import { BottomSheet, BottomSheetRef, SearchBar } from '@/components/organisms';
+import { ScreenManagerProvider, ScreenRenderer, useScreenManager } from '@/components/templates';
 import { debugLog } from '@/lib/logging';
 import { useMapGL } from '@/hooks/useMapGL';
-import type { AdviceItem } from '@/components/dashboard/advice/types';
+import type { AdviceItem } from '@/__mocks__/advice/types';
+import type { ScreenType } from '@/components/templates/types';
 
 interface MobileMapShellProps {
   className?: string;

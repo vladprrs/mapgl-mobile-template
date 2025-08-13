@@ -31,7 +31,7 @@ const mockSuggestions = {
   categories: mockCategories,
 };
 
-export function SearchSuggestions({ 
+export function SearchSuggestionsPage({ 
   query, 
   onSelectSuggestion,
   className = '' 

@@ -2,11 +2,8 @@
 
 import React from 'react';
 import { debugLog } from '@/lib/logging';
-import { SearchBar } from './SearchBar';
-import { QuickAccessPanel } from './QuickAccessPanel';
-import { StoriesPanel } from './StoriesPanel';
-import { AdviceSection } from './advice';
-import type { AdviceItem } from './advice/types';
+import { SearchBar, QuickAccessPanel, StoriesPanel, AdviceSection } from '@/components/organisms';
+import type { AdviceItem } from '@/__mocks__/advice/types';
 
 interface DashboardProps {
   className?: string;
@@ -21,7 +18,7 @@ interface DashboardProps {
   withinSheet?: boolean;
 }
 
-export function Dashboard({ 
+export function DashboardPage({ 
   className = '',
   onSearch,
   items,
