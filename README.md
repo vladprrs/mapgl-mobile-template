@@ -36,7 +36,8 @@ src/
 ├── lib/
 │   └── ui/
 │       └── tokens.ts     # Design tokens (colors, spacing, typography)
-└── __mocks__/            # Mock data for development
+├── __mocks__/            # Mock data for development
+└── assets/               # Static assets (images, icons)
 ```
 
 ## 🎨 Design Principles
@@ -78,9 +79,9 @@ git clone <repository-url>
 # Install dependencies
 npm install
 
-# Copy environment variables
-cp .env.example .env.local
-# Add your 2GIS API key to .env.local
+# Set up environment variables
+# Create .env.local and add your 2GIS API key:
+# NEXT_PUBLIC_2GIS_API_KEY=your_api_key_here
 ```
 
 ### Development
@@ -110,7 +111,9 @@ npm start
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
 | `npm run type-check` | Run TypeScript compiler |
-| `npm test` | Run test suite |
+| `npm run format` | Format code with Prettier |
+
+> **⚠️ Testing Status**: Tests are temporarily removed. All test files and configurations have been deleted while preserving code quality tools. Tests will be refactored and rewritten in a future task.
 
 ## 🏛️ Component Architecture
 
@@ -181,6 +184,7 @@ const actions = useActions();
 - **Responsive Design** - Mobile-first with safe area support
 - **State Management** - Zustand with atomic selectors and cross-slice actions
 - **Performance Optimized** - Minimal re-renders, 8KB state management overhead
+- **Code Quality** - ESLint, TypeScript, Prettier with pre-commit hooks
 
 ## 📱 Mobile Optimizations
 
@@ -225,6 +229,30 @@ Modify `src/lib/ui/tokens.ts` to customize:
 ## 📄 License
 
 [Your License Here]
+
+## 🧪 Testing Strategy
+
+**Current Status**: All tests have been temporarily removed to allow for a clean architectural refactor.
+
+**What was removed**:
+- Jest configuration and test files
+- Playwright E2E setup
+- Testing Library components
+- All `*.test.ts` and `*.spec.ts` files
+
+**What remains**:
+- ✅ Full TypeScript type checking
+- ✅ ESLint with comprehensive rules
+- ✅ Prettier code formatting
+- ✅ Pre-commit hooks for quality
+- ✅ Build process validation
+
+**Future Plans**:
+Tests will be rewritten to align with the atomic design architecture, focusing on:
+- Component isolation testing at each atomic level
+- Integration testing for store interactions
+- E2E testing for critical user flows
+- Performance testing for state management
 
 ## 🤝 Contributing
 

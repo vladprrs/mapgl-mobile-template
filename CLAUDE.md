@@ -34,8 +34,10 @@ npm run dev         # Start development server (port 3000)
 npm run build       # Production build
 npm run type-check  # TypeScript validation
 npm run lint        # ESLint checks
-npm test           # Run test suite
+npm run format      # Format code with Prettier
 ```
+
+> **Note**: Tests have been temporarily removed. All test files and configurations have been deleted while preserving ESLint, TypeScript type checking, and other code quality tools. Tests will be refactored and rewritten in a future task.
 
 ## 🎨 Design Token Usage
 
@@ -393,7 +395,6 @@ contentBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.b
 - ✅ Use design tokens for all styling
 - ✅ Use Zustand atomic selectors for performance
 - ✅ Keep components single-responsibility
-- ✅ Test components in isolation
 - ✅ Use TypeScript strictly (no `any` without justification)
 - ✅ Clean up resources in useEffect
 - ✅ Handle loading and error states
@@ -449,7 +450,6 @@ const data: any = fetch();
 - Must be client components (`'use client'`)
 - Props must have TypeScript interfaces
 - Must handle edge cases (empty states, errors)
-- Should be testable in isolation
 - Follow naming conventions (PascalCase for components)
 
 ## 🔄 Git Workflow
@@ -467,13 +467,23 @@ refactor: migrate to Zustand store
 docs: update README with Zustand architecture
 ```
 
-## 🧪 Testing Approach
+## 🧪 Testing Status
 
-- Unit tests for atoms and molecules
-- Integration tests for organisms
-- E2E tests for critical user flows
-- Mock external dependencies
-- Test error boundaries
+**Currently Removed**: All tests have been temporarily removed from this project to allow for a clean refactor. This includes:
+
+- All test files (`*.test.ts`, `*.test.tsx`, `*.spec.ts`, `*.spec.tsx`)
+- Test configuration files (`jest.config.js`, `jest.setup.js`, `playwright.config.ts`)
+- Test dependencies (`@testing-library/*`, `jest`, `@playwright/test`, etc.)
+- Test scripts in `package.json`
+
+**Preserved**: All code quality tools remain operational:
+- ✅ ESLint (`npm run lint`)
+- ✅ TypeScript type checking (`npm run type-check`)
+- ✅ Prettier formatting (`npm run format`)
+- ✅ Git pre-commit hooks
+- ✅ Build process (`npm run build`)
+
+**Future Plan**: Tests will be rewritten using modern testing patterns that align with the atomic design architecture.
 
 ## 📚 Quick Reference
 
@@ -481,7 +491,6 @@ docs: update README with Zustand architecture
 - Components: `PascalCase.tsx`
 - Utilities: `camelCase.ts`
 - Types: `types.ts` or `ComponentName.types.ts`
-- Tests: `ComponentName.test.tsx`
 
 ### Import Order
 1. React imports
