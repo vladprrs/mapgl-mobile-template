@@ -40,8 +40,8 @@ export function ScreenManagerProvider({
 }: ScreenManagerProviderProps) {
   const [screenState, setScreenState] = useState<ScreenState>({
     currentScreen: initialScreen,
-    screenHistory: [initialScreen],
-    searchQuery: initialQuery,
+    previousScreen: null,
+    history: [initialScreen],
   });
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
@@ -91,8 +91,8 @@ export function ScreenManagerProvider({
   const clearHistory = useCallback(() => {
     setScreenState({
       currentScreen: ScreenType.DASHBOARD,
-      screenHistory: [ScreenType.DASHBOARD],
-      searchQuery: '',
+      previousScreen: null,
+      history: [ScreenType.DASHBOARD],
     });
     setSearchQuery('');
   }, []);
