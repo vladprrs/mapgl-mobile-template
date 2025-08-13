@@ -58,7 +58,9 @@ export function Cover({
       data-collection-id={collectionId}
       data-item-id={id}
     >
-      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${imageUrl}')` }} />
+      {imageUrl && (
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${imageUrl}')` }} />
+      )}
 
       {isBig ? (
         <div className="absolute inset-0 rounded-xl bg-black/40" />

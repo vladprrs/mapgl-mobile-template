@@ -67,7 +67,9 @@ export function Interesting({
         )}
       </div>
 
-      <div className="flex-1 w-full bg-center bg-contain bg-no-repeat" style={{ backgroundImage: `url('${imageUrl}')` }} />
+      {imageUrl && (
+        <div className="flex-1 w-full bg-center bg-contain bg-no-repeat" style={{ backgroundImage: `url('${imageUrl}')` }} />
+      )}
     </AdviceCardContainer>
   );
 }
