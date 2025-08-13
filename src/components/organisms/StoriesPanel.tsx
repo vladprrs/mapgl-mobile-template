@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { StoryItem } from './StoryItem';
+import { StoryItem } from '@/components/molecules';
 // Import default stories from centralized mock data
 import { mockStories as defaultStories } from '@/__mocks__/dashboard/stories';
 

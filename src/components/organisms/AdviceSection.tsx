@@ -1,12 +1,16 @@
 'use client';
 
 import React from 'react';
-import { AdviceSectionProps, AdviceItem } from './types';
-import { MetaItem } from './MetaItem';
-import { MetaItemAd } from './MetaItemAd';
-import { Cover } from './Cover';
-import { Interesting } from './Interesting';
-import { RD } from './RD';
+import { MetaItem, MetaItemAd, Cover, Interesting, RD } from '@/components/molecules';
+import type { AdviceItem } from '@/__mocks__/advice/types';
+
+interface AdviceSectionProps {
+  items: AdviceItem[];
+  layout?: 'horizontal' | 'mixed';
+  title?: string;
+  onItemClick?: (item: AdviceItem) => void;
+  className?: string;
+}
 
 /**
  * AdviceSection Component
@@ -40,9 +44,9 @@ export function AdviceSection({
     };
 
     switch (item.type) {
-      case 'meta-item':
+      case 'meta_item':
         return <MetaItem {...item} {...commonProps} />;
-      case 'meta-item-ad':
+      case 'meta_item_ad':
         return <MetaItemAd {...item} {...commonProps} />;
       case 'cover':
         return <Cover {...item} {...commonProps} />;
