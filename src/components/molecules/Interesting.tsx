@@ -47,8 +47,11 @@ export function Interesting({
   return (
     <div
       onClick={handleClick}
-      className={`flex flex-col h-full overflow-hidden cursor-pointer ${className}`}
-      style={containerStyles}
+      className={`flex flex-col overflow-hidden cursor-pointer ${className}`}
+      style={{
+        ...containerStyles,
+        height: '244px', // Double height: 2 * 116px + 12px gap = 244px
+      }}
       aria-label={`Feature: ${title}`}
       role="button"
       tabIndex={0}
@@ -61,7 +64,7 @@ export function Interesting({
     >
       {/* Text section */}
       <div
-        className="flex flex-col items-start"
+        className="flex flex-col items-start shrink-0"
         style={{
           paddingLeft: tokens.spacing[4],
           paddingRight: tokens.spacing[4],
@@ -101,11 +104,14 @@ export function Interesting({
         )}
       </div>
 
-      {/* Image section */}
+      {/* Image section - grows to fill remaining space */}
       {imageUrl && (
         <div
           className="flex-1 w-full bg-center bg-contain bg-no-repeat"
-          style={{ backgroundImage: `url('${imageUrl}')` }}
+          style={{ 
+            backgroundImage: `url('${imageUrl}')`,
+            minHeight: '120px', // Ensure image has space to display
+          }}
           aria-hidden="true"
         />
       )}
