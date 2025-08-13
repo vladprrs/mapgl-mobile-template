@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { MetaItemProps } from './types';
-import { AdviceCardContainer, AdviceCardText } from '@/components/molecules';
+import { AdviceCardContainer, AdviceTitle, AdviceSubtitle } from '@/components/molecules';
 
 /**
  * MetaItem Component
@@ -48,11 +48,11 @@ export function MetaItem({
       data-item-id={id}
     >
       <div className="flex flex-col items-start">
-        <AdviceCardText theme={theme} className="text-left line-clamp-2">
+        <AdviceTitle theme={theme} className="text-left line-clamp-2">
           {title}
-        </AdviceCardText>
+        </AdviceTitle>
         {subtitle && (
-          <AdviceCardText className="text-left mt-0.5">{subtitle}</AdviceCardText>
+          <AdviceSubtitle className="text-left mt-0.5">{subtitle}</AdviceSubtitle>
         )}
       </div>
 

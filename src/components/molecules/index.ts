@@ -1,8 +1,8 @@
 // Advice Card Molecules
 export { AdviceBadge } from './AdviceBadge';
 export { AdviceCardContainer } from './AdviceCardContainer';
-export { AdviceCardText } from './AdviceCardText';
-export { AdviceMedia } from './AdviceMedia';
+export { AdviceTitle, AdviceSubtitle, AdviceBodyText } from './AdviceCardText';
+export { AdviceIconCircle, AdviceLogoCircle, BackgroundImage } from './AdviceMedia';
 export { Cover } from './Cover';
 export { Interesting } from './Interesting';
 export { MetaItem } from './MetaItem';

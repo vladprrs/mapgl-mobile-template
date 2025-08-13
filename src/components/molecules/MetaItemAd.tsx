@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { debugLog } from '@/lib/logging';
 import { MetaItemAdProps } from './types';
-import { AdviceCardContainer, AdviceCardText } from '@/components/molecules';
+import { AdviceCardContainer, AdviceTitle } from '@/components/molecules';
 
 /**
  * MetaItemAd Component
@@ -76,9 +76,9 @@ export function MetaItemAd({
       )}
 
       <div className="absolute inset-0 px-4 pt-2.5 pb-[13px] flex flex-col justify-between">
-        <AdviceCardText theme={theme} className="text-left">
+        <AdviceTitle theme={theme} className="text-left">
           {title}
-        </AdviceCardText>
+        </AdviceTitle>
         {isSponsored && (
           <p
             className={`text-[11px] leading-[14px] tracking-[-0.176px] text-left ${

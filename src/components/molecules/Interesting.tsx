@@ -3,7 +3,7 @@
 import React from 'react';
 import { debugLog } from '@/lib/logging';
 import { InterestingProps } from './types';
-import { AdviceCardContainer, AdviceCardText, AdviceBadge } from '@/components/molecules';
+import { AdviceCardContainer, AdviceTitle, AdviceBodyText, AdviceBadge } from '@/components/molecules';
 
 /**
  * Interesting Component
@@ -56,10 +56,10 @@ export function Interesting({
       )}
 
       <div className="flex flex-col items-start px-4 pt-2.5 pb-3">
-        <AdviceCardText theme={theme} className="text-left">
+        <AdviceTitle theme={theme} className="text-left">
           {title}
-        </AdviceCardText>
-        <AdviceCardText className="text-left mt-0.5">{description}</AdviceCardText>
+        </AdviceTitle>
+        <AdviceBodyText className="text-left mt-0.5">{description}</AdviceBodyText>
         {actionText && (
           <span className={`text-[14px] font-medium mt-2 ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>
             {actionText} →
