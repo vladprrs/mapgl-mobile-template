@@ -120,16 +120,20 @@ Basic building blocks with no dependencies:
 - `CardContainer`, `Input`
 
 ### Molecules
-Simple combinations of atoms:
-- `SearchResultItem` - Composed of Text, Badge, Button
-- `QuickAction` - Icon + Text
-- `StoryItem` - Image + Badge
+Simple combinations of atoms (recently migrated to atomic design):
+- `SearchInput` - Search field with icons, voice assistant integration
+- `StoryItem` - Image + text display for story content
+- `MetaItem` - Category search card with icon, title, subtitle (116px height)
+- `MetaItemAd` - Sponsored content card with logo and gradient
+- `Cover` - Featured collection covers (116px default, 244px big variant)
+- `Interesting` - Feature promotion cards (244px double height)
+- `RD` - Business advertiser cards with gallery (244px double height)
 
 ### Organisms
 Complex, self-contained components:
 - `SearchBar` - Full search interface with Zustand integration
-- `SearchResultsList` - List of SearchResultItems
-- `BottomSheet` - Draggable sheet container
+- `AdviceSection` - Masonry grid layout for advice cards
+- `BottomSheet` - Draggable sheet container with snap points
 - `MapContainer` - Map instance wrapper with direct store access
 
 ### Templates
@@ -171,6 +175,9 @@ const actions = useActions();
 - **Draggable Bottom Sheet** - 3 snap points (10%, 50%, 90%) with state persistence
 - **Interactive Map** - 2GIS MapGL with markers and navigation, direct control
 - **Smart Search System** - Real-time suggestions, debounced queries, cached results
+- **Advice Cards System** - Masonry grid with MetaItem, Cover, Interesting, RD components
+- **Atomic Design Architecture** - Recently migrated to strict component hierarchy
+- **Design Tokens** - Centralized styling system with no hardcoded values
 - **Responsive Design** - Mobile-first with safe area support
 - **State Management** - Zustand with atomic selectors and cross-slice actions
 - **Performance Optimized** - Minimal re-renders, 8KB state management overhead

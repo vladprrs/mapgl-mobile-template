@@ -4,6 +4,17 @@
 
 This codebase follows **Atomic Design** principles strictly. Components are organized in a hierarchy where each level can only depend on levels below it.
 
+### 🚀 Recent Migration Progress
+
+**COMPLETED**: Atomic design migration for advice card components
+- ✅ **MetaItem** - Category search cards (116px height)
+- ✅ **MetaItemAd** - Sponsored content cards with gradient
+- ✅ **Cover** - Collection covers (116px/244px variants)
+- ✅ **Interesting** - Feature promotion cards (244px double height)
+- ✅ **RD** - Business advertiser cards with gallery (244px double height)
+
+All components now use design tokens exclusively and follow atomic design hierarchy.
+
 ### Component Hierarchy Rules
 
 ```
@@ -153,14 +164,35 @@ export function MyAtom({ ...props }: MyAtomProps) {
 'use client';
 
 import React from 'react';
-import { Button, Text } from '@/components/atoms';
+import { tokens } from '@/lib/ui/tokens';
+// Import only atoms - NO molecule imports allowed!
 
-export function MyMolecule() {
-  // Can only import from atoms, no store access
+interface MyMoleculeProps {
+  title: string;
+  onClick?: () => void;
+  theme?: 'Light' | 'Dark';
+}
+
+export function MyMolecule({ title, onClick, theme = 'Light' }: MyMoleculeProps) {
+  // Can only import design tokens, no molecule dependencies
+  const isLight = theme === 'Light';
+  
   return (
-    <div>
-      <Text>Label</Text>
-      <Button>Action</Button>
+    <div
+      onClick={onClick}
+      style={{
+        backgroundColor: isLight ? tokens.colors.background.primary : 'rgba(255,255,255,0.06)',
+        borderRadius: tokens.borders.radius.lg,
+        padding: tokens.spacing[4],
+      }}
+    >
+      <h3 style={{
+        color: isLight ? tokens.colors.text.primary : tokens.colors.text.inverse,
+        fontSize: tokens.typography.fontSize.lg,
+        fontWeight: tokens.typography.fontWeight.semibold,
+      }}>
+        {title}
+      </h3>
     </div>
   );
 }
@@ -376,6 +408,26 @@ contentBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.b
 | Map not cleaning up | Always call `map.destroy()` in cleanup |
 | Bottom sheet not dragging | Check react-modal-sheet v4.4.0 installed |
 | Phantom borders | Use consistent background colors through props |
+| Atomic design violations | Never import molecules from other molecules - use design tokens only |
+| Theme inconsistency | Always use 'Light'/'Dark' format, not 'light'/'dark' |
+| Hardcoded styling | Replace ALL hardcoded values with tokens.* references |
+
+## 🎯 Atomic Design Best Practices
+
+### ✅ Do This
+- Import only design tokens in molecules: `import { tokens } from '@/lib/ui/tokens'`
+- Use 'Light'/'Dark' theme format consistently
+- All colors: `tokens.colors.*`, spacing: `tokens.spacing[*]`, typography: `tokens.typography.*`
+- Follow exact Figma specifications from Dev Mode
+- Test visual verification after changes
+- Document fixes in separate markdown files
+
+### ❌ Never Do This
+- Import molecules from other molecules
+- Use hardcoded colors, spacing, or font sizes
+- Mix 'light'/'dark' with 'Light'/'Dark' theme formats
+- Skip visual verification after component changes
+- Commit without running type-check and lint
 
 ## 📝 Code Quality Standards
 
