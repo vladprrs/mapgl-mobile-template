@@ -3,6 +3,7 @@
 import React, { forwardRef } from 'react';
 import { Input } from '@/components/atoms';
 import { Icon, ICONS } from '@/components/icons';
+import { tokens } from '@/lib/ui/tokens';
 
 interface SearchInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   onClear?: () => void;
@@ -31,7 +32,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           <Icon 
             name={ICONS.SEARCH} 
             size={20} 
-            color="#898989"
+            color={tokens.colors.text.secondary}
           />
         }
         rightIcon={
@@ -43,7 +44,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               aria-label="Clear search"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M12 4L4 12M4 4L12 12" stroke="#898989" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M12 4L4 12M4 4L12 12" stroke={tokens.colors.text.secondary} strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </button>
           ) : undefined

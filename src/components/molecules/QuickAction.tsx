@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/atoms';
 import { Icon, ICONS } from '@/components/icons';
+import { tokens } from '@/lib/ui/tokens';
 
 interface QuickActionProps {
   icon: keyof typeof ICONS;
@@ -27,14 +28,14 @@ export function QuickAction({
       isActive={isActive}
       className={`flex items-center gap-2 whitespace-nowrap ${className}`}
       style={{
-        backgroundColor: isActive ? 'rgba(20, 20, 20, 0.12)' : 'rgba(20, 20, 20, 0.06)',
+        backgroundColor: isActive ? tokens.colors.background.overlayDark : tokens.colors.background.overlay,
         border: 'none',
-        padding: '8px 12px',
-        height: '36px',
+        padding: `${tokens.spacing[2]} ${tokens.spacing[3]}`,
+        height: tokens.spacing[9],
       }}
     >
       <Icon name={ICONS[icon]} size={20} />
-      <span className="text-sm font-medium text-gray-900">{label}</span>
+      <span className="text-sm font-medium" style={{ color: tokens.colors.text.primary }}>{label}</span>
     </Button>
   );
 }

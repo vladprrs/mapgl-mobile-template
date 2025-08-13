@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { tokens } from '@/lib/ui/tokens';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'icon';
 export type ButtonSize = 'sm' | 'md' | 'lg';

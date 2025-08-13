@@ -4,6 +4,7 @@ import React from 'react';
 import { SearchInput } from '@/components/molecules';
 import { Button } from '@/components/atoms';
 import { Icon, ICONS, IMAGES, COLORS } from '@/components/icons';
+import { tokens } from '@/lib/ui/tokens';
 import Image from 'next/image';
 
 export type SearchBarVariant = 'dashboard' | 'suggest' | 'results';
@@ -60,7 +61,7 @@ export function SearchBar({
     <div 
       className={`${noTopRadius ? '' : 'rounded-t-2xl'} ${className}`}
       style={{
-        backgroundColor: isResults ? 'transparent' : 'white',
+        backgroundColor: isResults ? tokens.colors.transparent : tokens.colors.background.primary,
         border: 'none',
         outline: 'none',
         boxShadow: 'none',
@@ -68,15 +69,15 @@ export function SearchBar({
         padding: 0,
       }}>
       {/* Drag Handle - exact dimensions from Figma */}
-      <div className="flex justify-center py-1.5" style={{ backgroundColor: isResults ? '#F1F1F1' : 'transparent' }}>
+      <div className="flex justify-center py-1.5" style={{ backgroundColor: isResults ? tokens.colors.background.secondary : tokens.colors.transparent }}>
         <div 
           className="w-9 h-1 rounded-full"
-          style={{ backgroundColor: COLORS.DRAG_HANDLE }}
+          style={{ backgroundColor: tokens.colors.ui.dragHandle }}
         />
       </div>
       
       {/* Search Bar Container */}
-      <div className="flex flex-row items-start gap-3 px-4 pb-2" style={{ backgroundColor: isResults ? '#F1F1F1' : 'transparent' }}>
+      <div className="flex flex-row items-start gap-3 px-4 pb-2" style={{ backgroundColor: isResults ? tokens.colors.background.secondary : tokens.colors.transparent }}>
         {/* Search Input */}
         <div className="flex-1 min-w-0">
           <form onSubmit={handleSubmit}>
@@ -92,7 +93,7 @@ export function SearchBar({
               variant={isResults ? 'filled' : 'default'}
               className="h-10"
               style={{
-                backgroundColor: isResults ? 'white' : 'rgba(20, 20, 20, 0.06)',
+                backgroundColor: isResults ? tokens.colors.background.primary : tokens.colors.background.overlay,
               }}
             />
           </form>
@@ -121,7 +122,7 @@ export function SearchBar({
             className="w-10 h-10"
             aria-label="Меню"
           >
-            <Icon name={ICONS.MENU} size={24} color={COLORS.TEXT_PRIMARY} />
+            <Icon name={ICONS.MENU} size={24} color={tokens.colors.text.primary} />
           </Button>
         )}
         
@@ -133,7 +134,7 @@ export function SearchBar({
             aria-label="Очистить поиск"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6L18 18" stroke={COLORS.TEXT_PRIMARY} strokeWidth="2" strokeLinecap="round"/>
+              <path d="M18 6L6 18M6 6L18 18" stroke={tokens.colors.text.primary} strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </Button>
         )}

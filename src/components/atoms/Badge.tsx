@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { tokens } from '@/lib/ui/tokens';
 
 export type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info';
 export type BadgeSize = 'sm' | 'md' | 'lg';

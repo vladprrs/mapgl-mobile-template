@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Icon, ICONS, COLORS } from '@/components/icons';
+import { tokens } from '@/lib/ui/tokens';
 
 // Icons extracted from Figma - unused for now, using Icon component instead
 // const SUGGEST_ICONS = {
@@ -51,9 +52,9 @@ export function SuggestRow({
     
     return (
       <>
-        {before && <span className="font-medium text-[#141414]">{before}</span>}
-        {highlighted && <span className="font-medium text-[#141414]">{highlighted}</span>}
-        {after && <span className="font-normal text-[#898989]">{after}</span>}
+        {before && <span className="font-medium" style={{ color: tokens.colors.text.primary }}>{before}</span>}
+        {highlighted && <span className="font-medium" style={{ color: tokens.colors.text.primary }}>{highlighted}</span>}
+        {after && <span className="font-normal" style={{ color: tokens.colors.text.secondary }}>{after}</span>}
       </>
     );
   };
@@ -93,18 +94,18 @@ export function SuggestRow({
         </div>
         
         {/* Content row */}
-        <div className="flex-1 bg-transparent box-border flex flex-row gap-2 items-start justify-start min-h-px overflow-clip pb-3 pl-0 pr-4 pt-2.5 relative border-b border-[rgba(137,137,137,0.3)]">
+        <div className="flex-1 bg-transparent box-border flex flex-row gap-2 items-start justify-start min-h-px overflow-clip pb-3 pl-0 pr-4 pt-2.5 relative border-b" style={{ borderColor: tokens.colors.border.DEFAULT }}>
           <div className="flex-1 box-border flex flex-col gap-0.5 items-start justify-start min-h-px p-0 relative">
             {/* Title */}
             <div className="box-border flex flex-row items-start justify-start p-0 relative w-full">
               <div className="flex-1 box-border flex flex-row gap-2 items-start justify-start min-h-px p-0 relative">
                 <div className="flex-1 leading-[20px] min-h-px relative text-[16px] text-left tracking-[-0.24px]">
                   {type === SuggestType.SAVED_ADDRESS && (
-                    <span className="font-medium text-[#141414]">{title}</span>
+                    <span className="font-medium" style={{ color: tokens.colors.text.primary }}>{title}</span>
                   )}
                   {type === SuggestType.ORGANIZATION && renderHighlightedTitle()}
                   {type === SuggestType.CATEGORY && (
-                    <span className="font-normal text-[#898989]">{title}</span>
+                    <span className="font-normal" style={{ color: tokens.colors.text.secondary }}>{title}</span>
                   )}
                 </div>
               </div>
@@ -113,7 +114,7 @@ export function SuggestRow({
             {/* Subtitle */}
             {(subtitle || distance || branchCount) && (
               <div className="box-border flex flex-row items-start justify-start p-0 relative w-full">
-                <div className="flex-1 box-border flex flex-row gap-2 items-start justify-start leading-[18px] min-h-px p-0 relative text-[#898989] text-[14px] text-left tracking-[-0.28px]">
+                <div className="flex-1 box-border flex flex-row gap-2 items-start justify-start leading-[18px] min-h-px p-0 relative text-[14px] text-left tracking-[-0.28px]" style={{ color: tokens.colors.text.secondary }}>
                   {type === SuggestType.SAVED_ADDRESS && (
                     <>
                       <div className="flex-1 min-h-px relative">
