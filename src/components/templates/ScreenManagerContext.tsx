@@ -90,8 +90,7 @@ export function ScreenManagerProvider({
     debugLog('Search query:', query);
     setSearchQuery(query);
     if (query.trim()) {
-      // Temporarily redirect to dashboard until search results are rebuilt
-      navigateTo(ScreenType.DASHBOARD, query);
+      navigateTo(ScreenType.SEARCH_RESULTS, query);
     }
   }, [navigateTo]);
 

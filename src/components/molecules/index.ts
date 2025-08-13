@@ -16,5 +16,6 @@ export { SecondaryLine } from './SecondaryLine';
 // UI Molecules
 export { QuickAction } from './QuickAction';
 export { SearchInput } from './SearchInput';
+export { SearchResultItem, type SearchResultItemProps } from './SearchResultItem';
 export { StoryItem } from './StoryItem';
 export { SuggestRow, SuggestType, type SuggestRowProps } from './SuggestRow';
