@@ -75,21 +75,23 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
     return currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'transparent';
   };
 
+  // For search results, apply background directly to content
+  if (currentScreen === ScreenType.SEARCH_RESULTS) {
+    return (
+      <div 
+        className={`flex-1 transition-all duration-300 ease-in-out ${
+          isTransitioning ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
+        }`}
+        style={{ backgroundColor: '#F1F1F1' }}
+      >
+        {renderScreen()}
+      </div>
+    );
+  }
+
+  // For other screens, include Quick Access Panel if needed
   return (
-    <div 
-      className="flex flex-col h-full"
-      style={{ 
-        backgroundColor: getBackgroundColor(),
-        // Remove ALL borders and ensure clean background
-        border: 'none',
-        borderTop: 'none',
-        borderBottom: 'none',
-        outline: 'none',
-        margin: 0,
-        padding: 0,
-        boxShadow: 'none',
-      }}
-    >
+    <>
       {/* Quick Access Panel - only show on dashboard */}
       {currentScreen === ScreenType.DASHBOARD && (
         <div className="bg-white pt-2 pb-4 relative z-10">
@@ -102,21 +104,10 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
         className={`flex-1 transition-all duration-300 ease-in-out ${
           isTransitioning ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
         }`}
-        style={{
-          // Ensure the content area has clean background with NO borders
-          backgroundColor: currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'transparent',
-          border: 'none',
-          borderTop: 'none', 
-          borderBottom: 'none',
-          outline: 'none',
-          boxShadow: 'none',
-          margin: 0,
-          padding: 0,
-        }}
       >
         {renderScreen()}
       </div>
-    </div>
+    </>
   );
 }
 

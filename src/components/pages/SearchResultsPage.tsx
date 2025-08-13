@@ -29,42 +29,15 @@ export function SearchResultsPage({
   // Use mock data for now - replace with actual API call
   const searchResults = mockSearchResults;
 
-  // Empty state with explicit styling
+  // Empty state - simplified
   if (searchResults.length === 0) {
     return (
-      <div 
-        className={className}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '48px 16px',
-          backgroundColor: '#F1F1F1',
-          border: 'none',
-          outline: 'none',
-          margin: 0,
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-      >
+      <div className={`flex flex-col items-center justify-center py-12 px-4 ${className}`}>
         <Icon name={ICONS.SEARCH} size={48} color={COLORS.TEXT_SECONDARY} />
-        <p style={{ 
-          marginTop: '16px', 
-          color: '#6B7280',
-          fontSize: '16px',
-          border: 'none',
-          outline: 'none',
-        }}>
+        <p className="mt-4 text-gray-600 text-base">
           No results found for &ldquo;{query}&rdquo;
         </p>
-        <p style={{ 
-          marginTop: '4px', 
-          color: '#9CA3AF',
-          fontSize: '14px',
-          border: 'none',
-          outline: 'none',
-        }}>
+        <p className="mt-1 text-gray-400 text-sm">
           Try searching for something else
         </p>
       </div>
@@ -81,34 +54,14 @@ export function SearchResultsPage({
     // You can add navigation logic here if needed
   };
 
-  // Main results view with explicit styling
+  // Main results view - simplified structure
   return (
-    <div 
-      className={className}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#F1F1F1',
-        padding: 0,
-        margin: 0,
-        border: 'none',
-        outline: 'none',
-        width: '100%',
-        boxSizing: 'border-box',
-      }}
-    >
+    <>
       {/* First 3 search results */}
       {resultsBeforeStories.map((result, index) => (
         <div
           key={result.organization.id}
-          style={{
-            padding: index === 0 ? '16px 16px 8px 16px' : '8px 16px',
-            backgroundColor: '#F1F1F1',
-            border: 'none',
-            outline: 'none',
-            margin: 0,
-            boxSizing: 'border-box',
-          }}
+          className={index === 0 ? 'px-4 pt-4 pb-2' : 'px-4 py-2'}
         >
           <SearchResultCard
             variant={result.variant}
@@ -140,16 +93,7 @@ export function SearchResultsPage({
       
       {/* Stories carousel at position 4 (after 3rd result) */}
       {resultsBeforeStories.length >= 3 && (
-        <div 
-          style={{
-            padding: '16px',
-            backgroundColor: '#F1F1F1',
-            border: 'none',
-            outline: 'none',
-            margin: 0,
-            boxSizing: 'border-box',
-          }}
-        >
+        <div className="p-4">
           <StoriesPanel 
             stories={mockStories}
             onStoryClick={handleStoryClick}
@@ -159,17 +103,10 @@ export function SearchResultsPage({
       )}
       
       {/* Remaining search results (4, 5, 6, etc.) */}
-      {resultsAfterStories.map((result, index) => (
+      {resultsAfterStories.map((result) => (
         <div
           key={result.organization.id}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#F1F1F1',
-            border: 'none',
-            outline: 'none',
-            margin: 0,
-            boxSizing: 'border-box',
-          }}
+          className="px-4 py-2"
         >
           <SearchResultCard
             variant={result.variant}
@@ -200,16 +137,8 @@ export function SearchResultsPage({
       ))}
       
       {/* Bottom padding to ensure last card isn't cut off */}
-      <div 
-        style={{
-          height: '16px',
-          backgroundColor: '#F1F1F1',
-          border: 'none',
-          outline: 'none',
-          margin: 0,
-        }}
-      />
-    </div>
+      <div className="h-4" />
+    </>
   );
 }
 
