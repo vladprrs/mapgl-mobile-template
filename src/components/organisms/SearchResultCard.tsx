@@ -39,6 +39,9 @@ export interface SearchResultCardProps {
   zmkData?: {
     products: ZMKProduct[];
   };
+  coords?: [number, number];
+  // Result type to distinguish between organizations and addresses
+  type?: 'organization' | 'address';
   // Advertiser-specific fields
   isAdvertiser?: boolean;
   logo?: string;

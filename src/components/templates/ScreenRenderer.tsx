@@ -7,6 +7,9 @@ import { SearchSuggestionsPage } from '@/components/pages/SearchSuggestionsPage'
 import { SearchResultsPage } from '@/components/pages/SearchResultsPage';
 import { DashboardPage } from '@/components/pages/DashboardPage';
 import { OrganizationPage } from '@/components/pages/OrganizationPage';
+import { AddressPage } from '@/components/pages/AddressPage';
+import { MasterDetailsPage } from '@/components/pages/MasterDetailsPage';
+import { MastersListPage } from '@/components/pages/MastersListPage';
 import { debugLog } from '@/lib/logging';
 // tokens import removed - not used
 import type { AdviceItem } from '@/__mocks__/advice/types';
@@ -62,6 +65,21 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       case ScreenType.ORGANIZATION_DETAILS:
         return (
           <OrganizationPage />
+        );
+      
+      case ScreenType.ADDRESS_DETAILS:
+        return (
+          <AddressPage />
+        );
+      
+      case ScreenType.MASTER_DETAILS:
+        return (
+          <MasterDetailsPage />
+        );
+      
+      case ScreenType.MASTERS_LIST:
+        return (
+          <MastersListPage />
         );
       
       default:

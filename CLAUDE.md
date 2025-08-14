@@ -6,7 +6,7 @@ This codebase follows **Atomic Design** principles strictly. Components are orga
 
 ### 🚀 Recent Migration Progress
 
-**COMPLETED**: Atomic design migration and search functionality implementation
+**COMPLETED**: Atomic design migration and comprehensive app functionality
 - ✅ **MetaItem** - Category search cards (116px height)
 - ✅ **MetaItemAd** - Sponsored content cards with gradient
 - ✅ **Cover** - Collection covers (116px/244px variants)
@@ -21,6 +21,16 @@ This codebase follows **Atomic Design** principles strictly. Components are orga
 - ✅ **SearchResultCard** - Complete search result organism with friends integration
   - ✅ **FriendAvatars** - Pixel-perfect overlapping avatars with Figma assets
   - ✅ **ZMKBlock** - Advertising block for non-advertiser cards
+- ✅ **Organization Details System** - Complete organization page implementation
+  - ✅ **OrganizationPage** - Full page with tab navigation and content sections
+  - ✅ **OrganizationHeader** - Expanded/collapsed states with smooth transitions
+  - ✅ **OrganizationTabs** - Horizontal scrollable tabs with counters and gradients
+  - ✅ **OrganizationSlice** - Zustand state management for organization data
+- ✅ **MastersNearbyCard** - Service professionals with ratings and galleries
+- ✅ **Bottom Sheet Improvements** - Enhanced navigation and positioning
+  - ✅ Search pages now open in expanded state (90%) by default
+  - ✅ Fixed OrganizationTabs positioning to eliminate unwanted spacing
+  - ✅ Consistent snap behavior across all screens
 - ✅ **Friends Section Debugging** - Playwright-assisted debugging and fixes
   - ✅ Fixed data flow from mock sources to search results
   - ✅ Corrected avatar paths to use extracted Figma assets
@@ -142,19 +152,29 @@ SearchBar organism:
 ```
 src/
 ├── components/
-│   ├── atoms/      # Basic UI elements
-│   ├── molecules/  # Composed from atoms  
-│   ├── organisms/  # Complex components
-│   ├── templates/  # Page layouts
-│   └── pages/      # Complete screens
-├── stores/         # Zustand state management
-│   ├── index.ts    # Main store with middleware
-│   ├── slices/     # Map, Search, UI state slices
-│   ├── selectors/  # Atomic selectors
-│   └── types.ts    # TypeScript interfaces
+│   ├── atoms/          # Basic UI elements (Button, Icon, FilterChip, RatingStars)
+│   ├── molecules/      # Composed from atoms (SearchInput, FriendAvatars, OrganizationTabs)
+│   ├── organisms/      # Complex components (SearchBar, OrganizationHeader, MastersNearbyCard)
+│   ├── templates/      # Page layouts (MobileMapShell, ScreenRenderer)
+│   └── pages/          # Complete screens (DashboardPage, OrganizationPage)
+├── stores/             # Zustand state management
+│   ├── index.ts        # Main store with middleware
+│   ├── slices/         # Map, Search, UI, Organization state slices
+│   │   ├── mapSlice.ts
+│   │   ├── searchSlice.ts
+│   │   ├── uiSlice.ts
+│   │   ├── organizationSlice.ts
+│   │   └── actions.ts  # Cross-slice actions
+│   ├── selectors/      # Atomic selectors
+│   └── types.ts        # TypeScript interfaces
+├── __mocks__/          # Mock data for development
+│   ├── search/         # Search results and suggestions
+│   └── masters/        # Service professionals data
+├── assets/             # Static assets and Figma exports
+│   └── figma/          # Extracted Figma assets
 └── lib/
     └── ui/
-        └── tokens.ts  # Design tokens
+        └── tokens.ts   # Design tokens
 ```
 
 ## 🚀 Component Creation Guidelines
@@ -389,9 +409,26 @@ await actions.performSearch('restaurants'); // Updates search, UI, and map
 const ui = useStore((state) => state.ui);
 const currentScreen = ui.currentScreen;
 
-// Search results uses secondary background
-headerBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.background.secondary : 'white'}
-contentBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.background.secondary : 'white'}
+// Auto-expand behavior for different screens
+switch (currentScreen) {
+  case ScreenType.SEARCH_SUGGESTIONS:
+  case ScreenType.SEARCH_RESULTS:
+  case ScreenType.ORGANIZATION_DETAILS:
+    // Automatically expand to 90% for better content visibility
+    targetSnap = 90;
+    break;
+  case ScreenType.DASHBOARD:
+  default:
+    // Keep at 50% for dashboard
+    targetSnap = 50;
+    break;
+}
+
+// Search results and organization details use secondary background
+headerBackground={currentScreen === ScreenType.SEARCH_RESULTS || currentScreen === ScreenType.ORGANIZATION_DETAILS 
+  ? tokens.colors.background.secondary : 'white'}
+contentBackground={currentScreen === ScreenType.SEARCH_RESULTS || currentScreen === ScreenType.ORGANIZATION_DETAILS 
+  ? tokens.colors.background.secondary : 'white'}
 ```
 
 ### Empty Search State Pattern
@@ -523,9 +560,11 @@ const avatarDetails = await page.evaluate(() => {
 | Atomic design violations | Never import molecules from other molecules - use design tokens only |
 | Theme inconsistency | Always use 'Light'/'Dark' format, not 'light'/'dark' |
 | Hardcoded styling | Replace ALL hardcoded values with tokens.* references |
-| Friends section not showing | Check mock data source in search slice, verify avatar paths use `/avatars/` |
-| Avatar images not loading | Extract images from Figma Dev Mode to `public/avatars/` directory |
-| Friends data missing in search results | Update `src/__mocks__/search/results.ts` with `friendsVisited` property |
+| ~~Friends section not showing~~ | ✅ **FIXED**: Mock data and avatar paths correctly configured |
+| ~~Avatar images not loading~~ | ✅ **FIXED**: All Figma assets extracted to `public/avatars/` |
+| ~~Friends data missing in search results~~ | ✅ **FIXED**: Updated mock data with `friendsVisited` property |
+| ~~OrganizationTabs spacing issues~~ | ✅ **FIXED**: Removed hardcoded positioning, proper sticky behavior |
+| ~~Search pages opening at 50%~~ | ✅ **FIXED**: Search screens now open at 90% (expanded) by default |
 
 ## 🎯 Atomic Design Best Practices
 

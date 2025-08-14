@@ -820,12 +820,23 @@ export const searchResultsByQuery: SearchResultsByQuery = {
 
   // Specific address search results
   'москва ленина 11': [
-    // Position 1: Medical center at this address
+    // Position 1: The building itself as an address result
+    {
+      id: 'addr-lenin-11',
+      name: 'ул. Ленина, 11',
+      category: 'Жилое здание',
+      address: 'ул. Ленина, 11, Москва',
+      distance: '0 м',
+      type: 'address',
+      coords: [82.9207, 55.0415],
+    },
+    // Position 2: Medical center at this address
     {
       id: 'lenin11-adv-1',
       name: 'Медицинский центр "Здоровье+"',
       category: 'Частная клиника • ул. Ленина, 11',
       isAdvertiser: true,
+      type: 'organization',
       rating: 4.7,
       reviewCount: 445,
       address: 'ул. Ленина, 11, 2 этаж',
@@ -1083,6 +1094,46 @@ export const searchResultsByQuery: SearchResultsByQuery = {
         text: 'Работает круглосуточно',
         isWarning: false,
       },
+    }
+  ],
+
+  // General address searches
+  'ленина 11': [
+    // Position 1: Address building
+    {
+      id: 'addr-lenin-11-general',
+      name: 'ул. Ленина, 11',
+      category: 'Многоквартирный дом',
+      address: 'ул. Ленина, 11, Новосибирск',
+      distance: '250 м',
+      type: 'address',
+      coords: [82.9207, 55.0415],
+    }
+  ],
+
+  'бривибас 45': [
+    // Position 1: Office building address
+    {
+      id: 'addr-brivibas-45',
+      name: 'ул. Бривибас, 45',
+      category: 'Офисное здание',
+      address: 'ул. Бривибас, 45, Рига',
+      distance: '1.2 км',
+      type: 'address',
+      coords: [24.1052, 56.9496],
+    }
+  ],
+
+  'тверская 12': [
+    // Position 1: Historic building
+    {
+      id: 'addr-tverskaya-12',
+      name: 'ул. Тверская, 12',
+      category: 'Историческое здание',
+      address: 'ул. Тверская, 12, Москва',
+      distance: '300 м',
+      type: 'address',
+      coords: [37.6173, 55.7558],
     }
   ]
 };
