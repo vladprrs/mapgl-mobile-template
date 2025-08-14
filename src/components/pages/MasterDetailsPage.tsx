@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { tokens } from '@/lib/ui/tokens';
-import { Text, Button } from '@/components/atoms';
-import { ReviewCard } from '@/components/molecules';
+import { Text } from '@/components/atoms';
+import { ReviewCard, ContactInfo } from '@/components/molecules';
 import { MasterDetailsHeader } from '@/components/organisms';
 import useStore from '@/stores';
 // ScreenType import removed - not used directly in component
@@ -36,12 +36,6 @@ export function MasterDetailsPage({
     ui.navigateBack();
   };
 
-  const handleCallClick = () => {
-    if (currentMaster?.phone) {
-      // In a real app, this would initiate a phone call
-      window.location.href = `tel:${currentMaster.phone}`;
-    }
-  };
 
   // Loading state
   if (!currentMaster) {
@@ -68,7 +62,6 @@ export function MasterDetailsPage({
         className="flex-1 overflow-y-auto"
         style={{
           backgroundColor: tokens.colors.background.secondary,
-          paddingBottom: '80px', // Space for fixed call button
         }}
       >
         <div
@@ -76,6 +69,20 @@ export function MasterDetailsPage({
             padding: tokens.spacing[4], // 16px
           }}
         >
+          {/* Contact Info Section */}
+          <div
+            style={{
+              marginBottom: tokens.spacing[4], // 16px
+            }}
+          >
+            <ContactInfo
+              phone={currentMaster.phone}
+              messengers={currentMaster.messengers}
+              website={currentMaster.website}
+              socialMedia={currentMaster.socialMedia}
+            />
+          </div>
+
           {/* Description Section */}
           <div
             style={{
@@ -171,43 +178,6 @@ export function MasterDetailsPage({
         </div>
       </div>
 
-      {/* Fixed Call Button */}
-      {currentMaster.phone && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: tokens.colors.background.primary,
-            borderTop: `1px solid rgba(137,137,137,0.3)`,
-            padding: tokens.spacing[4], // 16px
-            zIndex: 50,
-          }}
-        >
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={handleCallClick}
-            style={{
-              width: '100%',
-              backgroundColor: '#2563eb', // Primary blue
-              color: 'white',
-              fontSize: tokens.typography.fontSize.lg, // 16px
-              fontWeight: tokens.typography.fontWeight.semibold, // 600
-              padding: `${tokens.spacing[4]} ${tokens.spacing[6]}`, // 16px vertical, 24px horizontal
-              borderRadius: tokens.borders.radius.lg,
-              border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: tokens.spacing[2], // 8px
-            }}
-          >
-            📞 Позвонить
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
