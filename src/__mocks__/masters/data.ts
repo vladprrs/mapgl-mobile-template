@@ -17,6 +17,19 @@ export interface Master {
   yearsOfExperience?: number;
   completedJobs?: number;
   phone?: string;
+  messengers?: {
+    telegram?: string;
+    whatsapp?: string;
+    viber?: string;
+  };
+  website?: string;
+  socialMedia?: {
+    vk?: string;
+    youtube?: string;
+    twitter?: string;
+    facebook?: string;
+    google?: string;
+  };
   reviews?: Review[];
 }
 
@@ -32,6 +45,17 @@ export const mockMasters: Master[] = [
     yearsOfExperience: 8,
     completedJobs: 1250,
     phone: '+7 (913) 123-45-67',
+    messengers: {
+      telegram: '@elena_nails',
+      whatsapp: '+79131234567',
+      viber: '+79131234567',
+    },
+    website: 'elena-nails.ru',
+    socialMedia: {
+      vk: 'https://vk.com/elena_nails',
+      youtube: 'https://youtube.com/@elena_nails',
+      facebook: 'https://facebook.com/elena.nails',
+    },
     reviews: [
       {
         id: 'review-1-1',
@@ -67,6 +91,15 @@ export const mockMasters: Master[] = [
     yearsOfExperience: 5,
     completedJobs: 980,
     phone: '+7 (913) 234-56-78',
+    messengers: {
+      telegram: '@anna_manicure',
+      whatsapp: '+79132345678',
+    },
+    website: 'anna-manicure.com',
+    socialMedia: {
+      vk: 'https://vk.com/anna_manicure',
+      google: 'https://g.co/kgs/anna_manicure',
+    },
     reviews: [
       {
         id: 'review-2-1',
@@ -113,6 +146,16 @@ export const mockMasters: Master[] = [
     yearsOfExperience: 12,
     completedJobs: 560,
     phone: '+7 (913) 456-78-90',
+    messengers: {
+      telegram: '@sergey_electro',
+      whatsapp: '+79134567890',
+      viber: '+79134567890',
+    },
+    website: 'electro-service.ru',
+    socialMedia: {
+      vk: 'https://vk.com/electro_service',
+      youtube: 'https://youtube.com/@electro_sergey',
+    },
     reviews: [
       {
         id: 'review-5-1',
