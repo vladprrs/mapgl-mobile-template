@@ -31,6 +31,11 @@ This codebase follows **Atomic Design** principles strictly. Components are orga
   - ✅ Search pages now open in expanded state (90%) by default
   - ✅ Fixed OrganizationTabs positioning to eliminate unwanted spacing
   - ✅ Consistent snap behavior across all screens
+- ✅ **Address & Master Details Pages** - Complete address and service professional pages
+  - ✅ **AddressPage** - Simplified address details with tabs (Обзор, Мастера)
+  - ✅ **MasterDetailsPage** - Complete master profiles with reviews and contact info
+  - ✅ **MastersListPage** - Full masters list with navigation from search results
+  - ✅ **ContactInfo** - Comprehensive contact component from Figma (node-id 322-78232)
 - ✅ **Friends Section Debugging** - Playwright-assisted debugging and fixes
   - ✅ Fixed data flow from mock sources to search results
   - ✅ Corrected avatar paths to use extracted Figma assets
@@ -153,10 +158,10 @@ SearchBar organism:
 src/
 ├── components/
 │   ├── atoms/          # Basic UI elements (Button, Icon, FilterChip, RatingStars)
-│   ├── molecules/      # Composed from atoms (SearchInput, FriendAvatars, OrganizationTabs)
+│   ├── molecules/      # Composed from atoms (SearchInput, FriendAvatars, ContactInfo)
 │   ├── organisms/      # Complex components (SearchBar, OrganizationHeader, MastersNearbyCard)
 │   ├── templates/      # Page layouts (MobileMapShell, ScreenRenderer)
-│   └── pages/          # Complete screens (DashboardPage, OrganizationPage)
+│   └── pages/          # Complete screens (DashboardPage, AddressPage, MasterDetailsPage)
 ├── stores/             # Zustand state management
 │   ├── index.ts        # Main store with middleware
 │   ├── slices/         # Map, Search, UI, Organization state slices
@@ -521,6 +526,64 @@ const avatarDetails = await page.evaluate(() => {
 // - Avatar paths: Use '/avatars/' not '/assets/' for Figma-extracted images  
 // - Friends property: Verify 'friendsVisited' exists in search result data
 // - Component rendering: Check conditional rendering logic in SearchResultCard
+```
+
+### ContactInfo Pattern
+
+```typescript
+// ContactInfo molecule for comprehensive contact functionality
+<ContactInfo
+  phone={master.phone}
+  messengers={master.messengers}
+  website={master.website}
+  socialMedia={master.socialMedia}
+/>
+
+// Master data structure with contact information
+interface Master {
+  phone?: string;
+  messengers?: {
+    telegram?: string;  // '@username' or phone number
+    whatsapp?: string;  // Phone number format
+    viber?: string;     // Phone number format
+  };
+  website?: string;     // Domain or full URL (auto HTTPS prefix)
+  socialMedia?: {
+    vk?: string;        // Full VK URL
+    youtube?: string;   // Full YouTube URL
+    twitter?: string;   // Full Twitter URL
+    facebook?: string;  // Full Facebook URL
+    google?: string;    // Google Business URL
+  };
+}
+
+// Usage in MasterDetailsPage
+export function MasterDetailsPage() {
+  const currentMaster = useStore((state) => state.organization.currentOrganization) as Master;
+  
+  return (
+    <div>
+      <MasterDetailsHeader master={currentMaster} />
+      
+      {/* Contact Info - replaces floating call button */}
+      <ContactInfo
+        phone={currentMaster.phone}
+        messengers={currentMaster.messengers}
+        website={currentMaster.website}
+        socialMedia={currentMaster.socialMedia}
+      />
+      
+      {/* Other sections... */}
+    </div>
+  );
+}
+
+// Features:
+// - 📞 Direct phone calls with tel: links
+// - 💬 Smart messenger URL handling (Telegram @username, WhatsApp/Viber numbers)
+// - 🌐 Auto HTTPS prefix for websites
+// - 📱 Horizontal scrollable social media buttons with platform colors
+// - 🎯 Pixel-perfect Figma design match (node-id 322-78232)
 ```
 
 ## ⚠️ Critical Rules

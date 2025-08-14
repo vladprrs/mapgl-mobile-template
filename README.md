@@ -24,10 +24,10 @@ src/
 ├── app/                       # Next.js app router
 ├── components/
 │   ├── atoms/                # Basic UI elements (Button, Icon, FilterChip, RatingStars)
-│   ├── molecules/            # Combinations of atoms (SearchInput, FriendAvatars, OrganizationTabs)
+│   ├── molecules/            # Combinations of atoms (SearchInput, FriendAvatars, ContactInfo)
 │   ├── organisms/            # Complex components (SearchBar, OrganizationHeader, MastersNearbyCard)
 │   ├── templates/            # Page layouts (MobileMapShell, ScreenRenderer)
-│   └── pages/               # Full pages (DashboardPage, OrganizationPage)
+│   └── pages/               # Full pages (DashboardPage, AddressPage, MasterDetailsPage)
 ├── stores/                   # Zustand state management
 │   ├── index.ts             # Main store with middleware
 │   ├── slices/              # Map, Search, UI, Organization state slices
@@ -148,6 +148,7 @@ Simple combinations of atoms (recently migrated to atomic design):
 - `FriendAvatars` - Overlapping avatar display with pixel-perfect Figma specs (24×24px, 50% overlap)
 - `ZMKBlock` - Purple gradient advertising block for non-advertiser search results
 - `OrganizationTabs` - Horizontal scrollable tabs with counters and gradients
+- `ContactInfo` - Comprehensive contact component with phone, messaging, website, and social media (Figma node-id 322-78232)
 
 ### Organisms
 Complex, self-contained components:
@@ -173,6 +174,9 @@ Complete screen implementations:
 - `SearchResultsPage` - Search results display
 - `SearchSuggestionsPage` - Search suggestions with empty search state (recommendations, history, city highlights)
 - `OrganizationPage` - Complete organization details with tabs navigation
+- `AddressPage` - Address/building details with simplified tabs (Обзор, Мастера)
+- `MasterDetailsPage` - Service professional profiles with reviews and ContactInfo
+- `MastersListPage` - Complete masters list with navigation from search results
 
 ## 🏪 State Management
 
@@ -206,7 +210,8 @@ const actions = useActions();
 - **Search Results with Social Features** - Friends visited indicators with overlapping avatars
 - **Empty Search State** - Complete UX with recommendations, history, and city highlights
 - **Organization Details** - Complete organization pages with tabs navigation and content sections
-- **Service Professionals** - MastersNearbyCard with ratings, galleries, and contact information
+- **Service Professionals** - MastersNearbyCard with ratings, galleries, and comprehensive contact functionality
+- **Contact Integration** - ContactInfo component with phone calls, messaging, websites, and social media
 - **Advice Cards System** - Masonry grid with MetaItem, Cover, Interesting, RD components
 - **Atomic Design Architecture** - Recently migrated to strict component hierarchy
 - **Design Tokens** - Centralized styling system with no hardcoded values
