@@ -74,11 +74,23 @@ export function MobileMapShell({
         targetSnap = 90;
         break;
       case ScreenType.SEARCH_RESULTS:
-        // Set to 50% to show both results and map
-        targetSnap = 50;
+        // Expand to 90% for better visibility of search results
+        targetSnap = 90;
         break;
       case ScreenType.ORGANIZATION_DETAILS:
         // Expand to 90% for organization details page
+        targetSnap = 90;
+        break;
+      case ScreenType.ADDRESS_DETAILS:
+        // Expand to 90% for address details page (same as organization)
+        targetSnap = 90;
+        break;
+      case ScreenType.MASTER_DETAILS:
+        // Expand to 90% for master details page
+        targetSnap = 90;
+        break;
+      case ScreenType.MASTERS_LIST:
+        // Expand to 90% for masters list page
         targetSnap = 90;
         break;
       case ScreenType.DASHBOARD:
@@ -150,7 +162,10 @@ export function MobileMapShell({
       case ScreenType.SEARCH_SUGGESTIONS:
         return 'suggest';
       case ScreenType.ORGANIZATION_DETAILS:
-        return 'results'; // Hide search bar for organization details
+      case ScreenType.ADDRESS_DETAILS:
+      case ScreenType.MASTER_DETAILS:
+      case ScreenType.MASTERS_LIST:
+        return 'results'; // Hide search bar for organization/address/master details and masters list
       default:
         return 'dashboard';
     }
@@ -159,24 +174,33 @@ export function MobileMapShell({
   // Determine header background based on screen - use solid color to prevent artifacts
   const getHeaderBackground = () => {
     return (screenState.currentScreen === ScreenType.SEARCH_RESULTS || 
-            screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS) ? '#F1F1F1' : 'white';
+            screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS ||
+            screenState.currentScreen === ScreenType.ADDRESS_DETAILS ||
+            screenState.currentScreen === ScreenType.MASTER_DETAILS ||
+            screenState.currentScreen === ScreenType.MASTERS_LIST) ? '#F1F1F1' : 'white';
   };
 
   // Determine content background based on screen
   const getContentBackground = () => {
     return (screenState.currentScreen === ScreenType.SEARCH_RESULTS || 
-            screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS) ? '#F1F1F1' : 'white';
+            screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS ||
+            screenState.currentScreen === ScreenType.ADDRESS_DETAILS ||
+            screenState.currentScreen === ScreenType.MASTER_DETAILS ||
+            screenState.currentScreen === ScreenType.MASTERS_LIST) ? '#F1F1F1' : 'white';
   };
 
   // Determine header content based on screen
   const getHeaderContent = () => {
-    // No header for ORGANIZATION_DETAILS - OrganizationPage handles its own header
+    // No header for ORGANIZATION_DETAILS or ADDRESS_DETAILS - pages handle their own headers
     return null;
   };
 
   // Determine sticky header content based on screen
   const getStickyHeaderContent = () => {
-    if (screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS) {
+    if (screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS || 
+        screenState.currentScreen === ScreenType.ADDRESS_DETAILS ||
+        screenState.currentScreen === ScreenType.MASTER_DETAILS ||
+        screenState.currentScreen === ScreenType.MASTERS_LIST) {
       return null;
     }
     return (

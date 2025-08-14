@@ -65,6 +65,8 @@ export interface SearchResult {
     products: ZMKProduct[];
   };
   coords?: [number, number];
+  // Result type to distinguish between organizations and addresses
+  type?: 'organization' | 'address';
   // Future extensibility fields
   hasLogo?: boolean;
   hasPhotos?: boolean;
@@ -155,6 +157,8 @@ export interface CrossSliceActions {
   performSearch: (query: string) => Promise<void>;
   selectLocation: (location: SearchResult | SearchSuggestion) => void;
   selectOrganization: (organization: SearchResult) => void;
+  selectMaster: (master: unknown) => void; // Using unknown to avoid circular dependency
+  showMastersList: () => void;
   focusSearchBar: () => void;
   blurSearchBar: () => void;
   clearAllState: () => void;

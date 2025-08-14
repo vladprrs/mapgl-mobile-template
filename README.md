@@ -21,23 +21,35 @@ This application follows **Atomic Design** methodology with a clear component hi
 
 ```
 src/
-├── app/                    # Next.js app router
+├── app/                       # Next.js app router
 ├── components/
-│   ├── atoms/             # Basic UI elements (Button, Badge, Text, Icon)
-│   ├── molecules/         # Combinations of atoms (SearchResultItem, QuickAction)
-│   ├── organisms/         # Complex components (SearchBar, SearchResultsList, BottomSheet)
-│   ├── templates/         # Page layouts (MobileMapShell, ScreenRenderer)
-│   └── pages/            # Full pages (DashboardPage, SearchResultsPage)
-├── stores/                # Zustand state management
-│   ├── index.ts          # Main store with middleware
-│   ├── slices/           # Map, Search, UI state slices
-│   ├── selectors/        # Atomic selectors for performance
-│   └── types.ts          # TypeScript interfaces
+│   ├── atoms/                # Basic UI elements (Button, Icon, FilterChip, RatingStars)
+│   ├── molecules/            # Combinations of atoms (SearchInput, FriendAvatars, OrganizationTabs)
+│   ├── organisms/            # Complex components (SearchBar, OrganizationHeader, MastersNearbyCard)
+│   ├── templates/            # Page layouts (MobileMapShell, ScreenRenderer)
+│   └── pages/               # Full pages (DashboardPage, OrganizationPage)
+├── stores/                   # Zustand state management
+│   ├── index.ts             # Main store with middleware
+│   ├── slices/              # Map, Search, UI, Organization state slices
+│   │   ├── mapSlice.ts
+│   │   ├── searchSlice.ts
+│   │   ├── uiSlice.ts
+│   │   ├── organizationSlice.ts
+│   │   └── actions.ts       # Cross-slice actions
+│   ├── selectors/           # Atomic selectors for performance
+│   └── types.ts             # TypeScript interfaces
 ├── lib/
 │   └── ui/
-│       └── tokens.ts     # Design tokens (colors, spacing, typography)
-├── __mocks__/            # Mock data for development
-└── assets/               # Static assets (images, icons)
+│       └── tokens.ts        # Design tokens (colors, spacing, typography)
+├── __mocks__/               # Mock data for development
+│   ├── search/              # Search results and suggestions
+│   └── masters/             # Service professionals data
+├── assets/                  # Static assets and Figma exports
+│   └── figma/               # Extracted Figma assets
+└── public/
+    ├── avatars/             # Friend avatars from Figma
+    ├── assets/              # Product images and icons
+    └── icons/               # UI icons
 ```
 
 ## 🎨 Design Principles
@@ -135,6 +147,7 @@ Simple combinations of atoms (recently migrated to atomic design):
 - `SearchHistoryItem` - Search history items following SuggestRow pattern
 - `FriendAvatars` - Overlapping avatar display with pixel-perfect Figma specs (24×24px, 50% overlap)
 - `ZMKBlock` - Purple gradient advertising block for non-advertiser search results
+- `OrganizationTabs` - Horizontal scrollable tabs with counters and gradients
 
 ### Organisms
 Complex, self-contained components:
@@ -146,6 +159,8 @@ Complex, self-contained components:
 - `SearchHistorySection` - Search history with default suggestions for new users
 - `CityHighlightsSection` - Featured city content using Cover molecule
 - `SearchResultCard` - Complete search result display with friends integration and ZMK advertising
+- `OrganizationHeader` - Organization page header with expanded/collapsed states
+- `MastersNearbyCard` - Service professionals with ratings and galleries
 
 ### Templates
 Page layouts and navigation:
@@ -157,6 +172,7 @@ Complete screen implementations:
 - `DashboardPage` - Home screen with advice cards
 - `SearchResultsPage` - Search results display
 - `SearchSuggestionsPage` - Search suggestions with empty search state (recommendations, history, city highlights)
+- `OrganizationPage` - Complete organization details with tabs navigation
 
 ## 🏪 State Management
 
@@ -173,7 +189,8 @@ const actions = useActions();
 - **Map Slice**: Map instance, markers, center, zoom with direct map control
 - **Search Slice**: Query, suggestions, results, history with debounced search
 - **UI Slice**: Navigation, bottom sheet, screen state with optimized updates
-- **Cross-Slice Actions**: Coordinated workflows like `performSearch()`
+- **Organization Slice**: Organization details, tab navigation, loading states
+- **Cross-Slice Actions**: Coordinated workflows like `performSearch()`, `selectOrganization()`
 
 ### Performance Features
 - **Selective Re-renders**: Components only update when their data changes
@@ -183,11 +200,13 @@ const actions = useActions();
 
 ## 🎯 Key Features
 
-- **Draggable Bottom Sheet** - 3 snap points (10%, 50%, 90%) with state persistence
+- **Draggable Bottom Sheet** - Smart auto-expansion: search pages open at 90%, dashboard at 50%
 - **Interactive Map** - 2GIS MapGL with markers and navigation, direct control
 - **Smart Search System** - Real-time suggestions, debounced queries, cached results
 - **Search Results with Social Features** - Friends visited indicators with overlapping avatars
 - **Empty Search State** - Complete UX with recommendations, history, and city highlights
+- **Organization Details** - Complete organization pages with tabs navigation and content sections
+- **Service Professionals** - MastersNearbyCard with ratings, galleries, and contact information
 - **Advice Cards System** - Masonry grid with MetaItem, Cover, Interesting, RD components
 - **Atomic Design Architecture** - Recently migrated to strict component hierarchy
 - **Design Tokens** - Centralized styling system with no hardcoded values

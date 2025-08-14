@@ -23,6 +23,8 @@ export interface SearchResult {
     displayText?: string;
   };
   coords?: [number, number];
+  // Result type to distinguish between organizations and addresses
+  type?: 'organization' | 'address';
   hasLogo?: boolean;
   hasPhotos?: boolean;
   isAdvertiser?: boolean;
@@ -46,12 +48,23 @@ export interface SearchResult {
  * Comprehensive data with varied states for testing UI components
  */
 export const mockSearchResults: SearchResult[] = [
+  // Add address result example
+  {
+    id: 'address-1',
+    name: 'Ленина 11',
+    category: 'Жилое здание',
+    address: 'ул. Ленина 11, Новосибирск',
+    distance: '2 мин',
+    type: 'address',
+    coords: [82.9207, 55.0415],
+  },
   {
     id: '1',
     name: 'Управление ГИБДД',
     category: 'Главное управление МВД России по Новосибирской области',
     address: 'Тверская 32/12, 1 этаж, Москва',
     distance: '3 мин',
+    type: 'organization',
     closingStatus: {
       text: 'Закроется через 30 минут',
       isWarning: true,
@@ -66,6 +79,7 @@ export const mockSearchResults: SearchResult[] = [
     reviewCount: 120,
     address: 'ул. Ленина 45, Новосибирск',
     distance: '3 мин',
+    type: 'organization',
     coords: [82.9307, 55.0515],
     isAdvertiser: true,
     logo: '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png',
@@ -101,6 +115,7 @@ export const mockSearchResults: SearchResult[] = [
     reviewCount: 89,
     address: 'пр. Дзержинского 12, 2 этаж, Новосибирск',
     distance: '850 м',
+    type: 'organization',
     isAdvertiser: false,
     closingStatus: {
       text: 'Работает до 20:00',
@@ -129,6 +144,37 @@ export const mockSearchResults: SearchResult[] = [
     },
     coords: [82.9407, 55.0615],
   },
+];
+
+// Mock address results for fallback search
+export const mockAddressResults: SearchResult[] = [
+  {
+    id: 'addr-lenin-11-fallback',
+    name: 'ул. Ленина, 11',
+    category: 'Жилое здание',
+    address: 'ул. Ленина, 11, Новосибирск',
+    distance: '250 м',
+    type: 'address',
+    coords: [82.9207, 55.0415],
+  },
+  {
+    id: 'addr-tverskaya-15',
+    name: 'ул. Тверская, 15',
+    category: 'Административное здание',
+    address: 'ул. Тверская, 15, Москва',
+    distance: '800 м',
+    type: 'address',
+    coords: [37.6173, 55.7558],
+  },
+  {
+    id: 'addr-mira-45',
+    name: 'пр. Мира, 45',
+    category: 'Торговый центр',
+    address: 'пр. Мира, 45, Новосибирск',
+    distance: '1.2 км',
+    type: 'address',
+    coords: [82.9307, 55.0515],
+  }
 ];
 
 export const mockRestaurantResults: SearchResult[] = [
@@ -202,6 +248,7 @@ export const manySearchResults: SearchResult[] = [
   ...mockSearchResults,
   ...mockRestaurantResults,
   ...mockCafeResults,
+  ...mockAddressResults,
 ];
 
 // Helper function to generate search results

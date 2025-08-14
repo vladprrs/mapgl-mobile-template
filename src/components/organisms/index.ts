@@ -18,6 +18,8 @@ export { MastersNearbyCard } from './MastersNearbyCard';
 
 // Organization Organisms
 export { OrganizationHeader } from './OrganizationHeader';
+export { MastersList } from './MastersList';
+export { MasterDetailsHeader } from './MasterDetailsHeader';
 
 // Layout Organisms
 export { BottomSheet, type BottomSheetProps, type BottomSheetRef } from './bottom-sheet';

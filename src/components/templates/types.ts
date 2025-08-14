@@ -3,6 +3,9 @@ export enum ScreenType {
   SEARCH_SUGGESTIONS = 'search',
   SEARCH_RESULTS = 'search-results',
   ORGANIZATION_DETAILS = 'organization-details',
+  ADDRESS_DETAILS = 'address-details',
+  MASTER_DETAILS = 'master-details',
+  MASTERS_LIST = 'masters-list',
   LOCATION_DETAILS = 'location-details',
   ROUTE_DETAILS = 'route-details'
 }

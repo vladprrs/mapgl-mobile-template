@@ -4,6 +4,7 @@ import type { StateCreator } from 'zustand';
 import type { AppStore, CrossSliceActions, SearchResult, SearchSuggestion } from '../types';
 import { ScreenType } from '@/components/templates/types';
 import { debugLog } from '@/lib/logging';
+import type { Master } from '@/__mocks__/masters/data';
 
 export const createActions: StateCreator<
   AppStore,
@@ -112,13 +113,17 @@ export const createActions: StateCreator<
   selectOrganization: (organization: SearchResult) => {
     debugLog('Selecting organization:', organization);
     
-    // Set current organization in store
+    // Set current organization/address in store (reuse organization slice)
     get().organization.setCurrentOrganization(organization);
     
-    // Navigate to organization details screen
-    get().ui.navigateTo(ScreenType.ORGANIZATION_DETAILS);
+    // Navigate to appropriate details screen based on type
+    if (organization.type === 'address') {
+      get().ui.navigateTo(ScreenType.ADDRESS_DETAILS);
+    } else {
+      get().ui.navigateTo(ScreenType.ORGANIZATION_DETAILS);
+    }
     
-    // Center map on organization if it has coordinates
+    // Center map on organization/address if it has coordinates
     if (organization.coords) {
       get().map.clearMarkers();
       get().map.addMarker(organization.id, organization.coords, {
@@ -132,5 +137,23 @@ export const createActions: StateCreator<
     debugLog('Toggling filter:', filterId);
     
     get().search.toggleFilter(filterId);
+  },
+
+  selectMaster: (master: unknown) => {
+    const masterData = master as Master;
+    debugLog('Selecting master:', masterData);
+    
+    // Set master as current organization in store (reuse organization slice)
+    get().organization.setCurrentOrganization(masterData as unknown as SearchResult);
+    
+    // Navigate to master details screen
+    get().ui.navigateTo(ScreenType.MASTER_DETAILS);
+  },
+
+  showMastersList: () => {
+    debugLog('Showing masters list');
+    
+    // Navigate to masters list screen
+    get().ui.navigateTo(ScreenType.MASTERS_LIST);
   },
 });

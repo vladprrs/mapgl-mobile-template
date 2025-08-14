@@ -1,12 +1,22 @@
 import { SearchResultCardProps } from '@/components/organisms/SearchResultCard';
 
 export const mockSearchResults: SearchResultCardProps[] = [
+  // Add an address result
+  {
+    id: 'addr-lenin-11-data',
+    name: 'ул. Ленина, 11',
+    category: 'Жилое здание',
+    address: 'ул. Ленина, 11, Новосибирск',
+    distance: '250 м',
+    type: 'address',
+  },
   {
     id: '1',
     name: 'Управление ГИБДД',
     category: 'Главное управление МВД России по Новосибирской области',
     address: 'Тверская 32/12, 1 этаж, Москва',
     distance: '3 мин',
+    type: 'organization',
     closingStatus: {
       text: 'Закроется через 30 минут',
       isWarning: true,
@@ -29,6 +39,7 @@ export const mockSearchResults: SearchResultCardProps[] = [
     reviewCount: 120,
     address: 'ул. Ленина 45, Новосибирск',
     distance: '3 мин',
+    type: 'organization',
     isAdvertiser: true,
     logo: '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png',
     gallery: [

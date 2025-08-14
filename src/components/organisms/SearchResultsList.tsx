@@ -7,6 +7,7 @@ import { Text } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
 import { mockMastersNearby, mastersNearbyConfig } from '@/__mocks__/masters/nearby';
 import useStore from '@/stores';
+import { useActions } from '@/stores';
 
 interface SearchResultsListProps {
   results: SearchResultCardProps[];
@@ -24,15 +25,16 @@ export function SearchResultsList({
   onResultClick,
   className = '',
 }: SearchResultsListProps) {
-  // Get current search query from Zustand store
+  // Get current search query from Zustand store and actions
   const query = useStore((state) => state.search.query);
+  const actions = useActions();
   
   // Check if we should show Masters Nearby card
   const shouldShowMastersCard = query.toLowerCase().trim() === 'маникюр';
 
   const handleMastersCardClick = () => {
-    console.log('Masters nearby card clicked');
-    // TODO: Navigate to masters page or show masters details
+    // Navigate to masters list page
+    actions.showMastersList();
   };
 
   // Empty state

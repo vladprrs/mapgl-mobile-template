@@ -37,7 +37,7 @@ export const createUISlice: StateCreator<
           targetSnap = 90;
           break;
         case ScreenType.SEARCH_RESULTS:
-          targetSnap = 50;
+          targetSnap = 90;
           break;
         case ScreenType.ORGANIZATION_DETAILS:
           targetSnap = 90;
