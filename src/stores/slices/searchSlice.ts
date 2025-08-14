@@ -1,12 +1,73 @@
 'use client';
 
 import type { StateCreator } from 'zustand';
-import type { AppStore, SearchSlice, SearchSuggestion } from '../types';
+import type { AppStore, SearchSlice, SearchSuggestion, Filter, SearchResult } from '../types';
 import { debugLog } from '@/lib/logging';
 import { mockAllSuggestions } from '@/__mocks__/search/suggestions';
 import { mockSearchResults } from '@/__mocks__/search/results';
+import { getSearchResultsForQuery, hasResultsForQuery } from '@/data/searchResultsByQuery';
 
 const MAX_HISTORY_ITEMS = 10;
+
+// Generate available filters based on search results and query
+function generateAvailableFilters(results: SearchResult[], query: string): Filter[] {
+  const filters: Filter[] = [];
+  
+  // Always add common filters
+  filters.push(
+    { id: 'nearby', label: 'Рядом' },
+    { id: 'open-now', label: 'Открыто' },
+    { id: 'high-rating', label: 'Рейтинг 4+' }
+  );
+  
+  // Add 24-hour filter if relevant
+  const has24Hour = results.some(r => 
+    r.name.toLowerCase().includes('24') || 
+    r.category.toLowerCase().includes('круглосуточно')
+  );
+  if (has24Hour) {
+    filters.push({ 
+      id: '24-hours', 
+      label: '24 часа'
+    });
+  }
+  
+  // Add delivery filter for restaurants/cafes
+  const hasFood = results.some(r => 
+    r.category.toLowerCase().includes('кафе') || 
+    r.category.toLowerCase().includes('ресторан') ||
+    r.category.toLowerCase().includes('еда')
+  );
+  if (hasFood) {
+    filters.push({ 
+      id: 'delivery', 
+      label: 'Доставка'
+    });
+  }
+  
+  // Add parking filter for various venues
+  if (results.length > 2) {
+    filters.push({ 
+      id: 'with-parking', 
+      label: 'Парковка'
+    });
+  }
+  
+  // Add wifi filter for cafes, restaurants, hotels
+  const hasWifi = results.some(r => 
+    r.category.toLowerCase().includes('кафе') || 
+    r.category.toLowerCase().includes('ресторан') ||
+    r.category.toLowerCase().includes('отель')
+  );
+  if (hasWifi) {
+    filters.push({ 
+      id: 'with-wifi', 
+      label: 'Wi-Fi'
+    });
+  }
+  
+  return filters;
+}
 
 export const createSearchSlice: StateCreator<
   AppStore,
@@ -17,9 +78,12 @@ export const createSearchSlice: StateCreator<
   query: '',
   suggestions: [],
   results: [],
+  filteredResults: [],
   history: [],
   isFocused: false,
   isSearching: false,
+  activeFilters: [],
+  availableFilters: [],
 
   setQuery: (query: string) => {
     set((state) => {
@@ -36,25 +100,27 @@ export const createSearchSlice: StateCreator<
     });
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      const results = mockSearchResults.filter((result) =>
-        result.name?.toLowerCase().includes(query.toLowerCase()) ||
-        result.address?.toLowerCase().includes(query.toLowerCase()) ||
-        result.category?.toLowerCase().includes(query.toLowerCase())
-      ).map(r => ({
-        id: r.id,
-        title: r.name,
-        subtitle: `${r.category} • ${r.address}`,
-        description: r.address,
-        coords: [82.9207 + Math.random() * 0.1, 55.0415 + Math.random() * 0.1] as [number, number],
-        distance: parseFloat(r.distance?.replace(' км', '') || '0'),
-        rating: r.rating,
-        category: r.category
-      }));
+      // First try to get results from our query-specific mock data
+      let results = getSearchResultsForQuery(query);
+      
+      // If no specific results found, fall back to filtered general results
+      if (results.length === 0) {
+        results = mockSearchResults.filter((result) =>
+          result.name?.toLowerCase().includes(query.toLowerCase()) ||
+          result.address?.toLowerCase().includes(query.toLowerCase()) ||
+          result.category?.toLowerCase().includes(query.toLowerCase())
+        );
+      }
 
+      // Generate available filters based on search results
+      const availableFilters = generateAvailableFilters(results, query);
+      
       set((state) => {
         state.search.results = results;
+        state.search.filteredResults = results;
+        state.search.availableFilters = availableFilters;
         state.search.isSearching = false;
       });
 
@@ -130,8 +196,11 @@ export const createSearchSlice: StateCreator<
     set((state) => {
       state.search.query = '';
       state.search.results = [];
+      state.search.filteredResults = [];
       state.search.suggestions = [];
       state.search.isSearching = false;
+      state.search.activeFilters = [];
+      state.search.availableFilters = [];
     });
   },
 
@@ -169,5 +238,90 @@ export const createSearchSlice: StateCreator<
     } else {
       get().search.search(suggestion.title);
     }
+  },
+
+  toggleFilter: (filterId: string) => {
+    set((state) => {
+      const currentFilters = state.search.activeFilters;
+      if (currentFilters.includes(filterId)) {
+        state.search.activeFilters = currentFilters.filter(id => id !== filterId);
+      } else {
+        state.search.activeFilters = [...currentFilters, filterId];
+      }
+    });
+    
+    // Apply filters after toggling
+    get().search.applyFilters();
+  },
+
+  clearFilters: () => {
+    set((state) => {
+      state.search.activeFilters = [];
+      state.search.filteredResults = state.search.results;
+    });
+  },
+
+  setAvailableFilters: (filters: Filter[]) => {
+    set((state) => {
+      state.search.availableFilters = filters;
+    });
+  },
+
+  applyFilters: () => {
+    const state = get().search;
+    const { results, activeFilters, availableFilters } = state;
+    
+    if (activeFilters.length === 0) {
+      set((searchState) => {
+        searchState.search.filteredResults = results;
+      });
+      return;
+    }
+
+    const filtered = results.filter((result) => {
+      // Apply each active filter
+      return activeFilters.every(filterId => {
+        switch (filterId) {
+          case 'open-now':
+            // Check if place is open (mock logic)
+            return !result.closingStatus?.isWarning;
+          
+          case 'nearby':
+            // Check if place is nearby (mock logic - check if distance exists and is short)
+            return result.distance && parseFloat(result.distance) < 5;
+          
+          case '24-hours':
+            // Check if place is 24 hours (mock logic)
+            return result.name.toLowerCase().includes('24') || 
+                   result.category.toLowerCase().includes('круглосуточно');
+          
+          case 'high-rating':
+            // Check if rating is 4+ 
+            return result.rating && result.rating >= 4;
+          
+          case 'with-parking':
+            // Mock logic for parking availability
+            return Math.random() > 0.5; // 50% chance for demo
+          
+          case 'delivery':
+            // Mock logic for delivery availability
+            return result.category.toLowerCase().includes('кафе') || 
+                   result.category.toLowerCase().includes('ресторан') ||
+                   result.category.toLowerCase().includes('еда');
+          
+          case 'with-wifi':
+            // Mock logic for wifi availability  
+            return result.category.toLowerCase().includes('кафе') || 
+                   result.category.toLowerCase().includes('ресторан');
+          
+          default:
+            return true;
+        }
+      });
+    });
+
+    set((state) => {
+      state.search.filteredResults = filtered;
+    });
   },
 });

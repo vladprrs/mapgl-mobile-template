@@ -25,15 +25,55 @@ export interface SearchSuggestion {
   coords?: [number, number];
 }
 
+export interface Filter {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+}
+
+interface Friend {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+interface ZMKProduct {
+  id: string;
+  image: string;
+  title: string;
+  price?: string;
+}
+
 export interface SearchResult {
   id: string;
-  title: string;
-  subtitle?: string;
-  description?: string;
-  coords: [number, number];
-  distance?: number;
+  name: string;
+  category: string;
+  address: string;
+  distance?: string;
   rating?: number;
-  category?: string;
+  reviewCount?: number;
+  closingStatus?: {
+    text: string;
+    isWarning: boolean;
+  };
+  friendsVisited?: {
+    friends: Friend[];
+    rating: number;
+    displayText?: string;
+  };
+  zmkData?: {
+    products: ZMKProduct[];
+  };
+  coords?: [number, number];
+  // Future extensibility fields
+  hasLogo?: boolean;
+  hasPhotos?: boolean;
+  isAdvertiser?: boolean;
+  friendsReviews?: number;
+  logo?: string;
+  gallery?: string[];
+  promotionalText?: string;
+  buttonLabel?: string;
 }
 
 export interface MapSlice {
@@ -58,9 +98,12 @@ export interface SearchSlice {
   query: string;
   suggestions: SearchSuggestion[];
   results: SearchResult[];
+  filteredResults: SearchResult[];
   history: string[];
   isFocused: boolean;
   isSearching: boolean;
+  activeFilters: string[];
+  availableFilters: Filter[];
   
   setQuery: (query: string) => void;
   search: (query: string) => Promise<void>;
@@ -70,6 +113,10 @@ export interface SearchSlice {
   addToHistory: (query: string) => void;
   clearHistory: () => void;
   selectSuggestion: (suggestion: SearchSuggestion) => void;
+  toggleFilter: (filterId: string) => void;
+  clearFilters: () => void;
+  setAvailableFilters: (filters: Filter[]) => void;
+  applyFilters: () => void;
 }
 
 export interface UISlice {
@@ -93,17 +140,31 @@ export interface UISlice {
   resetNavigation: () => void;
 }
 
+export interface OrganizationSlice {
+  currentOrganization: SearchResult | null;
+  isLoading: boolean;
+  activeTab: string;
+  
+  setCurrentOrganization: (organization: SearchResult) => void;
+  clearCurrentOrganization: () => void;
+  setLoading: (loading: boolean) => void;
+  setActiveTab: (tabId: string) => void;
+}
+
 export interface CrossSliceActions {
   performSearch: (query: string) => Promise<void>;
   selectLocation: (location: SearchResult | SearchSuggestion) => void;
+  selectOrganization: (organization: SearchResult) => void;
   focusSearchBar: () => void;
   blurSearchBar: () => void;
   clearAllState: () => void;
+  toggleFilter: (filterId: string) => void;
 }
 
 export interface AppStore {
   map: MapSlice;
   search: SearchSlice;
   ui: UISlice;
+  organization: OrganizationSlice;
   actions: CrossSliceActions;
 }

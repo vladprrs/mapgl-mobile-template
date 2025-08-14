@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { BottomSheet, BottomSheetRef, SearchBar } from '@/components/organisms';
+import { BottomSheet, BottomSheetRef, SearchBar, SearchFilters } from '@/components/organisms';
 import { ScreenRenderer } from '@/components/templates';
 import { ScreenType } from '@/components/templates/types';
 import { debugLog } from '@/lib/logging';
@@ -77,6 +77,10 @@ export function MobileMapShell({
         // Set to 50% to show both results and map
         targetSnap = 50;
         break;
+      case ScreenType.ORGANIZATION_DETAILS:
+        // Expand to 90% for organization details page
+        targetSnap = 90;
+        break;
       case ScreenType.DASHBOARD:
       default:
         // Keep at 50% for dashboard (or use current position)
@@ -145,6 +149,8 @@ export function MobileMapShell({
         return 'results';
       case ScreenType.SEARCH_SUGGESTIONS:
         return 'suggest';
+      case ScreenType.ORGANIZATION_DETAILS:
+        return 'results'; // Hide search bar for organization details
       default:
         return 'dashboard';
     }
@@ -152,12 +158,45 @@ export function MobileMapShell({
 
   // Determine header background based on screen - use solid color to prevent artifacts
   const getHeaderBackground = () => {
-    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
+    return (screenState.currentScreen === ScreenType.SEARCH_RESULTS || 
+            screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS) ? '#F1F1F1' : 'white';
   };
 
   // Determine content background based on screen
   const getContentBackground = () => {
-    return screenState.currentScreen === ScreenType.SEARCH_RESULTS ? '#F1F1F1' : 'white';
+    return (screenState.currentScreen === ScreenType.SEARCH_RESULTS || 
+            screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS) ? '#F1F1F1' : 'white';
+  };
+
+  // Determine header content based on screen
+  const getHeaderContent = () => {
+    // No header for ORGANIZATION_DETAILS - OrganizationPage handles its own header
+    return null;
+  };
+
+  // Determine sticky header content based on screen
+  const getStickyHeaderContent = () => {
+    if (screenState.currentScreen === ScreenType.ORGANIZATION_DETAILS) {
+      return null;
+    }
+    return (
+      <div className="sticky-header-content">
+        <SearchBar
+          onSearch={handleSearch}
+          onMenuClick={handleMenuClick}
+          onVoiceClick={handleVoiceClick}
+          onFocus={handleSearchFocus}
+          onBlur={handleSearchBlur}
+          onChange={handleSearchChange}
+          onClear={handleClearSearch}
+          value={searchQuery}
+          variant={getSearchBarVariant()}
+        />
+        {screenState.currentScreen === ScreenType.SEARCH_RESULTS && (
+          <SearchFilters />
+        )}
+      </div>
+    );
   };
 
   // Use BottomSheet wrapper for all screens for consistency
@@ -170,19 +209,8 @@ export function MobileMapShell({
       onSnapChange={handleSnapChange}
       headerBackground={getHeaderBackground()}
       contentBackground={getContentBackground()}
-      stickyHeader={
-        <SearchBar
-          onSearch={handleSearch}
-          onMenuClick={handleMenuClick}
-          onVoiceClick={handleVoiceClick}
-          onFocus={handleSearchFocus}
-          onBlur={handleSearchBlur}
-          onChange={handleSearchChange}
-          onClear={handleClearSearch}
-          value={searchQuery}
-          variant={getSearchBarVariant()}
-        />
-      }
+      header={getHeaderContent()}
+      stickyHeader={getStickyHeaderContent()}
     >
       <ScreenRenderer items={items} />
     </BottomSheet>

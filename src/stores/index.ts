@@ -12,6 +12,7 @@ import type { AppStore } from './types';
 import { createMapSlice } from './slices/mapSlice';
 import { createSearchSlice } from './slices/searchSlice';
 import { createUISlice } from './slices/uiSlice';
+import { createOrganizationSlice } from './slices/organizationSlice';
 import { createActions } from './slices/actions';
 
 const useStore = create<AppStore>()(
@@ -22,6 +23,7 @@ const useStore = create<AppStore>()(
           map: createMapSlice(set, get, api),
           search: createSearchSlice(set, get, api),
           ui: createUISlice(set, get, api),
+          organization: createOrganizationSlice(set, get, api),
           actions: createActions(set, get, api),
         }))
       ),
@@ -46,6 +48,7 @@ export default useStore;
 export const useMapStore = () => useStore((state) => state.map);
 export const useSearchStore = () => useStore((state) => state.search);
 export const useUIStore = () => useStore((state) => state.ui);
+export const useOrganizationStore = () => useStore((state) => state.organization);
 export const useActions = () => useStore((state) => state.actions);
 
 if (typeof window !== 'undefined') {

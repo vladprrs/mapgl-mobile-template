@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { SuggestRow, SuggestType } from '@/components/molecules';
+import { SuggestRow } from '@/components/molecules';
+import { RecommendationsSection, SearchHistorySection, CityHighlightsSection } from '@/components/organisms';
+import useStore from '@/stores';
 
 interface SearchSuggestionsProps {
-  query: string;
   onSelectSuggestion: (suggestion: string) => void;
   className?: string;
 }
@@ -32,10 +33,11 @@ const mockSuggestions = {
 };
 
 export function SearchSuggestionsPage({ 
-  query, 
   onSelectSuggestion,
   className = '' 
 }: SearchSuggestionsProps) {
+  // Get query from Zustand store instead of props
+  const query = useStore((state) => state.search.query);
   // Filter suggestions based on query
   const getSuggestions = () => {
     if (!query) {
@@ -61,6 +63,31 @@ export function SearchSuggestionsPage({
     return allSuggestions.length > 0 ? allSuggestions : mockSuggestions.categories;
   };
 
+  // Conditional rendering based on query length
+  if (query.length === 0) {
+    // Empty state: Match Figma layout with proper background zones
+    return (
+      <div className={`flex flex-col h-full ${className}`}>
+        {/* White background zone - Recommendations */}
+        <div className="bg-white pb-4 pt-2 shrink-0">
+          <RecommendationsSection />
+        </div>
+        
+        {/* Gray background zone - History + City Highlights */}
+        <div className="flex-1 overflow-y-auto" style={{ backgroundColor: '#f1f1f1' }}>
+          {/* History section - NO HEADER, starts with pt-4 */}
+          <div className="pt-4">
+            <SearchHistorySection showHeader={false} />
+          </div>
+          
+          {/* City highlights section */}
+          <CityHighlightsSection />
+        </div>
+      </div>
+    );
+  }
+
+  // Search state: Show suggestions (current implementation)
   const suggestions = getSuggestions();
 
   return (

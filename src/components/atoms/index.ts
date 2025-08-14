@@ -2,8 +2,10 @@ export { Badge, type BadgeVariant, type BadgeSize } from './Badge';
 export { Button, type ButtonVariant, type ButtonSize } from './Button';
 export { CardContainer, type CardVariant } from './CardContainer';
 export { Divider } from './Divider';
+export { FilterChip } from './FilterChip';
 export { Icon } from './Icon';
 export { Input, type InputVariant, type InputSize } from './Input';
+export { RatingStars } from './RatingStars';
 export { Spinner } from './Spinner';
 export { Text } from './Text';
 

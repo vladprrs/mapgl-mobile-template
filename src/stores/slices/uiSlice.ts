@@ -39,6 +39,9 @@ export const createUISlice: StateCreator<
         case ScreenType.SEARCH_RESULTS:
           targetSnap = 50;
           break;
+        case ScreenType.ORGANIZATION_DETAILS:
+          targetSnap = 90;
+          break;
         case ScreenType.DASHBOARD:
         default:
           targetSnap = 50;
