@@ -14,8 +14,14 @@ export { AddressLine } from './AddressLine';
 export { SecondaryLine } from './SecondaryLine';
 
 // UI Molecules
+export { FriendAvatars } from './FriendAvatars';
 export { QuickAction } from './QuickAction';
+export { RecommendationCard } from './RecommendationCard';
 export { SearchInput } from './SearchInput';
 export { SearchResultItem, type SearchResultItemProps } from './SearchResultItem';
 export { StoryItem } from './StoryItem';
 export { SuggestRow, SuggestType, type SuggestRowProps } from './SuggestRow';
+export { ZMKBlock } from './ZMKBlock';
+
+// Organization Molecules
+export { OrganizationTabs, type TabItem } from './OrganizationTabs';

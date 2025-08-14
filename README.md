@@ -131,6 +131,10 @@ Simple combinations of atoms (recently migrated to atomic design):
 - `Cover` - Featured collection covers (116px default, 244px big variant)
 - `Interesting` - Feature promotion cards (244px double height)
 - `RD` - Business advertiser cards with gallery (244px double height)
+- `RecommendationCard` - Horizontal recommendation cards for empty search (88×96px)
+- `SearchHistoryItem` - Search history items following SuggestRow pattern
+- `FriendAvatars` - Overlapping avatar display with pixel-perfect Figma specs (24×24px, 50% overlap)
+- `ZMKBlock` - Purple gradient advertising block for non-advertiser search results
 
 ### Organisms
 Complex, self-contained components:
@@ -138,6 +142,10 @@ Complex, self-contained components:
 - `AdviceSection` - Masonry grid layout for advice cards
 - `BottomSheet` - Draggable sheet container with snap points
 - `MapContainer` - Map instance wrapper with direct store access
+- `RecommendationsSection` - Horizontal scrollable recommendations for empty search
+- `SearchHistorySection` - Search history with default suggestions for new users
+- `CityHighlightsSection` - Featured city content using Cover molecule
+- `SearchResultCard` - Complete search result display with friends integration and ZMK advertising
 
 ### Templates
 Page layouts and navigation:
@@ -148,7 +156,7 @@ Page layouts and navigation:
 Complete screen implementations:
 - `DashboardPage` - Home screen with advice cards
 - `SearchResultsPage` - Search results display
-- `SearchSuggestionsPage` - Search suggestions
+- `SearchSuggestionsPage` - Search suggestions with empty search state (recommendations, history, city highlights)
 
 ## 🏪 State Management
 
@@ -178,13 +186,51 @@ const actions = useActions();
 - **Draggable Bottom Sheet** - 3 snap points (10%, 50%, 90%) with state persistence
 - **Interactive Map** - 2GIS MapGL with markers and navigation, direct control
 - **Smart Search System** - Real-time suggestions, debounced queries, cached results
+- **Search Results with Social Features** - Friends visited indicators with overlapping avatars
+- **Empty Search State** - Complete UX with recommendations, history, and city highlights
 - **Advice Cards System** - Masonry grid with MetaItem, Cover, Interesting, RD components
 - **Atomic Design Architecture** - Recently migrated to strict component hierarchy
 - **Design Tokens** - Centralized styling system with no hardcoded values
+- **Figma Integration** - Direct asset extraction using Figma Dev Mode for pixel-perfect implementation
+- **Playwright Debugging** - Advanced debugging patterns for React component visibility issues
 - **Responsive Design** - Mobile-first with safe area support
 - **State Management** - Zustand with atomic selectors and cross-slice actions
 - **Performance Optimized** - Minimal re-renders, 8KB state management overhead
 - **Code Quality** - ESLint, TypeScript, Prettier with pre-commit hooks
+
+## 👥 Friends Section Implementation
+
+### Pixel-Perfect Figma Integration
+The friends section showcases advanced Figma Dev Mode integration:
+
+- **Direct Asset Extraction**: Avatar images extracted from Figma Design (node-id 297-222454)
+- **Exact Specifications**: 24×24px rounded square avatars with 50% overlap
+- **Perfect Styling**: 0.5px borders, proper z-index stacking, #1ba136 green rating badges
+- **Real Data Integration**: 40+ high-quality avatar images in `public/avatars/` directory
+
+### Advanced Debugging with Playwright
+Demonstrates professional debugging techniques:
+
+```typescript
+// React Fiber inspection to access component props
+const searchResults = await page.evaluate(() => {
+  const fiberKey = Object.keys(searchResultsList).find(key => key.startsWith('__reactFiber'));
+  return searchResultsList[fiberKey].memoizedProps.results;
+});
+
+// Data flow verification from store to DOM
+const avatarDetails = await page.evaluate(() => 
+  Array.from(document.querySelectorAll('img[alt*="Елена"]')).map(img => ({
+    alt: img.alt, src: img.src, width: img.width, height: img.height
+  }))
+);
+```
+
+### Component Architecture
+- **FriendAvatars Molecule**: Self-contained overlapping avatar display
+- **SearchResultCard Integration**: Conditional rendering with proper data flow
+- **Mock Data Structure**: Realistic friends data with Figma-extracted avatars
+- **Error Boundaries**: Graceful fallbacks to user initials for missing images
 
 ## 📱 Mobile Optimizations
 

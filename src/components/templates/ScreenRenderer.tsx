@@ -5,8 +5,8 @@ import useStore from '@/stores';
 import { ScreenType } from './types';
 import { SearchSuggestionsPage } from '@/components/pages/SearchSuggestionsPage';
 import { SearchResultsPage } from '@/components/pages/SearchResultsPage';
-import type { SearchResultItemProps } from '@/components/molecules/SearchResultItem';
 import { DashboardPage } from '@/components/pages/DashboardPage';
+import { OrganizationPage } from '@/components/pages/OrganizationPage';
 import { debugLog } from '@/lib/logging';
 // tokens import removed - not used
 import type { AdviceItem } from '@/__mocks__/advice/types';
@@ -19,19 +19,12 @@ interface ScreenRendererProps {
 export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
   const ui = useStore((state) => state.ui);
   const search = useStore((state) => state.search);
-  const searchQuery = search.query;
   const currentScreen = ui.currentScreen;
 
   const handleSelectSuggestion = (suggestion: string) => {
     debugLog('Suggestion selected:', suggestion);
     search.setQuery(suggestion);
     ui.navigateTo(ScreenType.SEARCH_RESULTS);
-  };
-
-  const handleSelectResult = (result: SearchResultItemProps) => {
-    debugLog('Result selected:', result);
-    // Handle result selection (e.g., show on map, navigate to details)
-    ui.navigateTo(ScreenType.DASHBOARD);
   };
 
 
@@ -56,7 +49,6 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       case ScreenType.SEARCH_SUGGESTIONS:
         return (
           <SearchSuggestionsPage
-            query={searchQuery || ''}
             onSelectSuggestion={handleSelectSuggestion}
             className={className}
           />
@@ -64,10 +56,12 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       
       case ScreenType.SEARCH_RESULTS:
         return (
-          <SearchResultsPage
-            query={searchQuery || ''}
-            onSelectResult={handleSelectResult}
-          />
+          <SearchResultsPage />
+        );
+      
+      case ScreenType.ORGANIZATION_DETAILS:
+        return (
+          <OrganizationPage />
         );
       
       default:

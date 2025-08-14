@@ -30,6 +30,7 @@ export const colors = {
     tertiary: '#F7F7F7',
     overlay: 'rgba(20, 20, 20, 0.06)',
     overlayDark: 'rgba(20, 20, 20, 0.12)',
+    systemThinMaterial: 'rgba(236, 234, 234, 0.65)', // iOS systemThinMaterial equivalent
   },
   
   // Border Colors

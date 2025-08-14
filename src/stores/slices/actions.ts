@@ -27,14 +27,18 @@ export const createActions: StateCreator<
     get().map.clearMarkers();
     
     for (const result of results) {
-      await get().map.addMarker(result.id, result.coords, {
-        icon: 'https://docs.2gis.com/img/mapgl/marker.svg',
-      });
+      if (result.coords) {
+        await get().map.addMarker(result.id, result.coords, {
+          icon: 'https://docs.2gis.com/img/mapgl/marker.svg',
+        });
+      }
     }
     
     if (results.length > 0) {
       const firstResult = results[0];
-      get().map.centerOnLocation(firstResult.coords, 15);
+      if (firstResult.coords) {
+        get().map.centerOnLocation(firstResult.coords, 15);
+      }
     }
   },
 
@@ -42,9 +46,9 @@ export const createActions: StateCreator<
     debugLog('Selecting location:', location);
     
     if (!location.coords) {
-      if ('title' in location) {
-        get().actions.performSearch(location.title);
-      }
+      // Handle SearchSuggestion or SearchResult without coords
+      const searchQuery = 'title' in location ? location.title : location.name;
+      get().actions.performSearch(searchQuery);
       return;
     }
     
@@ -59,7 +63,8 @@ export const createActions: StateCreator<
     get().ui.setBottomSheetSnap(10);
     
     set((state) => {
-      state.search.query = location.title;
+      // Update query based on location type
+      state.search.query = 'title' in location ? location.title : location.name;
     });
   },
 
@@ -102,5 +107,30 @@ export const createActions: StateCreator<
     get().map.clearMarkers();
     
     get().ui.resetNavigation();
+  },
+
+  selectOrganization: (organization: SearchResult) => {
+    debugLog('Selecting organization:', organization);
+    
+    // Set current organization in store
+    get().organization.setCurrentOrganization(organization);
+    
+    // Navigate to organization details screen
+    get().ui.navigateTo(ScreenType.ORGANIZATION_DETAILS);
+    
+    // Center map on organization if it has coordinates
+    if (organization.coords) {
+      get().map.clearMarkers();
+      get().map.addMarker(organization.id, organization.coords, {
+        icon: 'https://docs.2gis.com/img/mapgl/marker.svg',
+      });
+      get().map.centerOnLocation(organization.coords, 16);
+    }
+  },
+
+  toggleFilter: (filterId: string) => {
+    debugLog('Toggling filter:', filterId);
+    
+    get().search.toggleFilter(filterId);
   },
 });

@@ -2,6 +2,7 @@ export enum ScreenType {
   DASHBOARD = 'dashboard',
   SEARCH_SUGGESTIONS = 'search',
   SEARCH_RESULTS = 'search-results',
+  ORGANIZATION_DETAILS = 'organization-details',
   LOCATION_DETAILS = 'location-details',
   ROUTE_DETAILS = 'route-details'
 }

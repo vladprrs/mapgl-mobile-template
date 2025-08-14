@@ -6,12 +6,25 @@ This codebase follows **Atomic Design** principles strictly. Components are orga
 
 ### 🚀 Recent Migration Progress
 
-**COMPLETED**: Atomic design migration for advice card components
+**COMPLETED**: Atomic design migration and search functionality implementation
 - ✅ **MetaItem** - Category search cards (116px height)
 - ✅ **MetaItemAd** - Sponsored content cards with gradient
 - ✅ **Cover** - Collection covers (116px/244px variants)
 - ✅ **Interesting** - Feature promotion cards (244px double height)
 - ✅ **RD** - Business advertiser cards with gallery (244px double height)
+- ✅ **Empty Search State** - Complete implementation with three sections
+  - ✅ **RecommendationCard** - 88×96px cards for horizontal recommendations
+  - ✅ **RecommendationsSection** - Horizontal scrollable recommendations
+  - ✅ **SearchHistoryItem** - Search history with SuggestRow pattern
+  - ✅ **SearchHistorySection** - History with default suggestions for new users
+  - ✅ **CityHighlightsSection** - Reuses Cover molecule for featured content
+- ✅ **SearchResultCard** - Complete search result organism with friends integration
+  - ✅ **FriendAvatars** - Pixel-perfect overlapping avatars with Figma assets
+  - ✅ **ZMKBlock** - Advertising block for non-advertiser cards
+- ✅ **Friends Section Debugging** - Playwright-assisted debugging and fixes
+  - ✅ Fixed data flow from mock sources to search results
+  - ✅ Corrected avatar paths to use extracted Figma assets
+  - ✅ Verified 24×24px rounded avatars with 50% overlap and proper z-index
 
 All components now use design tokens exclusively and follow atomic design hierarchy.
 
@@ -73,6 +86,12 @@ borderRadius: '8px'
 - **Dashboard Search Bar**: node-id `271-221631` - White background with menu button
 - **Suggestions Page Search Bar**: node-id `271-221659` - White background with X button  
 - **Search Results Search Bar**: node-id `271-221789` - Gray background (#F1F1F1) with X button
+
+### Empty Search State Components
+- **Horizontal Recommendations**: node-id `286-221899` - 88×96px cards with icons
+- **Search History Section**: node-id `286-221965` - White rounded container with history items
+- **City Highlights Section**: node-id `286-222026` - Featured collections using Cover molecule
+- **Complete Layout**: node-id `289-222256` - Two-zone background layout (white/gray)
 
 ### Implementation Notes
 - **Drag Handle**: Always handled by BottomSheet component, not SearchBar
@@ -375,6 +394,98 @@ headerBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.ba
 contentBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.background.secondary : 'white'}
 ```
 
+### Empty Search State Pattern
+
+```typescript
+// Two-zone layout implementation for empty search state
+if (query.length === 0) {
+  return (
+    <div className="flex flex-col h-full">
+      {/* White zone - Recommendations */}
+      <div className="bg-white pb-4 pt-2 shrink-0">
+        <RecommendationsSection />
+      </div>
+      
+      {/* Gray zone - History + City Highlights */}
+      <div className="flex-1 overflow-y-auto" style={{ backgroundColor: '#f1f1f1' }}>
+        <div className="pt-4">
+          <SearchHistorySection showHeader={false} />
+        </div>
+        <CityHighlightsSection />
+      </div>
+    </div>
+  );
+}
+```
+
+### Friends Section Pattern
+
+```typescript
+// FriendAvatars molecule with pixel-perfect Figma specifications
+<FriendAvatars 
+  friends={friendsVisited.friends}
+  maxVisible={4}
+  size={24}
+  theme="Light"
+  showRating={true}
+/>
+
+// SearchResultCard integration with conditional friends display
+{friendsVisited && (
+  <div style={{
+    paddingBottom: tokens.spacing[1], // 4px bottom padding
+    paddingTop: 0,
+  }}>
+    <FriendAvatars 
+      friends={friendsVisited.friends}
+      maxVisible={4}
+      size={24}
+      theme="Light"
+      showRating={true}
+    />
+  </div>
+)}
+
+// Mock data structure for friends
+friendsVisited: {
+  friends: [
+    { id: '1', name: 'Александр', avatar: '/avatars/23edad0153988d6704197a43ed4d17e51f00e455.png' },
+    { id: '2', name: 'Мария', avatar: '/avatars/7c555ac081e621955c2c245891b952413a9a27c3.png' }
+  ],
+  rating: 5.0
+}
+```
+
+### Friends Section Debugging Pattern
+
+```typescript
+// Use Playwright for debugging component visibility issues
+// 1. Check DOM structure and data flow
+const searchResults = await page.evaluate(() => {
+  const searchResultsList = document.querySelector('[role="list"]');
+  const fiberKey = Object.keys(searchResultsList).find(key => key.startsWith('__reactFiber'));
+  const fiber = searchResultsList[fiberKey];
+  return fiber.memoizedProps.results; // Access React component props
+});
+
+// 2. Verify avatar images and friends data
+const avatarDetails = await page.evaluate(() => {
+  const friendAvatars = document.querySelectorAll('img[alt*="Елена"], img[alt*="Дмитрий"]');
+  return Array.from(friendAvatars).map(img => ({
+    alt: img.alt,
+    src: img.src,
+    width: img.width,
+    height: img.height
+  }));
+});
+
+// 3. Common data flow issues to check:
+// - Mock data source: Ensure search slice imports from correct mock file
+// - Avatar paths: Use '/avatars/' not '/assets/' for Figma-extracted images  
+// - Friends property: Verify 'friendsVisited' exists in search result data
+// - Component rendering: Check conditional rendering logic in SearchResultCard
+```
+
 ## ⚠️ Critical Rules
 
 ### Never Do This
@@ -412,6 +523,9 @@ contentBackground={currentScreen === ScreenType.SEARCH_RESULTS ? tokens.colors.b
 | Atomic design violations | Never import molecules from other molecules - use design tokens only |
 | Theme inconsistency | Always use 'Light'/'Dark' format, not 'light'/'dark' |
 | Hardcoded styling | Replace ALL hardcoded values with tokens.* references |
+| Friends section not showing | Check mock data source in search slice, verify avatar paths use `/avatars/` |
+| Avatar images not loading | Extract images from Figma Dev Mode to `public/avatars/` directory |
+| Friends data missing in search results | Update `src/__mocks__/search/results.ts` with `friendsVisited` property |
 
 ## 🎯 Atomic Design Best Practices
 
