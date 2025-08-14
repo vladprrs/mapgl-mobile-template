@@ -198,7 +198,7 @@ function SocialMediaButtons({ socialMedia }: SocialMediaButtonsProps) {
               style={{
                 backgroundColor: 'rgba(20,20,20,0.06)',
                 borderRadius: tokens.borders.radius.lg,
-                padding: tokens.spacing[2.5], // 10px
+                padding: '10px', // 2.5 * 4px
                 minWidth: '40px',
                 height: '40px',
                 display: 'flex',
