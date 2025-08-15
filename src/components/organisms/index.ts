@@ -15,9 +15,9 @@ export { RecommendationsSection } from './RecommendationsSection';
 export { SearchHistorySection } from './SearchHistorySection';
 export { CityHighlightsSection } from './CityHighlightsSection';
 export { MastersNearbyCard } from './MastersNearbyCard';
-export { ProductsCarousel } from './ProductsCarousel';
-export { ProductCard } from './ProductCard';
+export { AISearchHelper } from './AISearchHelper';
 export { CheckoutItemCard } from './CheckoutItemCard';
+export { StoreRecommendationCard } from './StoreRecommendationCard';
 
 // Organization Organisms
 export { OrganizationHeader } from './OrganizationHeader';

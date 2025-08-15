@@ -258,6 +258,15 @@ export function Icon({
         <circle cx="6" cy="6" r="5" fill={color} />
       </svg>
     ),
+    // Star icon for ratings
+    'star-filled': (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ display: 'block' }}>
+        <path 
+          d="M8 1L9.854 5.146L14.5 5.5L11.25 8.5L12.208 13.5L8 11L3.792 13.5L4.75 8.5L1.5 5.5L6.146 5.146L8 1Z" 
+          fill={color}
+        />
+      </svg>
+    ),
   };
 
   // Wrap icon in container div with fixed dimensions

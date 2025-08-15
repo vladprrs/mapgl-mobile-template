@@ -3,6 +3,7 @@
 import React from 'react';
 import { SearchResultCard, type SearchResultCardProps } from './SearchResultCard';
 import { MastersNearbyCard } from './MastersNearbyCard';
+import { AISearchHelper } from './AISearchHelper';
 import { ProductsCarousel } from './ProductsCarousel';
 import { Text } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
@@ -26,9 +27,11 @@ export function SearchResultsList({
   onResultClick,
   className = '',
 }: SearchResultsListProps) {
-  // Get current search query from Zustand store and actions
+  // Get current search query, search context, actions, and chat from Zustand store
   const query = useStore((state) => state.search.query);
+  const searchContext = useStore((state) => state.search.searchContext);
   const actions = useActions();
+  const chat = useStore((state) => state.chat);
   
   // Check if we should show Masters Nearby card
   const shouldShowMastersCard = query.toLowerCase().trim() === 'маникюр';
@@ -36,6 +39,23 @@ export function SearchResultsList({
   const handleMastersCardClick = () => {
     // Navigate to masters list page
     actions.showMastersList();
+  };
+
+  const handleAISearchHelperClick = () => {
+    // Same behavior as Salute button - open chat and add search query as user message
+    const currentQuery = query.trim();
+    
+    // Open chat overlay
+    actions.openChat();
+    
+    // Add search query as first user message if it exists
+    if (currentQuery) {
+      console.log('AI search helper clicked - adding search query to chat:', currentQuery);
+      chat.addMessage({
+        text: currentQuery,
+        sender: 'user',
+      });
+    }
   };
 
   // Empty state
@@ -79,6 +99,17 @@ export function SearchResultsList({
       role="list"
       aria-label="Search results"
     >
+      {/* AI Search Helper - show only for product/alias searches */}
+      {query.trim() && searchContext?.type === 'product_search' && (
+        <div role="listitem">
+          <AISearchHelper
+            searchQuery={query.trim()}
+            onClick={handleAISearchHelperClick}
+            className="mb-2"
+          />
+        </div>
+      )}
+
       {/* Masters Nearby Card - show first for "маникюр" query */}
       {shouldShowMastersCard && (
         <div role="listitem">

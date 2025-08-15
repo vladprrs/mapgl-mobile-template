@@ -226,12 +226,37 @@ export interface CartSlice {
   clearCart: () => void;
 }
 
+export interface StoreProduct {
+  id: string;
+  image?: string;
+  image2?: string; // For "all products" variant with stacked images
+  title: string;
+  price?: number;
+  oldPrice?: number;
+  type?: 'product' | 'all';
+}
+
+export interface StoreRecommendation {
+  id: string;
+  name: string;
+  images: string[]; // 3 images for StoreImageStack
+  deliveryTime: string;
+  rideTime?: string; // Optional ride/travel time
+  rating: number;
+  gradient: string;
+  hasAward?: boolean; // Optional award/crown icon
+  products: StoreProduct[];
+  description: string;
+}
+
 export interface Message {
   id: string;
   text: string;
   sender: 'user' | 'assistant';
   timestamp: Date;
   isLoading?: boolean;
+  type?: 'text' | 'store_recommendations';
+  stores?: StoreRecommendation[];
 }
 
 export interface ChatSlice {

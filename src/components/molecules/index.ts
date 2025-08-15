@@ -15,13 +15,17 @@ export { SecondaryLine } from './SecondaryLine';
 
 // UI Molecules
 export { AddToCartButton } from './AddToCartButton';
+export { AssistantMessage } from './AssistantMessage';
 export { CartNavbar } from './CartNavbar';
 export { ChatInput } from './ChatInput';
 export { FriendAvatars } from './FriendAvatars';
+export { ProductCard } from './ProductCard';
+export { ProductsCarousel } from './ProductsCarousel';
 export { QuickAction } from './QuickAction';
 export { RecommendationCard } from './RecommendationCard';
 export { SearchInput } from './SearchInput';
 export { SearchResultItem, type SearchResultItemProps } from './SearchResultItem';
+export { StoreHeader } from './StoreHeader';
 export { StoryItem } from './StoryItem';
 export { SuggestRow, SuggestType, type SuggestRowProps } from './SuggestRow';
 export { ZMKBlock } from './ZMKBlock';

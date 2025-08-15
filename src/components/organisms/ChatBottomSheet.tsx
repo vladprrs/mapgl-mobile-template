@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Sheet, SheetRef } from 'react-modal-sheet';
 import { ChatInput } from '@/components/molecules/ChatInput';
+import { AssistantMessage } from '@/components/molecules/AssistantMessage';
 import { tokens } from '@/lib/ui/tokens';
 import useStore from '@/stores';
+import { getStoreRecommendationsForQuery, getAssistantResponseText } from '@/__mocks__/chat/storeRecommendations';
 
 interface ChatBottomSheetProps {
   isOpen: boolean;
@@ -33,9 +35,40 @@ export function ChatBottomSheet({ isOpen, onClose, onBack }: ChatBottomSheetProp
   const messages = useStore((state) => state.chat.messages);
   const isTyping = useStore((state) => state.chat.isTyping);
   const sendMessage = useStore((state) => state.chat.sendMessage);
+  const addMessage = useStore((state) => state.chat.addMessage);
+  
+  // Auto-respond with store recommendations when user sends search query
+  useEffect(() => {
+    if (messages.length === 1 && messages[0].sender === 'user') {
+      const userQuery = messages[0].text;
+      
+      // Simulate AI thinking delay
+      setTimeout(() => {
+        const responseText = getAssistantResponseText(userQuery);
+        const storeRecommendations = getStoreRecommendationsForQuery(userQuery);
+        
+        addMessage({
+          text: responseText,
+          sender: 'assistant',
+          type: 'store_recommendations',
+          stores: storeRecommendations,
+        });
+      }, 1000);
+    }
+  }, [messages, addMessage]);
 
   const handleSendMessage = (message: string) => {
     sendMessage(message);
+  };
+
+  const handleProductClick = (productId: string, storeId: string) => {
+    console.log('Product clicked:', { productId, storeId });
+    // TODO: Add product to cart or show product details
+  };
+
+  const handleOrderClick = (storeId: string) => {
+    console.log('Order clicked for store:', storeId);
+    // TODO: Navigate to store or open order flow
   };
 
   const handleClose = () => {
@@ -206,17 +239,13 @@ export function ChatBottomSheet({ isOpen, onClose, onBack }: ChatBottomSheetProp
                   // Show real messages
                   messages.map((message) => (
                     <div key={message.id} className="flex flex-col gap-2">
-                      {message.text ? (
-                        // Real message with text
+                      {message.sender === 'user' ? (
+                        // User message - right aligned
                         <div 
-                          className={`rounded-2xl p-4 max-w-[80%] ${
-                            message.sender === 'user' 
-                              ? 'ml-auto bg-blue-500 text-white' 
-                              : 'mr-auto'
-                          }`}
+                          className="rounded-2xl p-4 max-w-[80%] ml-auto"
                           style={{
-                            backgroundColor: message.sender === 'user' ? '#007AFF' : '#C1E4FF',
-                            color: message.sender === 'user' ? '#FFFFFF' : tokens.colors.text.primary,
+                            backgroundColor: '#007AFF',
+                            color: '#FFFFFF',
                           }}
                         >
                           <p 
@@ -229,14 +258,33 @@ export function ChatBottomSheet({ isOpen, onClose, onBack }: ChatBottomSheetProp
                             {message.text}
                           </p>
                         </div>
+                      ) : message.type === 'store_recommendations' && message.stores ? (
+                        // Assistant message with store recommendations
+                        <AssistantMessage
+                          text={message.text}
+                          stores={message.stores}
+                          onProductClick={handleProductClick}
+                          onOrderClick={handleOrderClick}
+                        />
                       ) : (
-                        // Placeholder blue card for empty messages
+                        // Regular assistant message
                         <div 
-                          className="h-[83px] rounded-2xl w-full"
+                          className="rounded-2xl p-4 max-w-[80%] mr-auto"
                           style={{
                             backgroundColor: '#C1E4FF',
+                            color: tokens.colors.text.primary,
                           }}
-                        />
+                        >
+                          <p 
+                            style={{
+                              fontFamily: 'SB Sans Text, sans-serif',
+                              fontSize: '15px',
+                              lineHeight: '20px',
+                            }}
+                          >
+                            {message.text}
+                          </p>
+                        </div>
                       )}
                     </div>
                   ))

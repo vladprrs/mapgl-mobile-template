@@ -10,7 +10,7 @@ import type { AppStore, ChatSlice, Message } from '../types';
  * - Typing indicators
  * - Message sending functionality
  */
-export const createChatSlice: StateCreator<AppStore, [], [], ChatSlice> = (set, get) => ({
+export const createChatSlice: StateCreator<AppStore, [], [], ChatSlice> = (set) => ({
   // Initial state
   isChatOpen: false,
   messages: [],
@@ -33,13 +33,13 @@ export const createChatSlice: StateCreator<AppStore, [], [], ChatSlice> = (set, 
       chat: {
         ...state.chat,
         isChatOpen: false,
+        messages: [], // Clear messages when closing
+        isTyping: false, // Reset typing state
       }
     }));
   },
 
   sendMessage: (text: string) => {
-    const { chat } = get();
-    
     // Add user message
     const userMessage: Message = {
       id: `user-${Date.now()}`,

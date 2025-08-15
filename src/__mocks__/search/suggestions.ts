@@ -144,20 +144,7 @@ function getChains(organizations: typeof allOrganizations) {
 export const generateSuggestions = (): SearchSuggestion[] => {
   const suggestions: SearchSuggestion[] = [];
   
-  // 1. Organization names as suggestions
-  allOrganizations.forEach(org => {
-    suggestions.push({
-      id: `org-${org.id}`,
-      type: 'organization',
-      text: org.name,
-      subtitle: org.address,
-      category: org.category,
-      organizationId: org.id,
-      coordinates: org.coordinates
-    });
-  });
-  
-  // 2. Category suggestions (unique categories)
+  // 1. Category suggestions (unique categories) - FIRST PRIORITY
   const categories = [...new Set(allOrganizations.map(o => o.category))];
   categories.forEach(cat => {
     const count = countInCategory(cat);
@@ -171,27 +158,9 @@ export const generateSuggestions = (): SearchSuggestion[] => {
     });
   });
   
-  // 3. Chain/brand suggestions (for chains with multiple branches)
-  const chains = getChains(allOrganizations);
-  chains.forEach(chain => {
-    // Get the category from the first organization in the chain
-    const firstOrg = allOrganizations.find(org => org.id === chain.ids[0]);
-    const category = firstOrg?.category || '';
-    
-    suggestions.push({
-      id: `chain-${chain.name.replace(/\s+/g, '-').toLowerCase()}`,
-      type: 'chain',
-      text: chain.name,
-      subtitle: `Сеть, ${chain.count} ${chain.count < 5 ? 'филиала' : 'филиалов'}`,
-      category,
-      organizationIds: chain.ids,
-      count: chain.count
-    });
-  });
-  
-  // 4. Product suggestions (popular products from aliases)
+  // 2. Product suggestions (popular products from aliases) - SECOND PRIORITY
   const popularProducts = [
-    'молоко', 'хлеб', 'мясо', 'телевизор', 'холодильник', 'перфоратор', 
+    'молоко', 'хлеб', 'мясо', 'телевизор', 'холодильник', 'перфоратор', 'дрель',
     'врач', 'стрижка', 'маникюр', 'шиномонтаж', 'пицца', 'кофе'
   ];
   
@@ -222,6 +191,37 @@ export const generateSuggestions = (): SearchSuggestion[] => {
     }
   });
   
+  // 3. Chain/brand suggestions (for chains with multiple branches) - THIRD PRIORITY
+  const chains = getChains(allOrganizations);
+  chains.forEach(chain => {
+    // Get the category from the first organization in the chain
+    const firstOrg = allOrganizations.find(org => org.id === chain.ids[0]);
+    const category = firstOrg?.category || '';
+    
+    suggestions.push({
+      id: `chain-${chain.name.replace(/\s+/g, '-').toLowerCase()}`,
+      type: 'chain',
+      text: chain.name,
+      subtitle: `Сеть, ${chain.count} ${chain.count < 5 ? 'филиала' : 'филиалов'}`,
+      category,
+      organizationIds: chain.ids,
+      count: chain.count
+    });
+  });
+  
+  // 4. Organization names as suggestions - LOWEST PRIORITY
+  allOrganizations.forEach(org => {
+    suggestions.push({
+      id: `org-${org.id}`,
+      type: 'organization',
+      text: org.name,
+      subtitle: org.address,
+      category: org.category,
+      organizationId: org.id,
+      coordinates: org.coordinates
+    });
+  });
+  
   return suggestions;
 };
 
@@ -248,7 +248,7 @@ export const getSuggestions = (query: string): SearchSuggestion[] => {
     'покупки': ['магазин', 'супермаркет', 'торговый']
   };
   
-  return allSuggestions.filter(suggestion => {
+  const filteredSuggestions = allSuggestions.filter(suggestion => {
     // Direct text match
     if (suggestion.text.toLowerCase().includes(lowerQuery)) {
       return true;
@@ -314,7 +314,20 @@ export const getSuggestions = (query: string): SearchSuggestion[] => {
     }
     
     return false;
-  }).slice(0, 10); // Limit to top 10 suggestions
+  });
+
+  // Sort filtered suggestions by priority: categories > products > chains > organizations
+  const priority = {
+    'category': 1,
+    'product': 2,
+    'chain': 3,
+    'organization': 4,
+    'history': 0 // History suggestions should appear first
+  };
+
+  return filteredSuggestions
+    .sort((a, b) => (priority[a.type] || 5) - (priority[b.type] || 5))
+    .slice(0, 10); // Limit to top 10 suggestions
 };
 
 // Default suggestions for empty search
