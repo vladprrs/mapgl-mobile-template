@@ -16,6 +16,10 @@ export const ICONS = {
   BOOKMARK: 'bookmark',
   LOCATION: 'location',
   
+  // Suggestion Icons
+  CHAIN: 'chain',
+  CATEGORY: 'category',
+  
   // Traffic Icons (to be added)
   TRAFFIC_HEAVY: 'traffic-heavy',
   TRAFFIC_MODERATE: 'traffic-moderate',

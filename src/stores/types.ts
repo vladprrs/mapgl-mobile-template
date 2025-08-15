@@ -21,8 +21,11 @@ export interface SearchSuggestion {
   id: string;
   title: string;
   subtitle?: string;
-  type: 'place' | 'category' | 'history';
+  type: 'place' | 'category' | 'history' | 'organization' | 'chain' | 'product';
   coords?: [number, number];
+  organizationId?: string;
+  organizationIds?: string[];
+  category?: string;
 }
 
 export interface Filter {
@@ -48,10 +51,23 @@ export interface SearchResult {
   id: string;
   name: string;
   category: string;
+  type?: 'regular' | 'advertiser' | 'organization' | 'address'; // Support both old and new type systems
   address: string;
+  coordinates?: [number, number];
+  metro?: {
+    station: string;
+    line: string;
+    distance: string;
+    color: string;
+  };
   distance?: string;
   rating?: number;
   reviewCount?: number;
+  workHours?: {
+    status: 'open' | 'closing_soon' | 'closed';
+    text: string;
+    schedule: string[];
+  };
   closingStatus?: {
     text: string;
     isWarning: boolean;
@@ -64,18 +80,43 @@ export interface SearchResult {
   zmkData?: {
     products: ZMKProduct[];
   };
+  // Products for checkout/cart functionality
+  products?: {
+    id: string;
+    image: string;
+    title: string;
+    weight?: string;
+    price: number;
+    oldPrice?: number;
+  }[];
   coords?: [number, number];
-  // Result type to distinguish between organizations and addresses
-  type?: 'organization' | 'address';
-  // Future extensibility fields
-  hasLogo?: boolean;
-  hasPhotos?: boolean;
+  // Contact information fields for ContactInfo molecule
+  phone?: string;
+  messengers?: {
+    telegram?: string;
+    whatsapp?: string;
+    viber?: string;
+  };
+  website?: string;
+  socialMedia?: {
+    vk?: string;
+    instagram?: string;
+    youtube?: string;
+    twitter?: string;
+    facebook?: string;
+    google?: string;
+  };
+  // Advertiser fields
   isAdvertiser?: boolean;
-  friendsReviews?: number;
   logo?: string;
   gallery?: string[];
   promotionalText?: string;
   buttonLabel?: string;
+  adContent?: {
+    text: string;
+    disclaimer: string;
+    logo?: string;
+  };
 }
 
 export interface MapSlice {
@@ -96,6 +137,14 @@ export interface MapSlice {
   destroyMap: () => void;
 }
 
+export interface SearchContext {
+  type: 'product_search' | 'category_search' | 'regular_search';
+  query: string;
+  categories?: string[];
+  message?: string;
+  originalQuery?: string;
+}
+
 export interface SearchSlice {
   query: string;
   suggestions: SearchSuggestion[];
@@ -106,6 +155,7 @@ export interface SearchSlice {
   isSearching: boolean;
   activeFilters: string[];
   availableFilters: Filter[];
+  searchContext: SearchContext | null;
   
   setQuery: (query: string) => void;
   search: (query: string) => Promise<void>;
@@ -119,6 +169,7 @@ export interface SearchSlice {
   clearFilters: () => void;
   setAvailableFilters: (filters: Filter[]) => void;
   applyFilters: () => void;
+  setSearchContext: (context: SearchContext | null) => void;
 }
 
 export interface UISlice {
@@ -148,9 +199,77 @@ export interface OrganizationSlice {
   activeTab: string;
   
   setCurrentOrganization: (organization: SearchResult) => void;
+  loadOrganizationById: (id: string) => Promise<void>;
   clearCurrentOrganization: () => void;
   setLoading: (loading: boolean) => void;
   setActiveTab: (tabId: string) => void;
+}
+
+export interface CartItem {
+  productId: string;
+  quantity: number;
+  price: number;
+  oldPrice?: number;
+  title: string;
+  image: string;
+  weight?: string;
+}
+
+export interface CartSlice {
+  cart: {
+    items: globalThis.Map<string, CartItem>;
+    total: number;
+    count: number;
+  };
+  addToCart: (product: Omit<CartItem, 'quantity'>) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+}
+
+export interface StoreProduct {
+  id: string;
+  image?: string;
+  image2?: string; // For "all products" variant with stacked images
+  title: string;
+  price?: number;
+  oldPrice?: number;
+  type?: 'product' | 'all';
+}
+
+export interface StoreRecommendation {
+  id: string;
+  name: string;
+  images: string[]; // 3 images for StoreImageStack
+  deliveryTime: string;
+  rideTime?: string; // Optional ride/travel time
+  rating: number;
+  gradient: string;
+  hasAward?: boolean; // Optional award/crown icon
+  products: StoreProduct[];
+  description: string;
+}
+
+export interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'assistant';
+  timestamp: Date;
+  isLoading?: boolean;
+  type?: 'text' | 'store_recommendations';
+  stores?: StoreRecommendation[];
+}
+
+export interface ChatSlice {
+  isChatOpen: boolean;
+  messages: Message[];
+  isTyping: boolean;
+  
+  openChat: () => void;
+  closeChat: () => void;
+  sendMessage: (text: string) => void;
+  addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void;
+  setTyping: (typing: boolean) => void;
+  clearMessages: () => void;
 }
 
 export interface CrossSliceActions {
@@ -163,6 +282,8 @@ export interface CrossSliceActions {
   blurSearchBar: () => void;
   clearAllState: () => void;
   toggleFilter: (filterId: string) => void;
+  openChat: () => void;
+  closeChat: () => void;
 }
 
 export interface AppStore {
@@ -170,5 +291,7 @@ export interface AppStore {
   search: SearchSlice;
   ui: UISlice;
   organization: OrganizationSlice;
+  cart: CartSlice;
+  chat: ChatSlice;
   actions: CrossSliceActions;
 }

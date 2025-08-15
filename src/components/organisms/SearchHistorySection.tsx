@@ -1,49 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SearchHistoryItem } from '@/components/molecules/SearchHistoryItem';
 import useStore from '@/stores';
 import { useActions } from '@/stores';
 import { tokens } from '@/lib/ui/tokens';
 
-interface DefaultSearchItem {
+interface HistoryItem {
   id: string;
-  query: string;
-  timestamp: number;
-  type: 'service' | 'address' | 'nearby';
+  title: string;
+  subtitle?: string;
+  isDefault?: boolean; // Track if it's a default suggestion
 }
 
-// Default search history items for new users
-const defaultSearchHistory: DefaultSearchItem[] = [
-  {
-    id: 'default-1',
-    query: 'Маникюр',
-    timestamp: Date.now() - 86400000, // 1 day ago
-    type: 'service'
+// Default suggestions (always present) - persistent suggestions that appear below user history
+const defaultSuggestions: HistoryItem[] = [
+  { 
+    id: 'def-1', 
+    title: 'Маникюр', 
+    subtitle: 'Услуги',
+    isDefault: true
   },
-  {
-    id: 'default-2',
-    query: 'Фитнес',
-    timestamp: Date.now() - 172800000, // 2 days ago
-    type: 'service'
+  { 
+    id: 'def-2', 
+    title: 'Фитнес залы', 
+    subtitle: 'Спорт и отдых',
+    isDefault: true
   },
-  {
-    id: 'default-3',
-    query: 'Москва Ленина 11',
-    timestamp: Date.now() - 259200000, // 3 days ago
-    type: 'address'
-  },
-  {
-    id: 'default-4',
-    query: 'Кафе рядом',
-    timestamp: Date.now() - 345600000, // 4 days ago
-    type: 'nearby'
-  },
-  {
-    id: 'default-5',
-    query: 'Аптека 24 часа',
-    timestamp: Date.now() - 432000000, // 5 days ago
-    type: 'service'
+  { 
+    id: 'def-3', 
+    title: 'Ленина 11', 
+    subtitle: 'Адрес',
+    isDefault: true
   }
 ];
 
@@ -57,25 +45,52 @@ interface SearchHistorySectionProps {
  * Complete search history section for empty search state
  * 
  * Design specs from Figma node 286-221965:
- * - Section header "История твоих запросов" or "Попробуй найти"
- * - List of recent search history items or default suggestions
- * - Shows default items for new users, real history for returning users
- * - White background container with rounded corners
- * - Proper spacing between recommendations and history sections
+ * - Combines user history + persistent default suggestions
+ * - User history appears first, default suggestions below (never disappear)
+ * - First visible item shows clock icon (green #1BA136), others show search icon  
+ * - Shows max 3 items initially, rest behind "Смотреть еще" button
+ * - Green "Смотреть еще" button expands/collapses full list
+ * - Default suggestions: "Маникюр", "Фитнес залы", "Ленина 11"
  */
 export function SearchHistorySection({ className = '', showHeader = true }: SearchHistorySectionProps) {
   const userHistory = useStore((state) => state.search.history);
   const actions = useActions();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleHistoryClick = (query: string) => {
     // Use cross-slice action to perform search and navigate
     actions.performSearch(query);
   };
 
-  // Determine what to show based on user history
-  const hasUserHistory = userHistory.length > 0;
+  const handleShowMore = () => {
+    setIsExpanded(!isExpanded);
+  };
 
-  // Always render section (either with real history or default items)
+  // Combine user history with default suggestions
+  const hasUserHistory = userHistory.length > 0;
+  
+  // Convert user history to HistoryItem format
+  const userHistoryItems: HistoryItem[] = userHistory.map((query, index) => ({
+    id: `user-${index}`,
+    title: query,
+    subtitle: undefined,
+    isDefault: false
+  }));
+
+  // Always combine user history + default suggestions (defaults never disappear)
+  const allHistoryItems = [...userHistoryItems, ...defaultSuggestions];
+  
+  // First visible item gets clock icon (regardless if it's user history or default)
+  const historyItemsWithIcon = allHistoryItems.map((item, index) => ({
+    ...item,
+    showIcon: index === 0 // Only first item gets clock icon
+  }));
+
+  // Show only first 3 items initially, all when expanded
+  const visibleItems = isExpanded ? historyItemsWithIcon : historyItemsWithIcon.slice(0, 3);
+  const hasMoreItems = historyItemsWithIcon.length > 3;
+
+  // Section title based on whether user has history
   const sectionTitle = hasUserHistory ? 'История твоих запросов' : 'Попробуй найти';
 
   return (
@@ -109,22 +124,34 @@ export function SearchHistorySection({ className = '', showHeader = true }: Sear
       >
         {/* History items container */}
         <div className="flex flex-col items-start justify-start overflow-clip relative w-full">
-          {hasUserHistory 
-            ? userHistory.slice(0, 8).map((query, index) => (
-                <SearchHistoryItem
-                  key={`user-${query}-${index}`}
-                  searchText={query}
-                  onClick={() => handleHistoryClick(query)}
-                />
-              ))
-            : defaultSearchHistory.map((item) => (
-                <SearchHistoryItem
-                  key={item.id}
-                  searchText={item.query}
-                  onClick={() => handleHistoryClick(item.query)}
-                />
-              ))
-          }
+          {visibleItems.map((item) => (
+            <SearchHistoryItem
+              key={item.id}
+              searchText={item.title}
+              subtitle={item.subtitle}
+              showIcon={item.showIcon}
+              onClick={() => handleHistoryClick(item.title)}
+            />
+          ))}
+          
+          {/* Show more button */}
+          {hasMoreItems && (
+            <button
+              onClick={handleShowMore}
+              className="w-full flex flex-row items-center justify-center py-3 px-4 transition-colors hover:bg-gray-50 active:bg-gray-100"
+            >
+              <span
+                style={{
+                  fontSize: '16px',
+                  fontWeight: tokens.typography.fontWeight.medium,
+                  color: '#1BA136',
+                  lineHeight: '20px',
+                }}
+              >
+                {isExpanded ? 'Скрыть' : 'Смотреть еще'}
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,66 +1,87 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SuggestRow } from '@/components/molecules';
 import { RecommendationsSection, SearchHistorySection, CityHighlightsSection } from '@/components/organisms';
 import useStore from '@/stores';
+import { getSuggestions, getDefaultSuggestions, type SearchSuggestion } from '@/__mocks__/search/suggestions';
 
 interface SearchSuggestionsProps {
-  onSelectSuggestion: (suggestion: string) => void;
   className?: string;
 }
-
-// Import mock data from centralized location
-import { 
-  mockSavedAddresses,
-  mockOrganizations, 
-  mockCategories 
-} from '@/__mocks__/search/suggestions';
 
 // Re-export types for convenience
 export type { 
   SavedAddressSuggestion,
   OrganizationSuggestion,
-  CategorySuggestion,
-  SearchSuggestion
+  CategorySuggestion
 } from '@/__mocks__/search/suggestions';
 
-// Use imported mock data
-const mockSuggestions = {
-  savedAddresses: mockSavedAddresses,
-  organizations: mockOrganizations,
-  categories: mockCategories,
-};
-
 export function SearchSuggestionsPage({ 
-  onSelectSuggestion,
   className = '' 
 }: SearchSuggestionsProps) {
   // Get query from Zustand store instead of props
   const query = useStore((state) => state.search.query);
-  // Filter suggestions based on query
-  const getSuggestions = () => {
-    if (!query) {
-      // Show saved addresses when no query
-      return mockSuggestions.savedAddresses;
+  const searchHistory = useStore((state) => state.search.history);
+  const search = useStore((state) => state.search);
+  
+  // State for instant suggestions with debounce
+  const [instantSuggestions, setInstantSuggestions] = useState<SearchSuggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Debounced suggestions effect
+  useEffect(() => {
+    if (!query.trim()) {
+      // For empty query, show default suggestions immediately
+      const defaultSuggestions = getDefaultSuggestions();
+      setInstantSuggestions(defaultSuggestions);
+      setIsLoading(false);
+      return;
     }
     
-    // Filter and combine all suggestion types
-    const allSuggestions = [
-      ...mockSuggestions.savedAddresses.filter(s => 
-        s.title.toLowerCase().includes(query.toLowerCase()) ||
-        s.subtitle?.toLowerCase().includes(query.toLowerCase())
-      ),
-      ...mockSuggestions.organizations.filter(s =>
-        s.title.toLowerCase().includes(query.toLowerCase()) ||
-        s.subtitle?.toLowerCase().includes(query.toLowerCase())
-      ),
-      ...mockSuggestions.categories.filter(s =>
-        s.title.toLowerCase().includes(query.toLowerCase())
-      ),
-    ];
+    setIsLoading(true);
     
-    return allSuggestions.length > 0 ? allSuggestions : mockSuggestions.categories;
+    // Debounce: 150ms delay for better UX
+    const timer = setTimeout(() => {
+      const suggestions = getSuggestions(query);
+      
+      // Add history suggestions if they match
+      const historySuggestions: SearchSuggestion[] = searchHistory
+        .filter(item => item.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 3) // Limit history suggestions
+        .map((item, index) => ({
+          id: `history-${index}`,
+          type: 'history' as const,
+          text: item,
+          subtitle: 'Из истории поиска',
+          category: '',
+        }));
+      
+      // Combine history and smart suggestions, limit to 10 total
+      const combinedSuggestions = [...historySuggestions, ...suggestions].slice(0, 10);
+      setInstantSuggestions(combinedSuggestions);
+      setIsLoading(false);
+    }, 150);
+    
+    return () => clearTimeout(timer);
+  }, [query, searchHistory]);
+  
+  // Handle smart suggestion selection
+  const handleSuggestionClick = (suggestion: SearchSuggestion) => {
+    // Convert our new suggestion format to the store's expected format
+    const storeSuggestion = {
+      id: suggestion.id,
+      title: suggestion.text,
+      subtitle: suggestion.subtitle,
+      type: suggestion.type as 'place' | 'category' | 'history' | 'organization' | 'chain',
+      coords: 'coordinates' in suggestion ? suggestion.coordinates : undefined,
+      organizationId: 'organizationId' in suggestion ? suggestion.organizationId : undefined,
+      organizationIds: 'organizationIds' in suggestion ? suggestion.organizationIds : undefined,
+      category: suggestion.category
+    };
+    
+    // Use the store's smart selection logic
+    search.selectSuggestion(storeSuggestion);
   };
 
   // Conditional rendering based on query length
@@ -87,33 +108,45 @@ export function SearchSuggestionsPage({
     );
   }
 
-  // Search state: Show suggestions (current implementation)
-  const suggestions = getSuggestions();
-
+  // Search state: Show smart suggestions with loading state
   return (
     <div className={`flex flex-col bg-white ${className}`}>
+      {/* Loading state */}
+      {isLoading && (
+        <div className="px-4 py-3 text-center">
+          <p className="text-sm text-[#898989]">Поиск...</p>
+        </div>
+      )}
+      
       {/* Suggestion list */}
-      <div className="flex flex-col">
-        {suggestions.map((suggestion, index) => (
-          <SuggestRow
-            key={index}
-            type={suggestion.type}
-            title={suggestion.title}
-            subtitle={'subtitle' in suggestion ? suggestion.subtitle : undefined}
-            distance={'distance' in suggestion ? suggestion.distance : undefined}
-            branchCount={'branchCount' in suggestion ? suggestion.branchCount : undefined}
-            highlightedText={'highlightedText' in suggestion ? suggestion.highlightedText : undefined}
-            icon={'icon' in suggestion ? suggestion.icon : undefined}
-            onClick={() => onSelectSuggestion(suggestion.title)}
-          />
-        ))}
-      </div>
+      {!isLoading && (
+        <div className="flex flex-col">
+          {instantSuggestions.map((suggestion) => (
+            <SuggestRow
+              key={suggestion.id}
+              type={suggestion.type}
+              title={suggestion.text}
+              subtitle={suggestion.subtitle}
+              onClick={() => handleSuggestionClick(suggestion)}
+            />
+          ))}
+        </div>
+      )}
       
       {/* Show more suggestions hint */}
-      {query && suggestions.length > 0 && (
+      {query && !isLoading && instantSuggestions.length > 0 && (
         <div className="px-4 py-3 border-t border-[rgba(137,137,137,0.3)]">
           <p className="text-sm text-[#898989]">
-            Показано {suggestions.length} из {suggestions.length + 10} результатов
+            Показано {instantSuggestions.length} результатов
+          </p>
+        </div>
+      )}
+      
+      {/* No results state */}
+      {query && !isLoading && instantSuggestions.length === 0 && (
+        <div className="px-4 py-8 text-center">
+          <p className="text-sm text-[#898989]">
+            Ничего не найдено по запросу &ldquo;{query}&rdquo;
           </p>
         </div>
       )}

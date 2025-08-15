@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { FriendAvatars } from '@/components/molecules';
-import { Button, Icon } from '@/components/atoms';
+import { FriendAvatars, OrganizationTabs, type TabItem } from '@/components/molecules';
+import { Button, Icon, RatingStars } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
 import useStore from '@/stores';
 
@@ -10,6 +10,9 @@ interface OrganizationHeaderProps {
   isCollapsed?: boolean;
   onClose?: () => void;
   className?: string;
+  tabs?: TabItem[];
+  activeTab?: string;
+  onTabChange?: (tabId: string) => void;
 }
 
 /**
@@ -24,7 +27,10 @@ interface OrganizationHeaderProps {
 export function OrganizationHeader({
   isCollapsed = false,
   onClose,
-  className = ''
+  className = '',
+  tabs = [],
+  activeTab = 'overview',
+  onTabChange
 }: OrganizationHeaderProps) {
   const organization = useStore((state) => state.organization.currentOrganization);
 
@@ -50,7 +56,8 @@ export function OrganizationHeader({
     rating,
     reviewCount,
     friendsVisited,
-    closingStatus
+    closingStatus,
+    isAdvertiser
   } = organization;
 
   if (isCollapsed) {
@@ -64,15 +71,6 @@ export function OrganizationHeader({
           paddingBottom: tokens.spacing[3], // 12px
         }}
       >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-1.5 pb-1.5">
-          <div 
-            className="w-10 h-1 rounded-md" 
-            style={{
-              backgroundColor: 'rgba(137, 137, 137, 0.25)',
-            }}
-          />
-        </div>
 
         {/* Nav bar */}
         <div className="flex flex-row gap-3 items-center px-4">
@@ -114,19 +112,10 @@ export function OrganizationHeader({
     <div 
       className={`bg-white rounded-t-[16px] ${className}`}
       style={{
-        paddingTop: 0,
+        paddingTop: '6px', // 6px - equivalent to pt-1.5 for drag handle space
         paddingBottom: 0,
       }}
     >
-      {/* Drag handle */}
-      <div className="flex justify-center pt-1.5 pb-1.5">
-        <div 
-          className="w-10 h-1 rounded-md" 
-          style={{
-            backgroundColor: 'rgba(20, 20, 20, 0.09)',
-          }}
-        />
-      </div>
 
       {/* Main content */}
       <div 
@@ -191,7 +180,7 @@ export function OrganizationHeader({
                 {/* Title */}
                 <div className="flex flex-row items-start justify-start">
                   <div 
-                    className="flex flex-row items-start justify-start"
+                    className="flex flex-row items-center gap-2"
                     style={{
                       paddingBottom: '1px',
                       paddingTop: '7px',
@@ -209,6 +198,37 @@ export function OrganizationHeader({
                     >
                       {name}
                     </h1>
+                    
+                    {/* Crown badge for advertisers */}
+                    {isAdvertiser && (
+                      <div 
+                        className="flex-shrink-0"
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                        }}
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M2.5 5.5L4 10h8l1.5-4.5L11 7l-3-1.5L5 7L2.5 5.5z"
+                            fill="#FFD700"
+                          />
+                          <path
+                            d="M4 10h8v1.5c0 0.276-0.224 0.5-0.5 0.5h-7c-0.276 0-0.5-0.224-0.5-0.5V10z"
+                            fill="#FFA500"
+                          />
+                          <circle cx="5" cy="4" r="0.5" fill="#FFD700" />
+                          <circle cx="8" cy="3" r="0.5" fill="#FFD700" />
+                          <circle cx="11" cy="4" r="0.5" fill="#FFD700" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -271,114 +291,35 @@ export function OrganizationHeader({
             >
               {rating && (
                 <div 
-                  className="flex-1 flex flex-row gap-1 items-center justify-start"
+                  className="flex-1 flex flex-row items-center justify-start"
                 >
-                  {/* Stars */}
-                  <div className="flex flex-row items-start justify-start">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <div 
-                        key={star}
-                        className="relative"
-                        style={{
-                          width: tokens.spacing[4], // 16px
-                          height: tokens.spacing[4], // 16px
-                        }}
-                      >
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            left: 0,
-                            top: 0,
-                            width: tokens.spacing[4], // 16px
-                            height: tokens.spacing[4], // 16px
-                          }}
-                        />
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            backgroundColor: star <= Math.floor(rating) ? '#efa701' : 'rgba(20,20,20,0.09)',
-                            bottom: 0,
-                            left: 0,
-                            right: '50%',
-                            top: 0,
-                          }}
-                        />
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            backgroundColor: star <= Math.floor(rating) ? '#efa701' : 'rgba(20,20,20,0.09)',
-                            bottom: 0,
-                            left: '50%',
-                            right: 0,
-                            top: 0,
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Rating text */}
-                  <div 
-                    className="flex-1 flex flex-row gap-1.5 items-start justify-start"
-                  >
-                    <div 
-                      className="flex flex-row items-start justify-start"
-                      style={{
-                        paddingTop: '1px',
-                        paddingBottom: '1px',
-                      }}
-                    >
-                      <p
-                        className="font-medium text-left text-nowrap"
-                        style={{
-                          color: tokens.colors.text.primary, // #141414
-                          fontSize: tokens.typography.fontSize.md, // 15px
-                          lineHeight: '20px',
-                          letterSpacing: '-0.3px',
-                          fontFamily: 'SB Sans Text, sans-serif',
-                        }}
-                      >
-                        {rating.toFixed(1)}
-                      </p>
-                    </div>
-                    
-                    {reviewCount && (
-                      <div 
-                        className="flex flex-row items-start justify-start"
-                        style={{
-                          paddingTop: '1px',
-                          paddingBottom: '1px',
-                        }}
-                      >
-                        <p
-                          className="font-normal text-left"
-                          style={{
-                            color: tokens.colors.text.secondary, // #898989
-                            fontSize: tokens.typography.fontSize.md, // 15px
-                            lineHeight: '20px',
-                            letterSpacing: '-0.3px',
-                            fontFamily: 'SB Sans Text, sans-serif',
-                            width: '128px',
-                          }}
-                        >
-                          {reviewCount} оценок
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  <RatingStars
+                    rating={rating}
+                    maxStars={5}
+                    size={16}
+                    showNumber={true}
+                    reviewCount={reviewCount}
+                    theme="Light"
+                  />
                 </div>
               )}
 
-              {/* Travel time placeholder */}
+              {/* Travel time with icon */}
               <div 
                 className="flex flex-row gap-1 items-center justify-start"
               >
-                <div 
-                  style={{
-                    width: tokens.spacing[4], // 16px
-                    height: tokens.spacing[4], // 16px
-                  }}
-                />
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8 2L9.5 6.5H14L10.5 9.5L12 14L8 11L4 14L5.5 9.5L2 6.5H6.5L8 2Z"
+                    fill={tokens.colors.text.secondary}
+                  />
+                </svg>
                 <div 
                   className="flex flex-row items-start justify-start"
                   style={{
@@ -450,7 +391,7 @@ export function OrganizationHeader({
                 <p
                   className="font-medium text-left text-nowrap"
                   style={{
-                    color: closingStatus.isWarning ? '#f5373c' : tokens.colors.text.primary,
+                    color: closingStatus.isWarning ? tokens.colors.traffic.heavy : tokens.colors.text.primary,
                     fontSize: tokens.typography.fontSize.md, // 15px
                     lineHeight: '20px',
                     letterSpacing: '-0.3px',
@@ -462,8 +403,72 @@ export function OrganizationHeader({
               </div>
             </div>
           )}
+
+          {/* AD block for advertisers */}
+          {isAdvertiser && (
+            <div 
+              className="flex flex-row items-center justify-start"
+              style={{
+                width: '100%',
+                paddingTop: tokens.spacing[2], // 8px
+              }}
+            >
+              <div 
+                className="flex flex-row items-center gap-2 px-2 py-1 rounded"
+                style={{
+                  backgroundColor: 'rgba(20, 20, 20, 0.05)',
+                }}
+              >
+                <div 
+                  className="w-4 h-4 rounded bg-primary flex items-center justify-center"
+                  style={{
+                    backgroundColor: tokens.colors.primary.DEFAULT,
+                  }}
+                >
+                  <span 
+                    className="text-white text-xs font-bold"
+                    style={{
+                      fontSize: '10px',
+                      lineHeight: '12px',
+                    }}
+                  >
+                    AD
+                  </span>
+                </div>
+                <p
+                  className="text-xs"
+                  style={{
+                    color: tokens.colors.text.secondary,
+                    fontSize: '11px',
+                    lineHeight: '14px',
+                    fontFamily: 'SB Sans Text, sans-serif',
+                  }}
+                >
+                  Реклама
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Tabs section - integrated into header */}
+      {!isCollapsed && tabs.length > 0 && onTabChange && (
+        <div 
+          className="bg-white border-t"
+          style={{
+            borderTopWidth: '1px',
+            borderTopStyle: 'solid',
+            borderTopColor: 'rgba(137,137,137,0.3)',
+          }}
+        >
+          <OrganizationTabs
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            tabs={tabs}
+          />
+        </div>
+      )}
     </div>
   );
 }

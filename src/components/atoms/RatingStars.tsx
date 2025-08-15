@@ -28,6 +28,9 @@ export function RatingStars({
   const textColor = theme === 'Light' ? tokens.colors.text.primary : tokens.colors.text.inverse;
   const secondaryTextColor = theme === 'Light' ? tokens.colors.text.secondary : tokens.colors.text.tertiary;
 
+  // Create proper star shape using CSS clip-path
+  const starPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+
   return (
     <div className="flex flex-row gap-2 items-start justify-start">
       {/* Stars container */}
@@ -42,30 +45,25 @@ export function RatingStars({
               className="relative shrink-0"
               style={{ width: size, height: size }}
             >
-              {/* Star background container */}
-              <div 
-                className="absolute left-0 top-0"
-                style={{ width: size, height: size }}
-              />
-              
-              {/* Left half of star */}
+              {/* Full star shape with clip-path */}
               <div
-                className="absolute bottom-0 left-0 top-0"
-                style={{ 
-                  right: '50%',
-                  backgroundColor: isFilled || isHalf ? starColor : emptyColor 
+                className="absolute inset-0"
+                style={{
+                  clipPath: starPath,
+                  backgroundColor: isFilled || isHalf ? starColor : emptyColor
                 }}
               />
               
-              {/* Right half of star */}
-              <div
-                className="absolute bottom-0 top-0"
-                style={{ 
-                  left: '50%',
-                  right: 0,
-                  backgroundColor: isFilled ? starColor : emptyColor 
-                }}
-              />
+              {/* Half star overlay for partial ratings */}
+              {isHalf && (
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    clipPath: starPath,
+                    background: `linear-gradient(90deg, ${starColor} 50%, ${emptyColor} 50%)`,
+                  }}
+                />
+              )}
             </div>
           );
         })}

@@ -24,10 +24,10 @@ src/
 ├── app/                       # Next.js app router
 ├── components/
 │   ├── atoms/                # Basic UI elements (Button, Icon, FilterChip, RatingStars)
-│   ├── molecules/            # Combinations of atoms (SearchInput, FriendAvatars, OrganizationTabs)
+│   ├── molecules/            # Combinations of atoms (SearchInput, FriendAvatars, ContactInfo)
 │   ├── organisms/            # Complex components (SearchBar, OrganizationHeader, MastersNearbyCard)
 │   ├── templates/            # Page layouts (MobileMapShell, ScreenRenderer)
-│   └── pages/               # Full pages (DashboardPage, OrganizationPage)
+│   └── pages/               # Full pages (DashboardPage, AddressPage, MasterDetailsPage)
 ├── stores/                   # Zustand state management
 │   ├── index.ts             # Main store with middleware
 │   ├── slices/              # Map, Search, UI, Organization state slices
@@ -35,6 +35,7 @@ src/
 │   │   ├── searchSlice.ts
 │   │   ├── uiSlice.ts
 │   │   ├── organizationSlice.ts
+│   │   ├── cartSlice.ts     # Shopping cart state management
 │   │   └── actions.ts       # Cross-slice actions
 │   ├── selectors/           # Atomic selectors for performance
 │   └── types.ts             # TypeScript interfaces
@@ -148,6 +149,9 @@ Simple combinations of atoms (recently migrated to atomic design):
 - `FriendAvatars` - Overlapping avatar display with pixel-perfect Figma specs (24×24px, 50% overlap)
 - `ZMKBlock` - Purple gradient advertising block for non-advertiser search results
 - `OrganizationTabs` - Horizontal scrollable tabs with counters and gradients
+- `ContactInfo` - Comprehensive contact component with phone, messaging, website, and social media (Figma node-id 322-78232)
+- `AddressCard` - Address display molecule with navigation integration for organization pages
+- `CartNavbar` - Fixed-position checkout overlay with maximum z-index for cart functionality
 
 ### Organisms
 Complex, self-contained components:
@@ -161,6 +165,9 @@ Complex, self-contained components:
 - `SearchResultCard` - Complete search result display with friends integration and ZMK advertising
 - `OrganizationHeader` - Organization page header with expanded/collapsed states
 - `MastersNearbyCard` - Service professionals with ratings and galleries
+- `ProductsCarousel` - Horizontal scrollable product display with cart integration
+- `ProductCard` - Individual product display with add to cart functionality
+- `CheckoutItemCard` - Cart/checkout item display with quantity controls (Figma node-id 337-225744)
 
 ### Templates
 Page layouts and navigation:
@@ -173,6 +180,9 @@ Complete screen implementations:
 - `SearchResultsPage` - Search results display
 - `SearchSuggestionsPage` - Search suggestions with empty search state (recommendations, history, city highlights)
 - `OrganizationPage` - Complete organization details with tabs navigation
+- `AddressPage` - Address/building details with simplified tabs (Обзор, Мастера)
+- `MasterDetailsPage` - Service professional profiles with reviews and ContactInfo
+- `MastersListPage` - Complete masters list with navigation from search results
 
 ## 🏪 State Management
 
@@ -190,6 +200,7 @@ const actions = useActions();
 - **Search Slice**: Query, suggestions, results, history with debounced search
 - **UI Slice**: Navigation, bottom sheet, screen state with optimized updates
 - **Organization Slice**: Organization details, tab navigation, loading states
+- **Cart Slice**: Shopping cart items, totals, quantity management with persistence
 - **Cross-Slice Actions**: Coordinated workflows like `performSearch()`, `selectOrganization()`
 
 ### Performance Features
@@ -206,12 +217,18 @@ const actions = useActions();
 - **Search Results with Social Features** - Friends visited indicators with overlapping avatars
 - **Empty Search State** - Complete UX with recommendations, history, and city highlights
 - **Organization Details** - Complete organization pages with tabs navigation and content sections
-- **Service Professionals** - MastersNearbyCard with ratings, galleries, and contact information
+- **Service Professionals** - MastersNearbyCard with ratings, galleries, and comprehensive contact functionality
+- **Contact Integration** - ContactInfo component with phone calls, messaging, websites, and social media  
+- **Address Navigation** - AddressCard component with one-tap navigation to organization locations
 - **Advice Cards System** - Masonry grid with MetaItem, Cover, Interesting, RD components
 - **Atomic Design Architecture** - Recently migrated to strict component hierarchy
 - **Design Tokens** - Centralized styling system with no hardcoded values
+- **Shopping Cart System** - Global cart state with persistent storage and checkout flow
+- **Cart Components** - CheckoutItemCard with quantity controls and price calculations
+- **Overlay Navigation** - CartNavbar with maximum z-index positioning over all UI elements
 - **Figma Integration** - Direct asset extraction using Figma Dev Mode for pixel-perfect implementation
-- **Playwright Debugging** - Advanced debugging patterns for React component visibility issues
+- **Playwright Debugging** - Advanced debugging patterns for React component visibility and data flow issues
+- **ContactInfo Verification** - Comprehensive Playwright-assisted debugging and testing infrastructure
 - **Responsive Design** - Mobile-first with safe area support
 - **State Management** - Zustand with atomic selectors and cross-slice actions
 - **Performance Optimized** - Minimal re-renders, 8KB state management overhead

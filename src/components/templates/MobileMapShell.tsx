@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { BottomSheet, BottomSheetRef, SearchBar, SearchFilters } from '@/components/organisms';
+import { BottomSheet, BottomSheetRef, SearchBar, SearchFilters, ChatBottomSheet } from '@/components/organisms';
+import { CartNavbar } from '@/components/molecules';
 import { ScreenRenderer } from '@/components/templates';
+import { CartSheetPage } from '@/components/pages/CartSheetPage';
 import { ScreenType } from '@/components/templates/types';
 import { debugLog } from '@/lib/logging';
 // tokens import removed - not used
@@ -29,6 +31,8 @@ export function MobileMapShell({
   const search = useStore((state) => state.search);
   const ui = useStore((state) => state.ui);
   const map = useStore((state) => state.map);
+  const cart = useStore((state) => state.cart);
+  const chat = useStore((state) => state.chat);
   const actions = useActions();
   
   // Create screen state object for compatibility
@@ -51,9 +55,11 @@ export function MobileMapShell({
     ui.navigateTo(ScreenType.DASHBOARD);
   };
   const [currentSnap, setCurrentSnap] = useState<number>(initialSnap ?? snapPoints[1]);
+  const [isCartSheetOpen, setIsCartSheetOpen] = useState<boolean>(false);
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
   const bottomSheetRef = useRef<BottomSheetRef>(null);
+  const cartBottomSheetRef = useRef<BottomSheetRef>(null);
   const previousScreenRef = useRef<ScreenType>(screenState.currentScreen);
   const isAutoSnappingRef = useRef<boolean>(false);
   
@@ -123,9 +129,46 @@ export function MobileMapShell({
   }, []);
 
   const handleVoiceClick = useCallback(() => {
-    debugLog('Voice assistant clicked');
-    // Could trigger voice search
+    debugLog('Voice assistant clicked - opening AI chat');
+    const currentQuery = search.query.trim();
+    
+    // Open chat overlay
+    actions.openChat();
+    
+    // Add search query as first user message if it exists
+    if (currentQuery) {
+      debugLog('Adding search query to chat:', currentQuery);
+      chat.addMessage({
+        text: currentQuery,
+        sender: 'user',
+      });
+    }
+  }, [actions, search.query, chat]);
+
+  const handleCheckout = useCallback(() => {
+    debugLog('Opening cart sheet with total:', cart.cart.total, 'items:', cart.cart.count);
+    setIsCartSheetOpen(true);
+  }, [cart.cart.total, cart.cart.count]);
+
+  const handleCartSheetClose = useCallback(() => {
+    setIsCartSheetOpen(false);
   }, []);
+
+  // Chat sheet handlers
+  const handleChatBack = useCallback(() => {
+    actions.closeChat();
+  }, [actions]);
+
+  const handleChatClose = useCallback(() => {
+    actions.closeChat();
+  }, [actions]);
+
+  // Debug cart state
+  console.log('MobileMapShell cart state:', { 
+    total: cart.cart.total, 
+    count: cart.cart.count, 
+    isVisible: cart.cart.count > 0 
+  });
 
   const handleSnapChange = useCallback((snap: number) => {
     // Update current snap state
@@ -225,19 +268,74 @@ export function MobileMapShell({
 
   // Use BottomSheet wrapper for all screens for consistency
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      className={className}
-      snapPoints={snapPoints}
-      initialSnap={initialSnap}
-      onSnapChange={handleSnapChange}
-      headerBackground={getHeaderBackground()}
-      contentBackground={getContentBackground()}
-      header={getHeaderContent()}
-      stickyHeader={getStickyHeaderContent()}
-    >
-      <ScreenRenderer items={items} />
-    </BottomSheet>
+    <div className="relative h-full">
+      {/* Main BottomSheet */}
+      <BottomSheet
+        ref={bottomSheetRef}
+        className={className}
+        snapPoints={snapPoints}
+        initialSnap={initialSnap}
+        onSnapChange={handleSnapChange}
+        headerBackground={getHeaderBackground()}
+        contentBackground={getContentBackground()}
+        header={getHeaderContent()}
+        stickyHeader={getStickyHeaderContent()}
+      >
+        <ScreenRenderer items={items} />
+      </BottomSheet>
+
+      {/* Cart BottomSheet Overlay - appears above main sheet */}
+      {isCartSheetOpen && (
+        <div 
+          className="fixed inset-0 z-[60]"
+          style={{ 
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={(e) => {
+            // Close if clicking the backdrop
+            if (e.target === e.currentTarget) {
+              handleCartSheetClose();
+            }
+          }}
+        >
+          <BottomSheet
+            ref={cartBottomSheetRef}
+            className="z-[60]"
+            snapPoints={[0, 90, 90]}
+            initialSnap={1}
+            headerBackground="transparent"
+            contentBackground="transparent"
+            onSnapChange={(snap) => {
+              // Close sheet if snapped to 0
+              if (snap === 0) {
+                handleCartSheetClose();
+              }
+            }}
+          >
+            <CartSheetPage 
+              isOpen={isCartSheetOpen}
+              onClose={handleCartSheetClose}
+            />
+          </BottomSheet>
+        </div>
+      )}
+
+      {/* CartNavbar - OVER everything with highest z-index */}
+      <CartNavbar
+        totalAmount={cart.cart.total}
+        itemCount={cart.cart.count}
+        isVisible={cart.cart.count > 0}
+        onCheckout={handleCheckout}
+      />
+
+      {/* AI Chat BottomSheet Overlay - highest z-index [70] */}
+      <ChatBottomSheet
+        isOpen={chat.isChatOpen}
+        onClose={handleChatClose}
+        onBack={handleChatBack}
+      />
+    </div>
   );
 }
 

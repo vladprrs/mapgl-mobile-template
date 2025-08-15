@@ -44,6 +44,7 @@ export function SearchResultsPage({
 
   return (
     <div className={`search-results-page min-h-full bg-background-secondary ${className}`}>
+      {/* AISearchHelper now handles the product search messaging */}
       <SearchResultsList
         results={searchResults}
         onResultClick={handleResultClick}

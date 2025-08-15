@@ -5,8 +5,10 @@ export { Divider } from './Divider';
 export { FilterChip } from './FilterChip';
 export { Icon } from './Icon';
 export { Input, type InputVariant, type InputSize } from './Input';
+export { ProductImage } from './ProductImage';
 export { RatingStars } from './RatingStars';
 export { Spinner } from './Spinner';
+export { StoreImageStack } from './StoreImageStack';
 export { Text } from './Text';
 
 // Re-export icon constants from lib

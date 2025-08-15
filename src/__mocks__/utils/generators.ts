@@ -1,5 +1,5 @@
 import type { Story } from '@/components/organisms/StoriesPanel';
-import type { SearchResult } from '@/__mocks__/search/results';
+import type { SearchResult } from '@/stores/types';
 import type { AdviceItem } from '@/__mocks__/advice/types';
 
 /**

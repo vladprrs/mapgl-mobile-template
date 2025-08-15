@@ -40,8 +40,8 @@ export interface SearchResultCardProps {
     products: ZMKProduct[];
   };
   coords?: [number, number];
-  // Result type to distinguish between organizations and addresses
-  type?: 'organization' | 'address';
+  // Result type to support both old and new type systems
+  type?: 'organization' | 'address' | 'regular' | 'advertiser';
   // Advertiser-specific fields
   isAdvertiser?: boolean;
   logo?: string;
@@ -254,27 +254,37 @@ export function SearchResultCard({
                   {/* Crown/Badge for Advertisers */}
                   {isAdvertiser && (
                     <div style={{ 
-                      marginLeft: tokens.spacing[2], // 8px spacing from title
-                      flexShrink: 0 
+                      marginLeft: '4px', // Reduce spacing 
+                      flexShrink: 0,
+                      width: '16px',
+                      height: '16px',
+                      position: 'relative'
                     }}>
-                      <div style={{
-                        backgroundColor: '#1ba136', // Green circle from Figma
-                        borderRadius: '50%',
-                        width: '16px',
-                        height: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                        <div style={{
-                          width: '8px',
-                          height: '6px',
-                          borderLeft: '2px solid white',
-                          borderBottom: '2px solid white',
-                          transform: 'rotate(-45deg)',
-                          marginTop: '-1px',
-                        }} />
-                      </div>
+                      {/* Two-layer crown from Figma */}
+                      <img 
+                        src="/assets/figma/icons/7ee196b658f4e3e8dac5d2a98dee839b04940d43.svg"
+                        alt="Crown layer 1"
+                        style={{ 
+                          position: 'absolute', 
+                          width: '15.548px', 
+                          height: '15.548px', 
+                          left: '50%', 
+                          top: '50%', 
+                          transform: 'translate(-50%, -50%)' 
+                        }}
+                      />
+                      <img 
+                        src="/assets/figma/icons/6a3a6d3886339a8b80d15126152d40c8ed35f959.svg"
+                        alt="Crown layer 2"
+                        style={{ 
+                          position: 'absolute', 
+                          width: '8px', 
+                          height: '7px',
+                          left: '50%', 
+                          top: 'calc(50% - 0.5px)', 
+                          transform: 'translate(-50%, -50%)' 
+                        }}
+                      />
                     </div>
                   )}
                 </div>
