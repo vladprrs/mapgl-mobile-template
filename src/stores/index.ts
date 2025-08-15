@@ -13,6 +13,8 @@ import { createMapSlice } from './slices/mapSlice';
 import { createSearchSlice } from './slices/searchSlice';
 import { createUISlice } from './slices/uiSlice';
 import { createOrganizationSlice } from './slices/organizationSlice';
+import { createCartSlice } from './slices/cartSlice';
+import { createChatSlice } from './slices/chatSlice';
 import { createActions } from './slices/actions';
 
 const useStore = create<AppStore>()(
@@ -24,6 +26,8 @@ const useStore = create<AppStore>()(
           search: createSearchSlice(set, get, api),
           ui: createUISlice(set, get, api),
           organization: createOrganizationSlice(set, get, api),
+          cart: createCartSlice(set, get, api),
+          chat: createChatSlice(set, get, api),
           actions: createActions(set, get, api),
         }))
       ),
@@ -49,6 +53,8 @@ export const useMapStore = () => useStore((state) => state.map);
 export const useSearchStore = () => useStore((state) => state.search);
 export const useUIStore = () => useStore((state) => state.ui);
 export const useOrganizationStore = () => useStore((state) => state.organization);
+export const useCartStore = () => useStore((state) => state.cart);
+export const useChatStore = () => useStore((state) => state.chat);
 export const useActions = () => useStore((state) => state.actions);
 
 if (typeof window !== 'undefined') {

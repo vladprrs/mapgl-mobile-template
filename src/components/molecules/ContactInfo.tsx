@@ -241,6 +241,18 @@ export function ContactInfo({
   socialMedia = {},
   className = '',
 }: ContactInfoProps) {
+  // Check if any contact info exists - only render if we have data
+  const hasContactInfo = Boolean(
+    phone || 
+    (messengers && (messengers.telegram || messengers.whatsapp || messengers.viber)) || 
+    website || 
+    (socialMedia && Object.values(socialMedia).some(value => value))
+  );
+  
+  // If no contact info, don't render anything
+  if (!hasContactInfo) {
+    return null;
+  }
   
   const handlePhoneClick = () => {
     if (phone) {
@@ -266,6 +278,7 @@ export function ContactInfo({
 
   return (
     <div
+      data-testid="contact-info"
       className={`contact-info flex flex-col items-start justify-start p-0 relative rounded-xl w-full ${className}`}
       style={{
         backgroundColor: tokens.colors.background.primary,
@@ -276,38 +289,46 @@ export function ContactInfo({
         
         {/* Phone Row */}
         {phone && (
-          <ContactRow
-            icon="📞"
-            title={phone}
-            subtitle={phoneSubtitle}
-            rightText="3"
-            onClick={handlePhoneClick}
-          />
+          <div data-testid="phone-button">
+            <ContactRow
+              icon="📞"
+              title={phone}
+              subtitle={phoneSubtitle}
+              rightText="3"
+              onClick={handlePhoneClick}
+            />
+          </div>
         )}
 
         {/* Telegram Row */}
         {messengers.telegram && (
-          <ContactRow
-            icon="💬"
-            title="Написать в Telegram"
-            onClick={handleTelegramClick}
-          />
+          <div data-testid="telegram-button">
+            <ContactRow
+              icon="💬"
+              title="Написать в Telegram"
+              onClick={handleTelegramClick}
+            />
+          </div>
         )}
 
         {/* Website Row */}
         {website && (
-          <ContactRow
-            icon="🌐"
-            title={website}
-            rightText="1"
-            onClick={handleWebsiteClick}
-            showBorder={Object.keys(socialMedia).length === 0} // Only show border if no social buttons follow
-          />
+          <div data-testid="website-button">
+            <ContactRow
+              icon="🌐"
+              title={website}
+              rightText="1"
+              onClick={handleWebsiteClick}
+              showBorder={Object.keys(socialMedia).length === 0} // Only show border if no social buttons follow
+            />
+          </div>
         )}
 
         {/* Social Media Buttons */}
         {Object.keys(socialMedia).length > 0 && (
-          <SocialMediaButtons socialMedia={socialMedia} />
+          <div data-testid="social-media-buttons">
+            <SocialMediaButtons socialMedia={socialMedia} />
+          </div>
         )}
       </div>
     </div>

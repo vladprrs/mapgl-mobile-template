@@ -15,6 +15,9 @@ export { RecommendationsSection } from './RecommendationsSection';
 export { SearchHistorySection } from './SearchHistorySection';
 export { CityHighlightsSection } from './CityHighlightsSection';
 export { MastersNearbyCard } from './MastersNearbyCard';
+export { ProductsCarousel } from './ProductsCarousel';
+export { ProductCard } from './ProductCard';
+export { CheckoutItemCard } from './CheckoutItemCard';
 
 // Organization Organisms
 export { OrganizationHeader } from './OrganizationHeader';
@@ -23,3 +26,6 @@ export { MasterDetailsHeader } from './MasterDetailsHeader';
 
 // Layout Organisms
 export { BottomSheet, type BottomSheetProps, type BottomSheetRef } from './bottom-sheet';
+
+// Chat Organisms
+export { ChatBottomSheet } from './ChatBottomSheet';

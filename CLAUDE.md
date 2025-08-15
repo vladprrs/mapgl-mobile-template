@@ -40,6 +40,53 @@ This codebase follows **Atomic Design** principles strictly. Components are orga
   - ✅ Fixed data flow from mock sources to search results
   - ✅ Corrected avatar paths to use extracted Figma assets
   - ✅ Verified 24×24px rounded avatars with 50% overlap and proper z-index
+- ✅ **Cart & Checkout System** - Complete shopping cart functionality
+  - ✅ **CartNavbar** - Fixed-position overlay with maximum z-index (2,147,483,647)
+  - ✅ **Global Cart State** - Zustand cart slice with persistent storage
+  - ✅ **CheckoutItemCard** - Pixel-perfect checkout item display (node-id 337-225744)
+  - ✅ **Cart Integration** - ProductsCarousel connected to global cart state
+  - ✅ **Overlay Positioning** - CartNavbar positioned OVER BottomSheet at template level
+- ✅ **OrganizationHeader Improvements** - Enhanced organization page header
+  - ✅ **Removed duplicate drag handle** - OrganizationHeader no longer renders own drag handle
+  - ✅ **RatingStars integration** - Replaced custom star implementation with RatingStars atom
+  - ✅ **Crown badge for advertisers** - Golden crown icon for organizations with `isAdvertiser: true`
+  - ✅ **Integrated OrganizationTabs** - Tabs now part of header for seamless scroll behavior
+  - ✅ **Fixed gradient directions** - Proper fade-out effects at tab scroll edges
+  - ✅ **AD block for advertisers** - Advertising disclaimer block with proper styling
+  - ✅ **Enhanced contact integration** - Replaced custom contact buttons with ContactInfo molecule
+- ✅ **OrganizationPage Enhancements** - Complete organization detail page improvements
+  - ✅ **Secondary background** - Content area uses `tokens.colors.background.secondary` (#F1F1F1)
+  - ✅ **ContactInfo molecule integration** - Standardized contact functionality with proper typing
+  - ✅ **Seamless header-tabs integration** - Single scrolling unit eliminates positioning jumps
+  - ✅ **Enhanced mock data** - Full contact information (phone, messengers, website, social media)
+- ✅ **AddressCard Molecule** - Complete address display component for organization pages
+  - ✅ **Address display** - Shows full address with distance/travel time information
+  - ✅ **Navigation integration** - 40×40px navigate button with custom navigation icon
+  - ✅ **Design compliance** - Follows Figma specifications with proper spacing and styling
+  - ✅ **Atomic design** - Proper molecule-level component using only atoms and design tokens
+- ✅ **ContactInfo Debugging & Verification** - Comprehensive Playwright-assisted investigation
+  - ✅ **Component functionality verified** - ContactInfo displays correctly with proper data flow
+  - ✅ **Mock data enhancement** - Added comprehensive contact information to all organizations
+  - ✅ **Test infrastructure** - Added data-testid attributes for automated testing
+  - ✅ **Conditional rendering** - Component properly handles missing contact data
+  - ✅ **Visual verification** - Screenshots and DOM inspection confirm proper rendering
+- ✅ **Conditional Tab Display Logic** - Category-based tab system for organization pages
+  - ✅ **Food establishment detection** - 20+ food-related categories (Russian/English) with flexible matching
+  - ✅ **Smart tab rendering** - Food establishments show "Меню" tab, others show "Цены" tab
+  - ✅ **Enhanced tab content** - MenuTabContent with dish pricing, PricesTabContent with service pricing
+  - ✅ **Auto-reset functionality** - Switches to overview tab when changing organizations
+  - ✅ **Debug support** - Console logging for category detection verification
+  - ✅ **Performance optimized** - Efficient substring matching with multilingual support
+- ✅ **Product-to-Category Aliasing System** - Complete smart search functionality for natural product queries
+  - ✅ **Comprehensive Product Mapping** - 200+ product terms across 6 major categories (electronics, grocery, medical, pharmacy, auto, beauty)
+  - ✅ **Smart Search Logic** - Enhanced search slice with product detection and category-based filtering
+  - ✅ **Search Context Display** - Blue banner UI showing search context ("Показаны магазины, где можно купить [product]")
+  - ✅ **Product Suggestions** - New suggestion type for product-based search recommendations
+  - ✅ **Natural Language Queries** - Users can search "молоко" to find grocery stores, "перфоратор" for electronics stores
+  - ✅ **Performance Optimized** - Reverse index for fast product-to-category lookup
+  - ✅ **TypeScript Integration** - Full type safety with enhanced SearchSuggestion and SearchContext types
+  - ✅ **Multilingual Support** - Russian product terms with extensible architecture for additional languages
+  - ✅ **Playwright Testing** - Comprehensive testing verified correct functionality for multiple product categories
 
 All components now use design tokens exclusively and follow atomic design hierarchy.
 
@@ -361,6 +408,175 @@ persist(
 )
 ```
 
+## 🔍 Product-to-Category Aliasing System
+
+### Smart Search Architecture
+
+The product aliasing system enables natural language product searches by mapping product terms to relevant store categories. Users can search for products like "молоко", "перфоратор", or "врач" and automatically find appropriate stores.
+
+### File Structure
+
+```
+src/__mocks__/search/
+├── productAliases.ts          # Product-to-category mappings
+├── suggestions.ts             # Enhanced with product suggestions
+└── searchResultsByQuery.ts    # Query-specific results
+```
+
+### Product Categories
+
+The system supports 6 major categories with 200+ product terms:
+
+- **Electronics**: перфоратор, дрель, телевизор, ноутбук, холодильник
+- **Grocery**: молоко, хлеб, мясо, овощи, фрукты
+- **Medical**: врач, анализы, узи, справка, консультация
+- **Pharmacy**: лекарство, витамины, бинт, градусник
+- **Auto**: шиномонтаж, масло, тормозные колодки, аккумулятор
+- **Beauty**: стрижка, маникюр, массаж, эпиляция
+
+### Implementation Pattern
+
+```typescript
+// Product search detection in searchSlice.ts
+const matchedCategories = getMatchingCategories(query);
+if (matchedCategories.length > 0) {
+  // Product search found - filter organizations by category
+  const orgCategories = getOrganizationCategories(matchedCategories);
+  results = allOrganizations.filter(org => 
+    orgCategories.includes(org.category)
+  );
+  
+  // Set search context for UI display
+  searchContext = {
+    type: 'product_search',
+    query: query,
+    categories: matchedCategories,
+    message: `Показаны магазины, где можно купить "${query}"`
+  };
+}
+```
+
+### Search Context Display
+
+```typescript
+// SearchResultsPage.tsx - Product search banner
+{searchContext?.type === 'product_search' && (
+  <div className="bg-blue-50 p-3 mx-4 mb-2 rounded-lg border border-blue-200">
+    <Text className="text-sm text-blue-700 font-medium">
+      {searchContext.message}
+    </Text>
+    {searchContext.categories && (
+      <Text className="text-xs text-blue-600 mt-1">
+        Категории: {searchContext.categories.map(cat => 
+          categoryDisplayNames[cat] || cat
+        ).join(', ')}
+      </Text>
+    )}
+  </div>
+)}
+```
+
+### Product Suggestions
+
+```typescript
+// Enhanced suggestions with product type
+export interface ProductSuggestion {
+  id: string;
+  type: 'product';
+  text: string;
+  subtitle: string;
+  category: string;
+  productCategories: string[];
+  count: number;
+}
+
+// Popular products auto-generated as suggestions
+const popularProducts = [
+  'молоко', 'хлеб', 'мясо', 'телевизор', 'холодильник', 
+  'перфоратор', 'врач', 'стрижка', 'маникюр', 'шиномонтаж'
+];
+```
+
+### Performance Optimization
+
+```typescript
+// Reverse index for fast product lookup
+export const buildProductIndex = (): Map<string, string[]> => {
+  const index = new Map<string, string[]>();
+  
+  Object.entries(productAliases).forEach(([category, products]) => {
+    products.forEach(product => {
+      const key = product.toLowerCase();
+      if (!index.has(key)) {
+        index.set(key, []);
+      }
+      index.get(key)!.push(category);
+    });
+  });
+  
+  return index;
+};
+```
+
+### Usage Examples
+
+```typescript
+// Example searches and expected results:
+
+// Grocery search
+await performSearch('молоко');
+// Results: Пятёрочка, Магнит, ВкусВилл, Перекрёсток
+// Context: "Показаны магазины, где можно купить 'молоко'"
+// Categories: "Продуктовые магазины"
+
+// Electronics search  
+await performSearch('перфоратор');
+// Results: Техносила, DNS, М.Видео
+// Context: "Показаны магазины, где можно купить 'перфоратор'"
+// Categories: "Электроника и техника"
+
+// Medical search
+await performSearch('врач');
+// Results: СМ-Клиника, Поликлиника №1, медицинские центры
+// Context: "Показаны магазины, где можно купить 'врач'"
+// Categories: "Медицинские услуги"
+```
+
+### Extension Guidelines
+
+To add new product categories:
+
+1. **Add products to productAliases.ts**:
+```typescript
+export const productAliases = {
+  // ... existing categories
+  'books': ['книга', 'учебник', 'роман', 'детектив'],
+};
+```
+
+2. **Map to organization categories**:
+```typescript
+export const categoryToOrganizationMap = {
+  // ... existing mappings
+  'books': ['Книжный магазин', 'Библиотека'],
+};
+```
+
+3. **Add display names**:
+```typescript
+export const categoryDisplayNames = {
+  // ... existing names
+  'books': 'Книжные магазины',
+};
+```
+
+### Debugging Support
+
+- **Console logging**: Search detection logs to browser console
+- **Search context**: Visual banner shows detected categories
+- **Type safety**: Full TypeScript support prevents runtime errors
+- **Playwright testing**: Automated verification of search functionality
+
 ## 🎯 Styling Best Practices
 
 ### CSS Classes
@@ -528,19 +744,105 @@ const avatarDetails = await page.evaluate(() => {
 // - Component rendering: Check conditional rendering logic in SearchResultCard
 ```
 
+### OrganizationHeader Pattern
+
+```typescript
+// Enhanced OrganizationHeader with integrated tabs and improved features
+<OrganizationHeader 
+  isCollapsed={isHeaderCollapsed}
+  tabs={tabs}
+  activeTab={activeTab}
+  onTabChange={setActiveTab}
+/>
+
+// OrganizationHeader structure after improvements:
+OrganizationHeader
+  ├── Friends avatars (FriendAvatars molecule)
+  ├── Title with crown badge (for advertisers: isAdvertiser === true)
+  ├── Rating stars (RatingStars atom - replaces custom implementation)
+  ├── Travel time with icon
+  ├── Address line
+  ├── Work hours with traffic.heavy color for warnings
+  ├── AD block (for advertisers only)
+  └── OrganizationTabs (integrated, not separate)
+
+// Key improvements:
+// - No duplicate drag handle (handled by BottomSheet)
+// - Crown badge: Golden crown SVG for advertiser organizations
+// - RatingStars: Proper atom usage instead of custom stars
+// - Tabs integration: Seamless scrolling with proper gradients
+// - AD block: Advertiser disclaimer with proper styling
+```
+
+### AddressCard Pattern
+
+```typescript
+// AddressCard molecule for displaying address information with navigation
+<AddressCard
+  address={organization.address}
+  distance={organization.distance}
+  travelTime={organization.travelTime}
+  onNavigate={() => {
+    // TODO: Open navigation/map functionality
+    console.log('Navigate to:', organization.address);
+  }}
+/>
+
+// AddressCard Props Interface
+interface AddressCardProps {
+  address: string;        // Full address string
+  distance?: string;      // Distance from current location (e.g., "2 мин", "850 м")
+  travelTime?: string;    // Travel time (optional, can be same as distance)
+  onNavigate?: () => void; // Navigation callback function
+}
+
+// Usage in OrganizationPage Overview tab
+function OverviewTabContent({ organization }: { organization: SearchResult }) {
+  const handleNavigate = () => {
+    // TODO: Integrate with map navigation system
+    console.log('Navigate to:', organization.address);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Address Card Section */}
+      <div>
+        <h2>Адрес</h2>
+        <AddressCard
+          address={organization.address}
+          distance={organization.distance}
+          onNavigate={handleNavigate}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Features:
+// - 🏠 Clean address display with proper typography
+// - 📍 Distance/travel time information in secondary color
+// - 🧭 40×40px navigation button with custom icon
+// - 🎯 White background with rounded corners (tokens.borders.radius.lg)
+// - 📱 16px padding (tokens.spacing[4]) for proper spacing
+// - ♿ Accessible navigation button with aria-label
+// - 🏗️ Follows atomic design - uses only atoms and design tokens
+```
+
 ### ContactInfo Pattern
 
 ```typescript
 // ContactInfo molecule for comprehensive contact functionality
+// Now integrated into OrganizationPage replacing custom contact buttons
 <ContactInfo
-  phone={master.phone}
-  messengers={master.messengers}
-  website={master.website}
-  socialMedia={master.socialMedia}
+  phone={organization.phone}
+  messengers={organization.messengers}
+  website={organization.website}
+  socialMedia={organization.socialMedia}
 />
 
-// Master data structure with contact information
-interface Master {
+// Organization/Master data structure with contact information (unified)
+interface SearchResult {
+  // ... other fields
   phone?: string;
   messengers?: {
     telegram?: string;  // '@username' or phone number
@@ -557,23 +859,37 @@ interface Master {
   };
 }
 
-// Usage in MasterDetailsPage
+// Usage in OrganizationPage (replaces custom contact buttons)
+function OverviewTabContent({ organization }: { organization: SearchResult }) {
+  return (
+    <div className="space-y-6">
+      {/* Contact Section */}
+      <div>
+        <h2>Контакты</h2>
+        <ContactInfo
+          phone={organization.phone}
+          messengers={organization.messengers}
+          website={organization.website}
+          socialMedia={organization.socialMedia}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Also used in MasterDetailsPage
 export function MasterDetailsPage() {
-  const currentMaster = useStore((state) => state.organization.currentOrganization) as Master;
+  const currentMaster = useStore((state) => state.organization.currentOrganization);
   
   return (
     <div>
       <MasterDetailsHeader master={currentMaster} />
-      
-      {/* Contact Info - replaces floating call button */}
       <ContactInfo
         phone={currentMaster.phone}
         messengers={currentMaster.messengers}
         website={currentMaster.website}
         socialMedia={currentMaster.socialMedia}
       />
-      
-      {/* Other sections... */}
     </div>
   );
 }
@@ -584,6 +900,148 @@ export function MasterDetailsPage() {
 // - 🌐 Auto HTTPS prefix for websites
 // - 📱 Horizontal scrollable social media buttons with platform colors
 // - 🎯 Pixel-perfect Figma design match (node-id 322-78232)
+```
+
+### CheckoutItemCard Pattern
+
+```typescript
+// CheckoutItemCard organism for cart and checkout functionality
+<CheckoutItemCard
+  id="item-1"
+  image="/assets/figma/8441c3055b3f38c931e05b652aacb578fe48a2b8.png"
+  title="Спортивная бутылка с ситечком Арктика 500 мл чёрная матовая"
+  weight="60 г"
+  quantity={1}
+  price={120}
+  oldPrice={150}
+  onQuantityChange={handleQuantityChange}
+/>
+
+// CheckoutItemCard Props Interface
+interface CheckoutItemCardProps {
+  id: string;
+  image: string;          // Product image URL
+  title: string;          // Product title (max 2 lines with ellipsis)
+  weight?: string;        // Optional weight/size display
+  quantity: number;       // Current quantity in cart
+  price: number;          // Current price per item
+  oldPrice?: number;      // Optional strikethrough price
+  onQuantityChange: (id: string, quantity: number) => void;
+}
+
+// Usage in cart/checkout pages
+export function CartPage() {
+  const cartItems = useStore((state) => state.cart.cart.items);
+  const updateQuantity = useStore((state) => state.cart.updateQuantity);
+  
+  const handleQuantityChange = useCallback((id: string, quantity: number, price: number) => {
+    updateQuantity(id, quantity, price);
+  }, [updateQuantity]);
+  
+  return (
+    <div className="space-y-4">
+      {Array.from(cartItems.entries()).map(([productId, quantity]) => {
+        const product = getProductById(productId); // Get product details
+        return (
+          <CheckoutItemCard
+            key={productId}
+            id={productId}
+            image={product.image}
+            title={product.title}
+            weight={product.weight}
+            quantity={quantity}
+            price={product.price}
+            oldPrice={product.oldPrice}
+            onQuantityChange={(id, qty) => handleQuantityChange(id, qty, product.price)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+// Features:
+// - 📦 106×106px product image with border (rgba(137,137,137,0.3))
+// - 📝 2-line title truncation with proper typography (SB Sans Text 14px)
+// - ⚖️ Optional weight/size display (14px gray text)
+// - 🔢 Quantity controls with decrease/increase buttons (min quantity: 1)
+// - 💰 Price display with optional strikethrough old price
+// - 🧮 Automatic total calculation (price × quantity)
+// - 🎯 Pixel-perfect Figma design match (node-id 337-225744)
+// - ♿ Accessible button controls with proper alt texts
+// - 🏗️ Follows atomic design hierarchy (organism level)
+```
+
+### Conditional Tab Display Pattern
+
+```typescript
+// Conditional tab display based on organization category in OrganizationPage
+// Define comprehensive food-related categories for tab logic
+const FOOD_CATEGORIES = [
+  'ресторан', 'кафе', 'бар', 'кофе', 'пекарня', 'фастфуд', 'пицца', 'пиццерия', 'суши', 
+  'столовая', 'буфет', 'закусочная', 'бистро', 'паб', 'таверна', 'кофейня',
+  'restaurant', 'cafe', 'bar', 'coffee', 'bakery', 'fastfood', 'pizza', 'sushi', 
+  'canteen', 'buffet', 'bistro', 'pub', 'tavern', 'coffee shop'
+];
+
+// Smart category detection with flexible substring matching
+const isFoodEstablishment = organization ? FOOD_CATEGORIES.some(category => 
+  organization.category?.toLowerCase().includes(category.toLowerCase())
+) : false;
+
+// Dynamic tab configuration based on organization type
+const tabs: TabItem[] = [
+  { id: 'overview', label: 'Обзор' },
+  { id: 'reviews', label: 'Отзывы', count: organization?.reviewCount },
+  
+  // Conditional tab: Menu for food, Prices for everything else
+  isFoodEstablishment 
+    ? { id: 'menu', label: 'Меню', count: 213 }
+    : { id: 'prices', label: 'Цены' },
+    
+  { id: 'photos', label: 'Фото', count: 432 },
+  { id: 'info', label: 'Инфо' },
+  { id: 'promotions', label: 'Акции' },
+];
+
+// Conditional content rendering
+{activeTab === 'menu' && <MenuTabContent />}
+{activeTab === 'prices' && <PricesTabContent />}
+
+// Auto-reset to overview when organization changes
+useEffect(() => {
+  if (organization) {
+    setActiveTab('overview');
+  }
+}, [organization?.id, setActiveTab]);
+
+// Debug logging for category detection (development)
+useEffect(() => {
+  if (organization) {
+    console.log(`Organization "${organization.name}" - Category: "${organization.category}" - Food establishment: ${isFoodEstablishment}`);
+  }
+}, [organization, isFoodEstablishment]);
+
+// Category mapping examples:
+// Food establishments → "Меню" tab:
+// - "Ресторан европейской кухни" → Menu
+// - "Пиццерия" → Menu  
+// - "Кофейня" → Menu
+// - "Кафе" → Menu
+
+// Non-food establishments → "Цены" tab:
+// - "Магазин цифровой техники" → Prices
+// - "Медицинская лаборатория" → Prices
+// - "Автосервис" → Prices
+// - "Салон красоты" → Prices
+
+// Features:
+// - 🔍 Flexible detection: Substring matching catches variations
+// - 🌐 Multilingual support: Russian and English categories
+// - 📱 Responsive design: Content adapts to organization type
+// - 🔄 Auto-reset: Switches to overview on organization change
+// - 🐛 Debug support: Console logging for verification
+// - ⚡ Performance: Efficient category matching with short-circuit evaluation
 ```
 
 ## ⚠️ Critical Rules
@@ -628,6 +1086,13 @@ export function MasterDetailsPage() {
 | ~~Friends data missing in search results~~ | ✅ **FIXED**: Updated mock data with `friendsVisited` property |
 | ~~OrganizationTabs spacing issues~~ | ✅ **FIXED**: Removed hardcoded positioning, proper sticky behavior |
 | ~~Search pages opening at 50%~~ | ✅ **FIXED**: Search screens now open at 90% (expanded) by default |
+| ~~OrganizationHeader duplicate drag handle~~ | ✅ **FIXED**: Removed duplicate drag handle, BottomSheet handles it |
+| ~~Custom rating stars implementation~~ | ✅ **FIXED**: Replaced with RatingStars atom for consistency |
+| ~~OrganizationTabs positioning jumps~~ | ✅ **FIXED**: Integrated tabs into header for seamless scroll |
+| ~~Tab gradient directions backwards~~ | ✅ **FIXED**: Proper fade-out effects at scroll edges |
+| ~~Custom contact button implementations~~ | ✅ **FIXED**: Replaced with ContactInfo molecule across pages |
+| ~~ContactInfo not displaying in organization pages~~ | ✅ **FIXED**: Added comprehensive contact data to all mock organizations |
+| ~~Missing address navigation functionality~~ | ✅ **FIXED**: Implemented AddressCard molecule with navigation button |
 
 ## 🎯 Atomic Design Best Practices
 

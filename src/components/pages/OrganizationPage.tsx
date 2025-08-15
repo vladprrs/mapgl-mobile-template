@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { OrganizationHeader } from '@/components/organisms/OrganizationHeader';
-import { OrganizationTabs, type TabItem } from '@/components/molecules';
+import { CheckoutItemCard } from '@/components/organisms/CheckoutItemCard';
+import { AddressCard, ContactInfo } from '@/components/molecules';
+import type { TabItem } from '@/components/molecules';
 import { tokens } from '@/lib/ui/tokens';
 import useStore from '@/stores';
 import type { SearchResult } from '@/stores/types';
@@ -31,15 +33,47 @@ export function OrganizationPage({
   const activeTab = useStore((state) => state.organization.activeTab);
   const setActiveTab = useStore((state) => state.organization.setActiveTab);
 
-  // Tab configuration from Figma design
+  // Define food-related categories for conditional tab display
+  const FOOD_CATEGORIES = [
+    'ресторан', 'кафе', 'бар', 'кофе', 'пекарня', 'фастфуд', 'пицца', 'пиццерия', 'суши', 
+    'столовая', 'буфет', 'закусочная', 'бистро', 'паб', 'таверна', 'кофейня',
+    'restaurant', 'cafe', 'bar', 'coffee', 'bakery', 'fastfood', 'pizza', 'sushi', 
+    'canteen', 'buffet', 'bistro', 'pub', 'tavern', 'coffee shop'
+  ];
+
+  // Check if the organization is a food establishment
+  const isFoodEstablishment = organization ? FOOD_CATEGORIES.some(category => 
+    organization.category?.toLowerCase().includes(category.toLowerCase())
+  ) : false;
+
+  // Debug log to verify category detection
+  React.useEffect(() => {
+    if (organization) {
+      console.log(`Organization "${organization.name}" - Category: "${organization.category}" - Food establishment: ${isFoodEstablishment}`);
+    }
+  }, [organization, isFoodEstablishment]);
+
+  // Tab configuration from Figma design with conditional logic
   const tabs: TabItem[] = [
     { id: 'overview', label: 'Обзор' },
-    { id: 'menu', label: 'Меню', count: 213 },
+    { id: 'reviews', label: 'Отзывы', count: organization?.reviewCount },
+    
+    // Conditional tab based on category
+    isFoodEstablishment 
+      ? { id: 'menu', label: 'Меню', count: 213 }
+      : { id: 'prices', label: 'Цены' },
+    
     { id: 'photos', label: 'Фото', count: 432 },
-    { id: 'reviews', label: 'Отзывы', count: 232 },
     { id: 'info', label: 'Инфо' },
     { id: 'promotions', label: 'Акции' },
   ];
+
+  // Reset to overview tab when organization changes
+  useEffect(() => {
+    if (organization) {
+      setActiveTab('overview');
+    }
+  }, [organization?.id, setActiveTab]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,38 +121,24 @@ export function OrganizationPage({
       >
         <OrganizationHeader 
           isCollapsed={isHeaderCollapsed}
-        />
-      </div>
-
-      {/* Tabs section - sticky below header */}
-      <div 
-        className="bg-white border-b sticky flex-shrink-0"
-        style={{
-          top: isHeaderCollapsed ? '64px' : '140px', // Stick below header (approximate heights)
-          zIndex: 10,
-          borderBottomWidth: '1px',
-          borderBottomStyle: 'solid',
-          borderBottomColor: 'rgba(137,137,137,0.3)',
-          transition: 'top 300ms ease-in-out',
-        }}
-      >
-        <OrganizationTabs
+          tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          tabs={tabs}
         />
       </div>
 
       {/* Content Area - flex-1 to fill remaining space */}
       <div 
-        className="bg-white flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto"
         style={{
+          backgroundColor: tokens.colors.background.secondary,
           padding: tokens.spacing[4],
           minHeight: '800px', // Make it tall enough to test scrolling
         }}
       >
         {activeTab === 'overview' && <OverviewTabContent organization={organization} />}
         {activeTab === 'menu' && <MenuTabContent />}
+        {activeTab === 'prices' && <PricesTabContent organization={organization} />}
         {activeTab === 'photos' && <PhotosTabContent />}
         {activeTab === 'reviews' && <ReviewsTabContent />}
         {activeTab === 'info' && <InfoTabContent organization={organization} />}
@@ -130,8 +150,31 @@ export function OrganizationPage({
 
 // Tab Content Components
 function OverviewTabContent({ organization }: { organization: SearchResult }) {
+  const handleNavigate = () => {
+    // TODO: Open navigation/map functionality
+    console.log('Navigate to:', organization.address);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Address Card Section */}
+      <div>
+        <h2 
+          className="text-lg font-semibold mb-4"
+          style={{
+            color: tokens.colors.text.primary,
+            fontFamily: 'SB Sans Text, sans-serif',
+          }}
+        >
+          Адрес
+        </h2>
+        <AddressCard
+          address={organization.address}
+          distance={organization.distance}
+          onNavigate={handleNavigate}
+        />
+      </div>
+
       {/* General Info Section */}
       <div>
         <h2 
@@ -164,50 +207,6 @@ function OverviewTabContent({ organization }: { organization: SearchResult }) {
               {organization.category}
             </p>
           </div>
-          
-          <div>
-            <p 
-              className="text-sm font-medium"
-              style={{
-                color: tokens.colors.text.secondary,
-                fontFamily: 'SB Sans Text, sans-serif',
-              }}
-            >
-              Адрес
-            </p>
-            <p 
-              className="text-base"
-              style={{
-                color: tokens.colors.text.primary,
-                fontFamily: 'SB Sans Text, sans-serif',
-              }}
-            >
-              {organization.address}
-            </p>
-          </div>
-
-          {organization.distance && (
-            <div>
-              <p 
-                className="text-sm font-medium"
-                style={{
-                  color: tokens.colors.text.secondary,
-                  fontFamily: 'SB Sans Text, sans-serif',
-                }}
-              >
-                Расстояние
-              </p>
-              <p 
-                className="text-base"
-                style={{
-                  color: tokens.colors.text.primary,
-                  fontFamily: 'SB Sans Text, sans-serif',
-                }}
-              >
-                {organization.distance}
-              </p>
-            </div>
-          )}
         </div>
       </div>
 
@@ -222,61 +221,12 @@ function OverviewTabContent({ organization }: { organization: SearchResult }) {
         >
           Контакты
         </h2>
-        <div className="space-y-3">
-          <button 
-            className="w-full text-left p-4 rounded-lg border"
-            style={{
-              borderColor: 'rgba(137,137,137,0.3)',
-              backgroundColor: tokens.colors.background.primary,
-            }}
-          >
-            <p 
-              className="text-sm font-medium"
-              style={{
-                color: tokens.colors.text.secondary,
-                fontFamily: 'SB Sans Text, sans-serif',
-              }}
-            >
-              Телефон
-            </p>
-            <p 
-              className="text-base"
-              style={{
-                color: tokens.colors.primary.DEFAULT,
-                fontFamily: 'SB Sans Text, sans-serif',
-              }}
-            >
-              +7 (495) 123-45-67
-            </p>
-          </button>
-          
-          <button 
-            className="w-full text-left p-4 rounded-lg border"
-            style={{
-              borderColor: 'rgba(137,137,137,0.3)',
-              backgroundColor: tokens.colors.background.primary,
-            }}
-          >
-            <p 
-              className="text-sm font-medium"
-              style={{
-                color: tokens.colors.text.secondary,
-                fontFamily: 'SB Sans Text, sans-serif',
-              }}
-            >
-              Веб-сайт
-            </p>
-            <p 
-              className="text-base"
-              style={{
-                color: tokens.colors.primary.DEFAULT,
-                fontFamily: 'SB Sans Text, sans-serif',
-              }}
-            >
-              website.example.com
-            </p>
-          </button>
-        </div>
+        <ContactInfo
+          phone={organization.phone}
+          messengers={organization.messengers}
+          website={organization.website}
+          socialMedia={organization.socialMedia}
+        />
       </div>
 
       {/* Working Hours Section */}
@@ -331,16 +281,165 @@ function MenuTabContent() {
       >
         Меню (213 позиций)
       </h2>
-      <div className="text-center py-12">
-        <p 
+      <div className="space-y-4">
+        {/* Sample menu sections */}
+        <div 
+          className="p-4 rounded-lg"
           style={{
-            color: tokens.colors.text.secondary,
-            fontFamily: 'SB Sans Text, sans-serif',
+            backgroundColor: tokens.colors.background.primary,
+            border: '1px solid rgba(137,137,137,0.3)',
           }}
         >
-          Раздел меню будет здесь
-        </p>
+          <h3 
+            className="text-base font-semibold mb-3"
+            style={{
+              color: tokens.colors.text.primary,
+              fontFamily: 'SB Sans Text, sans-serif',
+            }}
+          >
+            Основные блюда
+          </h3>
+          <div className="space-y-2">
+            {['Паста Карбонара', 'Стейк из говядины', 'Лосось на гриле'].map((dish) => (
+              <div key={dish} className="flex justify-between items-center">
+                <div>
+                  <p 
+                    className="text-sm font-medium"
+                    style={{
+                      color: tokens.colors.text.primary,
+                      fontFamily: 'SB Sans Text, sans-serif',
+                    }}
+                  >
+                    {dish}
+                  </p>
+                  <p 
+                    className="text-xs"
+                    style={{
+                      color: tokens.colors.text.secondary,
+                      fontFamily: 'SB Sans Text, sans-serif',
+                    }}
+                  >
+                    Описание блюда
+                  </p>
+                </div>
+                <p 
+                  className="text-sm font-semibold"
+                  style={{
+                    color: tokens.colors.text.primary,
+                    fontFamily: 'SB Sans Text, sans-serif',
+                  }}
+                >
+                  {Math.floor(Math.random() * 1000) + 500} ₽
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function PricesTabContent({ organization }: { organization: SearchResult }) {
+  const cartItems = useStore((state) => state.cart.cart.items);
+  const addToCart = useStore((state) => state.cart.addToCart);
+  const updateQuantity = useStore((state) => state.cart.updateQuantity);
+
+  // Default products if none exist in organization data
+  const defaultProducts = [
+    {
+      id: 'service-1',
+      image: '/assets/figma/24ace8940eccc51dbbf5b15af155b01435ec8a23.png',
+      title: 'Консультация специалиста',
+      weight: '1 час',
+      price: 1500,
+      oldPrice: 2000
+    },
+    {
+      id: 'service-2', 
+      image: '/assets/figma/d86e9c98cc883aff65270c606c4f6cc1b65f2d4d.png',
+      title: 'Диагностическое обследование',
+      weight: '30 мин',
+      price: 800,
+    },
+    {
+      id: 'service-3',
+      image: '/assets/figma/8441c3055b3f38c931e05b652aacb578fe48a2b8.png',
+      title: 'Комплексная услуга',
+      weight: '2 часа',
+      price: 3200,
+      oldPrice: 4000
+    }
+  ];
+
+  const products = organization.products || defaultProducts;
+
+  const handleAddToCart = (product: typeof products[0]) => {
+    console.log('Adding to cart:', product);
+    addToCart({
+      productId: product.id,
+      title: product.title,
+      image: product.image,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      weight: product.weight
+    });
+  };
+
+  const handleQuantityChange = (productId: string, quantity: number) => {
+    console.log('Updating quantity:', { productId, quantity });
+    if (quantity === 0) {
+      updateQuantity(productId, 0);
+    } else {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        const existingItem = cartItems.get(productId);
+        if (!existingItem) {
+          // Add new item to cart
+          handleAddToCart(product);
+        } else {
+          // Update existing item quantity
+          updateQuantity(productId, quantity);
+        }
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <h2 
+        className="text-lg font-semibold mb-4"
+        style={{
+          color: tokens.colors.text.primary,
+          fontFamily: 'SB Sans Text, sans-serif',
+        }}
+      >
+        Цены на товары и услуги
+      </h2>
+      
+      {products.map((product) => {
+        const cartItem = cartItems.get(product.id);
+        const quantity = cartItem ? cartItem.quantity : 0;
+        
+        return (
+          <div 
+            key={product.id}
+            className="bg-white rounded-lg"
+            style={{ backgroundColor: tokens.colors.background.primary }}
+          >
+            <CheckoutItemCard
+              id={product.id}
+              image={product.image}
+              title={product.title}
+              weight={product.weight}
+              quantity={quantity}
+              price={product.price}
+              oldPrice={product.oldPrice}
+              onQuantityChange={handleQuantityChange}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

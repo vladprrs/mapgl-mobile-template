@@ -1,47 +1,5 @@
 // Use the SearchResult type from store types
-interface Friend {
-  id: string;
-  name: string;
-  avatar: string;
-}
-
-export interface SearchResult {
-  id: string;
-  name: string;
-  category: string;
-  address: string;
-  distance?: string;
-  rating?: number;
-  reviewCount?: number;
-  closingStatus?: {
-    text: string;
-    isWarning: boolean;
-  };
-  friendsVisited?: {
-    friends: Friend[];
-    rating: number;
-    displayText?: string;
-  };
-  coords?: [number, number];
-  // Result type to distinguish between organizations and addresses
-  type?: 'organization' | 'address';
-  hasLogo?: boolean;
-  hasPhotos?: boolean;
-  isAdvertiser?: boolean;
-  friendsReviews?: number;
-  logo?: string;
-  gallery?: string[];
-  promotionalText?: string;
-  buttonLabel?: string;
-  zmkData?: {
-    products: {
-      id: string;
-      image: string;
-      title: string;
-      price?: string;
-    }[];
-  };
-}
+import type { SearchResult } from '@/stores/types';
 
 /**
  * Mock search results data matching SearchResultCard props
@@ -70,6 +28,12 @@ export const mockSearchResults: SearchResult[] = [
       isWarning: true,
     },
     coords: [82.9207, 55.0415],
+    phone: '+7 (495) 694-92-29',
+    website: 'gibdd.ru',
+    socialMedia: {
+      vk: 'https://vk.com/gibdd_official',
+      twitter: 'https://twitter.com/gibdd_official',
+    },
   },
   {
     id: '2',
@@ -106,6 +70,17 @@ export const mockSearchResults: SearchResult[] = [
       ],
       rating: 4.6
     },
+    phone: '+7 (383) 123-45-67',
+    messengers: {
+      whatsapp: '+73831234567',
+      telegram: '@reaktor_nsk',
+    },
+    website: 'reaktor-auto.ru',
+    socialMedia: {
+      vk: 'https://vk.com/reaktor_auto',
+      youtube: 'https://youtube.com/reaktorauto',
+      google: 'https://g.page/reaktor-auto',
+    },
   },
   {
     id: '3',
@@ -131,6 +106,18 @@ export const mockSearchResults: SearchResult[] = [
       rating: 4.8
     },
     coords: [82.9107, 55.0315],
+    phone: '+7 (383) 234-56-78',
+    messengers: {
+      whatsapp: '+73832345678',
+      telegram: '@denta_clinic',
+      viber: '+73832345678',
+    },
+    website: 'denta-nsk.ru',
+    socialMedia: {
+      vk: 'https://vk.com/denta_clinic',
+      facebook: 'https://facebook.com/dentaclinic',
+      google: 'https://g.page/denta-clinic',
+    },
   },
   {
     id: '4',
@@ -138,11 +125,17 @@ export const mockSearchResults: SearchResult[] = [
     category: 'Многофункциональный центр',
     address: 'ул. Красный проспект 101, Новосибирск',
     distance: '2.1 км',
+    type: 'organization',
     closingStatus: {
       text: 'Закроется через 15 минут',
       isWarning: true,
     },
     coords: [82.9407, 55.0615],
+    phone: '+7 (383) 345-67-89',
+    website: 'mfc.nso.ru',
+    socialMedia: {
+      vk: 'https://vk.com/mfc_nso',
+    },
   },
 ];
 

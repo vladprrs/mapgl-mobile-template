@@ -14,6 +14,9 @@ export { AddressLine } from './AddressLine';
 export { SecondaryLine } from './SecondaryLine';
 
 // UI Molecules
+export { AddToCartButton } from './AddToCartButton';
+export { CartNavbar } from './CartNavbar';
+export { ChatInput } from './ChatInput';
 export { FriendAvatars } from './FriendAvatars';
 export { QuickAction } from './QuickAction';
 export { RecommendationCard } from './RecommendationCard';
@@ -24,8 +27,10 @@ export { SuggestRow, SuggestType, type SuggestRowProps } from './SuggestRow';
 export { ZMKBlock } from './ZMKBlock';
 
 // Organization Molecules
+export { AddressCard } from './AddressCard';
 export { OrganizationTabs, type TabItem } from './OrganizationTabs';
 export { AddressTabs } from './AddressTabs';
 export { MasterCard } from './MasterCard';
 export { ReviewCard, type Review } from './ReviewCard';
 export { ContactInfo } from './ContactInfo';
+export { SectionHeader } from './SectionHeader';

@@ -156,4 +156,18 @@ export const createActions: StateCreator<
     // Navigate to masters list screen
     get().ui.navigateTo(ScreenType.MASTERS_LIST);
   },
+
+  openChat: () => {
+    debugLog('Opening AI chat');
+    
+    // Open chat overlay
+    get().chat.openChat();
+  },
+
+  closeChat: () => {
+    debugLog('Closing AI chat');
+    
+    // Close chat overlay
+    get().chat.closeChat();
+  },
 });

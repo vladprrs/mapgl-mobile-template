@@ -7,6 +7,7 @@ import { tokens } from '@/lib/ui/tokens';
 interface SearchHistoryItemProps {
   searchText: string;
   subtitle?: string;
+  showIcon?: boolean; // Only true for first item to show clock icon
   onClick?: () => void;
 }
 
@@ -15,15 +16,16 @@ interface SearchHistoryItemProps {
  * Individual search history entry for search history section
  * 
  * Design specs from Figma node 286-221965:
- * - Structure: Search icon + title + optional subtitle + bottom border
+ * - Structure: Icon + title + optional subtitle + bottom border
  * - Typography: 16px Regular for title, 14px Regular for subtitle
- * - Icon: 24px search icon (secondary color)
+ * - Icon: 24px clock icon (green #1BA136) for first item, search icon (secondary color) for others
  * - Spacing: Same as SuggestRow for consistency
  * - Border: Bottom border rgba(137,137,137,0.3)
  */
 export function SearchHistoryItem({ 
   searchText, 
   subtitle, 
+  showIcon = false,
   onClick 
 }: SearchHistoryItemProps) {
   return (
@@ -36,7 +38,16 @@ export function SearchHistoryItem({
         {/* Icon container */}
         <div className="box-border flex flex-row items-start justify-end pb-0 pt-[19px] px-0 relative shrink-0">
           <div className="shrink-0 size-6 flex items-center justify-center">
-            <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />
+            {showIcon ? (
+              <img
+                src="/assets/figma/icons/d326366184afbf1644a0dd7640c14e22f09ebcbf.svg"
+                alt="Recent search"
+                className="w-6 h-6"
+                style={{ color: '#1BA136' }}
+              />
+            ) : (
+              <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />
+            )}
           </div>
         </div>
         

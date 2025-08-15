@@ -24,11 +24,6 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
   const search = useStore((state) => state.search);
   const currentScreen = ui.currentScreen;
 
-  const handleSelectSuggestion = (suggestion: string) => {
-    debugLog('Suggestion selected:', suggestion);
-    search.setQuery(suggestion);
-    ui.navigateTo(ScreenType.SEARCH_RESULTS);
-  };
 
 
   const handleQuickAction = (actionId: string) => {
@@ -52,7 +47,6 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       case ScreenType.SEARCH_SUGGESTIONS:
         return (
           <SearchSuggestionsPage
-            onSelectSuggestion={handleSelectSuggestion}
             className={className}
           />
         );

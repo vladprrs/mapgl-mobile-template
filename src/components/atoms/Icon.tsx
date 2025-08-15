@@ -176,6 +176,72 @@ export function Icon({
         />
       </svg>
     ),
+    // Navigation/route icon for AddressCard
+    navigation: (
+      <svg 
+        width="20" 
+        height="20" 
+        viewBox="0 0 20 20" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        style={{ display: 'block' }}
+      >
+        <path 
+          fillRule="evenodd" 
+          clipRule="evenodd" 
+          d="M2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10ZM10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0Z" 
+          fill={color}
+        />
+        <path 
+          fillRule="evenodd" 
+          clipRule="evenodd" 
+          d="M8.55279 6.10557C8.83431 5.82405 9.29289 5.82405 9.57441 6.10557L13.5744 10.1056C13.8559 10.3871 13.8559 10.8457 13.5744 11.1272L9.57441 15.1272C9.29289 15.4087 8.83431 15.4087 8.55279 15.1272C8.27126 14.8457 8.27126 14.3871 8.55279 14.1056L11.6584 11L8.55279 7.89443C8.27126 7.61291 8.27126 7.15433 8.55279 6.87281Z" 
+          fill={color}
+        />
+        <path 
+          d="M6 11C6.55228 11 7 10.5523 7 10C7 9.44772 6.55228 9 6 9C5.44772 9 5 9.44772 5 10C5 10.5523 5.44772 11 6 11Z" 
+          fill={color}
+        />
+      </svg>
+    ),
+    // Chain/link icon for chain suggestions
+    chain: (
+      <svg 
+        width="20" 
+        height="20" 
+        viewBox="0 0 20 20" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        style={{ display: 'block' }}
+      >
+        <path 
+          d="M7.5 12.5L12.5 7.5M9.16667 6.66667L10.8333 5C11.5 4.33333 12.5 4.33333 13.1667 5L15 6.83333C15.6667 7.5 15.6667 8.5 15 9.16667L13.3333 10.8333M6.66667 9.16667L5 10.8333C4.33333 11.5 4.33333 12.5 5 13.1667L6.83333 15C7.5 15.6667 8.5 15.6667 9.16667 15L10.8333 13.3333" 
+          stroke={color} 
+          strokeWidth="1.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+    // Category icon (folder/grid representation)
+    category: (
+      <svg 
+        width="20" 
+        height="18" 
+        viewBox="0 0 20 18" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        style={{ display: 'block' }}
+      >
+        <path 
+          d="M0 3C0 1.34315 1.34315 0 3 0H7.58579C8.11622 0 8.62493 0.210714 9 0.585786L10.4142 2H17C18.6569 2 20 3.34315 20 5V15C20 16.6569 18.6569 18 17 18H3C1.34315 18 0 16.6569 0 15V3ZM3 2C2.44772 2 2 2.44772 2 3V15C2 15.5523 2.44772 16 3 16H17C17.5523 16 18 15.5523 18 15V5C18 4.44772 17.5523 4 17 4H9.58579C9.05536 4 8.54665 3.78929 8.17157 3.41421L6.75736 2H3Z" 
+          fill={color}
+        />
+      </svg>
+    ),
     // Traffic icons (simple circle indicators)
     'traffic-heavy': (
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ display: 'block' }}>

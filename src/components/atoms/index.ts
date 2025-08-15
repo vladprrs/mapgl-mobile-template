@@ -5,6 +5,7 @@ export { Divider } from './Divider';
 export { FilterChip } from './FilterChip';
 export { Icon } from './Icon';
 export { Input, type InputVariant, type InputSize } from './Input';
+export { ProductImage } from './ProductImage';
 export { RatingStars } from './RatingStars';
 export { Spinner } from './Spinner';
 export { Text } from './Text';

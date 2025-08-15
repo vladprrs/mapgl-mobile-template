@@ -7,6 +7,8 @@
 export * from './advice';
 export * from './dashboard';
 export * from './search';
+export * from './organizations';
+export * from './categories';
 export * from './utils/generators';
 export * from './utils/constants';
 
@@ -14,6 +16,7 @@ export * from './utils/constants';
 import { fullAdviceMockData } from './advice';
 import { fullDashboardMockData } from './dashboard';
 import { fullSearchMockData } from './search';
+import { allOrganizations } from './organizations';
 
 /**
  * Full application mock data
@@ -23,6 +26,7 @@ export const fullAppMockData = {
   ...fullDashboardMockData,
   ...fullSearchMockData,
   adviceItems: fullAdviceMockData,
+  organizations: allOrganizations,
 };
 
 /**

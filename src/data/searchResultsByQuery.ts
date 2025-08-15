@@ -107,7 +107,7 @@ export const searchResultsByQuery: SearchResultsByQuery = {
         isWarning: true,
       },
     },
-    // Position 5: Regular business
+    // Position 5: Regular business with half-star rating
     {
       id: 'rest-reg-5',
       name: 'Пиццерия Папа Джонс',
@@ -115,7 +115,7 @@ export const searchResultsByQuery: SearchResultsByQuery = {
       isAdvertiser: false,
       address: 'пр. Мира, 12',
       distance: '1.8 км',
-      rating: 4.1,
+      rating: 4.5,
       reviewCount: 156,
       closingStatus: {
         text: 'Открыто до 01:00',

@@ -40,14 +40,14 @@ export function OrganizationTabs({
         <div 
           className="absolute bottom-0 right-0 top-0 w-5"
           style={{
-            background: 'linear-gradient(to left, rgba(255,255,255,0) 5.625%, rgba(255,255,255,1) 100%)',
+            background: 'linear-gradient(to left, transparent, white)',
           }}
         />
         {/* Left gradient fade */}
         <div 
           className="absolute bottom-0 left-0 top-0 w-5"
           style={{
-            background: 'linear-gradient(to right, rgba(255,255,255,0) 5.625%, rgba(255,255,255,1) 100%)',
+            background: 'linear-gradient(to right, white, transparent)',
           }}
         />
       </div>

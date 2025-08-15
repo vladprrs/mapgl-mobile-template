@@ -3,6 +3,7 @@
 import React from 'react';
 import { SearchResultCard, type SearchResultCardProps } from './SearchResultCard';
 import { MastersNearbyCard } from './MastersNearbyCard';
+import { ProductsCarousel } from './ProductsCarousel';
 import { Text } from '@/components/atoms';
 import { tokens } from '@/lib/ui/tokens';
 import { mockMastersNearby, mastersNearbyConfig } from '@/__mocks__/masters/nearby';
@@ -91,14 +92,37 @@ export function SearchResultsList({
       )}
 
       {/* Regular search results */}
-      {results.map((result) => (
-        <div key={result.id} role="listitem">
-          <SearchResultCard
-            {...result}
-            onClick={() => onResultClick?.(result)}
-          />
-        </div>
-      ))}
+      {results.map((result, index) => {
+        // Insert ProductsCarousel after 3rd result (index 3)
+        if (index === 3) {
+          return (
+            <React.Fragment key={`result-with-carousel-${result.id}`}>
+              <div role="listitem">
+                <SearchResultCard
+                  {...result}
+                  onClick={() => onResultClick?.(result)}
+                />
+              </div>
+              <div role="listitem">
+                <ProductsCarousel 
+                  title="Товары"
+                  subtitle="Пригодятся для занятий спортом"
+                  products={[]} // Use default mock products
+                  onSeeAll={() => console.log('See all products')}
+                />
+              </div>
+            </React.Fragment>
+          );
+        }
+        return (
+          <div key={result.id} role="listitem">
+            <SearchResultCard
+              {...result}
+              onClick={() => onResultClick?.(result)}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

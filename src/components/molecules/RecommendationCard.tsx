@@ -5,7 +5,7 @@ import { tokens } from '@/lib/ui/tokens';
 
 interface RecommendationCardProps {
   id: string;
-  icon: string;
+  icon: string; // Now represents image path instead of emoji
   title: string;
   onClick?: () => void;
   theme?: 'Light' | 'Dark';
@@ -54,7 +54,11 @@ export function RecommendationCard({
           }}
         >
           <div className="overflow-clip relative shrink-0 size-8 flex items-center justify-center">
-            <span style={{ fontSize: '20px' }}>{icon}</span>
+            <img
+              src={icon}
+              alt={title}
+              className="w-8 h-8 object-contain"
+            />
           </div>
         </div>
       </div>

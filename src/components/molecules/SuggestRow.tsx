@@ -18,14 +18,16 @@ export enum SuggestType {
   CATEGORY = 'category',
 }
 
+export type SuggestRowType = 'saved_address' | 'organization' | 'category' | 'chain' | 'history' | 'place' | 'product';
+
 export interface SuggestRowProps {
-  type: SuggestType;
+  type: SuggestRowType;
   title: string;
   subtitle?: string;
   distance?: string;
   branchCount?: string;
   highlightedText?: string;
-  icon?: 'home' | 'work' | 'search' | 'category';
+  icon?: 'home' | 'work' | 'search' | 'category' | 'location' | 'chain';
   onClick?: () => void;
 }
 
@@ -61,22 +63,37 @@ export function SuggestRow({
 
   // Render icon based on type and icon prop
   const renderIcon = () => {
-    if (type === SuggestType.SAVED_ADDRESS && icon === 'home') {
+    // Handle saved address types with specific icons
+    if (type === 'saved_address' && icon === 'home') {
       return (
         <Icon name={ICONS.HOME} size={24} color={COLORS.TEXT_PRIMARY} />
       );
     }
-    if (type === SuggestType.SAVED_ADDRESS && icon === 'work') {
+    if (type === 'saved_address' && icon === 'work') {
       return (
         <Icon name={ICONS.WORK} size={24} color={COLORS.TEXT_PRIMARY} />
       );
     }
-    if (type === SuggestType.ORGANIZATION || type === SuggestType.CATEGORY) {
-      return (
-        <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />
-      );
+    if (type === 'organization') {
+      return <Icon name={ICONS.LOCATION} size={24} color={COLORS.TEXT_SECONDARY} />;
     }
-    return null;
+    if (type === 'category') {
+      return <Icon name={ICONS.CATEGORY} size={24} color={COLORS.TEXT_SECONDARY} />;
+    }
+    if (type === 'chain') {
+      return <Icon name={ICONS.CHAIN} size={24} color={COLORS.TEXT_SECONDARY} />;
+    }
+    if (type === 'history') {
+      return <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />;
+    }
+    if (type === 'place') {
+      return <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />;
+    }
+    if (type === 'product') {
+      return <Icon name={ICONS.CATEGORY} size={24} color={COLORS.TEXT_SECONDARY} />;
+    }
+    
+    return <Icon name={ICONS.SEARCH} size={24} color={COLORS.TEXT_SECONDARY} />;
   };
 
   return (
@@ -100,12 +117,12 @@ export function SuggestRow({
             <div className="box-border flex flex-row items-start justify-start p-0 relative w-full">
               <div className="flex-1 box-border flex flex-row gap-2 items-start justify-start min-h-px p-0 relative">
                 <div className="flex-1 leading-[20px] min-h-px relative text-[16px] text-left tracking-[-0.24px]">
-                  {type === SuggestType.SAVED_ADDRESS && (
+                  {type === 'saved_address' && (
                     <span className="font-medium" style={{ color: tokens.colors.text.primary }}>{title}</span>
                   )}
-                  {type === SuggestType.ORGANIZATION && renderHighlightedTitle()}
-                  {type === SuggestType.CATEGORY && (
-                    <span className="font-normal" style={{ color: tokens.colors.text.secondary }}>{title}</span>
+                  {type === 'organization' && renderHighlightedTitle()}
+                  {(type === 'category' || type === 'chain' || type === 'history' || type === 'place') && (
+                    <span className="font-medium" style={{ color: tokens.colors.text.primary }}>{title}</span>
                   )}
                 </div>
               </div>
@@ -115,7 +132,7 @@ export function SuggestRow({
             {(subtitle || distance || branchCount) && (
               <div className="box-border flex flex-row items-start justify-start p-0 relative w-full">
                 <div className="flex-1 box-border flex flex-row gap-2 items-start justify-start leading-[18px] min-h-px p-0 relative text-[14px] text-left tracking-[-0.28px]" style={{ color: tokens.colors.text.secondary }}>
-                  {type === SuggestType.SAVED_ADDRESS && (
+                  {type === 'saved_address' && (
                     <>
                       <div className="flex-1 min-h-px relative">
                         <span className="font-normal">{subtitle}</span>
@@ -127,24 +144,20 @@ export function SuggestRow({
                       )}
                     </>
                   )}
-                  {type === SuggestType.ORGANIZATION && subtitle && (
+                  {(type === 'organization' || type === 'chain' || type === 'category' || type === 'place' || type === 'history') && subtitle && (
                     <div className="flex-1 min-h-px relative">
                       <span className="font-normal">{subtitle}</span>
                     </div>
                   )}
-                  {type === SuggestType.CATEGORY && (
-                    <>
-                      {branchCount && (
-                        <div className="relative shrink-0 text-nowrap">
-                          <span className="font-normal whitespace-pre">{branchCount}</span>
-                        </div>
-                      )}
-                      {highlightedText && (
-                        <div className="flex-1 min-h-px relative">
-                          {renderHighlightedTitle()}
-                        </div>
-                      )}
-                    </>
+                  {branchCount && (
+                    <div className="relative shrink-0 text-nowrap">
+                      <span className="font-normal whitespace-pre">{branchCount}</span>
+                    </div>
+                  )}
+                  {highlightedText && (
+                    <div className="flex-1 min-h-px relative">
+                      {renderHighlightedTitle()}
+                    </div>
                   )}
                 </div>
               </div>

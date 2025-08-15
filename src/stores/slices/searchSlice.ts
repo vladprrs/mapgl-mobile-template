@@ -1,11 +1,16 @@
 'use client';
 
 import type { StateCreator } from 'zustand';
-import type { AppStore, SearchSlice, SearchSuggestion, Filter, SearchResult } from '../types';
+import type { AppStore, SearchSlice, SearchSuggestion, Filter, SearchResult, SearchContext } from '../types';
 import { debugLog } from '@/lib/logging';
-import { mockAllSuggestions } from '@/__mocks__/search/suggestions';
-import { mockSearchResults } from '@/__mocks__/search/results';
+import { mockAllSuggestions, getSuggestions, getDefaultSuggestions } from '@/__mocks__/search/suggestions';
+import { allOrganizations } from '@/__mocks__/organizations';
 import { getSearchResultsForQuery, hasResultsForQuery } from '@/data/searchResultsByQuery';
+import { 
+  getMatchingCategories, 
+  getOrganizationCategories, 
+  categoryDisplayNames 
+} from '@/__mocks__/search/productAliases';
 
 const MAX_HISTORY_ITEMS = 10;
 
@@ -84,6 +89,7 @@ export const createSearchSlice: StateCreator<
   isSearching: false,
   activeFilters: [],
   availableFilters: [],
+  searchContext: null,
 
   setQuery: (query: string) => {
     set((state) => {
@@ -97,21 +103,59 @@ export const createSearchSlice: StateCreator<
     set((state) => {
       state.search.isSearching = true;
       state.search.query = query;
+      state.search.searchContext = null; // Clear previous context
     });
 
     try {
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // First try to get results from our query-specific mock data
-      let results = getSearchResultsForQuery(query);
+      let results: SearchResult[] = [];
+      let searchContext: SearchContext | null = null;
       
-      // If no specific results found, fall back to filtered general results
-      if (results.length === 0) {
-        results = mockSearchResults.filter((result) =>
-          result.name?.toLowerCase().includes(query.toLowerCase()) ||
-          result.address?.toLowerCase().includes(query.toLowerCase()) ||
-          result.category?.toLowerCase().includes(query.toLowerCase())
+      // 1. Check if query matches any product/service terms
+      const matchedCategories = getMatchingCategories(query);
+      
+      if (matchedCategories.length > 0) {
+        // Product search found - find organizations in those categories
+        const orgCategories = getOrganizationCategories(matchedCategories);
+        
+        results = allOrganizations.filter(org => 
+          orgCategories.includes(org.category)
         );
+        
+        // Create search context for product search
+        searchContext = {
+          type: 'product_search',
+          query: query,
+          categories: matchedCategories,
+          message: `Показаны магазины, где можно купить "${query}"`,
+          originalQuery: query
+        };
+        
+        debugLog('Product search found:', { 
+          query, 
+          matchedCategories, 
+          orgCategories, 
+          resultCount: results.length 
+        });
+      } else {
+        // 2. Try to get results from our query-specific mock data
+        results = getSearchResultsForQuery(query);
+        
+        // 3. If no specific results found, fall back to filtered consolidated organizations
+        if (results.length === 0) {
+          results = allOrganizations.filter((result) =>
+            result.name?.toLowerCase().includes(query.toLowerCase()) ||
+            result.address?.toLowerCase().includes(query.toLowerCase()) ||
+            result.category?.toLowerCase().includes(query.toLowerCase())
+          );
+        }
+        
+        // Set regular search context
+        searchContext = {
+          type: 'regular_search',
+          query: query
+        };
       }
 
       // Generate available filters based on search results
@@ -121,6 +165,7 @@ export const createSearchSlice: StateCreator<
         state.search.results = results;
         state.search.filteredResults = results;
         state.search.availableFilters = availableFilters;
+        state.search.searchContext = searchContext;
         state.search.isSearching = false;
       });
 
@@ -131,6 +176,7 @@ export const createSearchSlice: StateCreator<
       set((state) => {
         state.search.isSearching = false;
         state.search.results = [];
+        state.search.searchContext = null;
       });
     }
   },
@@ -145,16 +191,21 @@ export const createSearchSlice: StateCreator<
         type: 'history' as const,
       }));
 
+      const defaultSuggestions = getDefaultSuggestions().map((s) => ({
+        id: s.id,
+        title: s.text,
+        subtitle: s.subtitle,
+        type: s.type as 'place' | 'category' | 'history' | 'organization' | 'chain',
+        coords: 'coordinates' in s ? s.coordinates : undefined,
+        organizationId: 'organizationId' in s ? s.organizationId : undefined,
+        organizationIds: 'organizationIds' in s ? s.organizationIds : undefined,
+        category: s.category
+      }));
+
       set((state) => {
         state.search.suggestions = historySuggestions.length > 0 
-          ? historySuggestions 
-          : mockAllSuggestions.slice(0, 5).map((s) => ({
-            id: `suggestion-${Math.random()}`,
-            title: s.title,
-            subtitle: 'subtitle' in s ? s.subtitle : undefined,
-            type: 'place' as const,
-            coords: undefined
-          }));
+          ? [...historySuggestions, ...defaultSuggestions].slice(0, 8)
+          : defaultSuggestions.slice(0, 5);
       });
       return;
     }
@@ -162,14 +213,16 @@ export const createSearchSlice: StateCreator<
     try {
       await new Promise(resolve => setTimeout(resolve, 200));
 
-      const filtered = mockAllSuggestions.filter((suggestion) =>
-        suggestion.title.toLowerCase().includes(query.toLowerCase())
-      ).map((s) => ({
-        id: `suggestion-${Math.random()}`,
-        title: s.title,
-        subtitle: 'subtitle' in s ? s.subtitle : undefined,
-        type: 'place' as const,
-        coords: undefined
+      // Use new smart suggestions system
+      const smartSuggestions = getSuggestions(query).map((s) => ({
+        id: s.id,
+        title: s.text,
+        subtitle: s.subtitle,
+        type: s.type as 'place' | 'category' | 'history' | 'organization' | 'chain',
+        coords: 'coordinates' in s ? s.coordinates : undefined,
+        organizationId: 'organizationId' in s ? s.organizationId : undefined,
+        organizationIds: 'organizationIds' in s ? s.organizationIds : undefined,
+        category: s.category
       }));
 
       const historySuggestions: SearchSuggestion[] = get().search.history
@@ -181,7 +234,7 @@ export const createSearchSlice: StateCreator<
         }));
 
       set((state) => {
-        state.search.suggestions = [...historySuggestions, ...filtered].slice(0, 10);
+        state.search.suggestions = [...historySuggestions, ...smartSuggestions].slice(0, 10);
       });
 
     } catch (error) {
@@ -201,6 +254,7 @@ export const createSearchSlice: StateCreator<
       state.search.isSearching = false;
       state.search.activeFilters = [];
       state.search.availableFilters = [];
+      state.search.searchContext = null;
     });
   },
 
@@ -233,10 +287,60 @@ export const createSearchSlice: StateCreator<
       state.search.query = suggestion.title;
     });
 
-    if (suggestion.type === 'history') {
-      get().search.search(suggestion.title);
-    } else {
-      get().search.search(suggestion.title);
+    // Handle different suggestion types
+    switch (suggestion.type) {
+      case 'organization':
+        if (suggestion.organizationId) {
+          // Navigate directly to organization
+          const organization = allOrganizations.find(org => org.id === suggestion.organizationId);
+          if (organization) {
+            get().actions.selectOrganization(organization);
+            return;
+          }
+        }
+        break;
+        
+      case 'category':
+        if (suggestion.category) {
+          // Search by category
+          const categoryResults = allOrganizations.filter(org => org.category === suggestion.category);
+          set((state) => {
+            state.search.results = categoryResults;
+            state.search.filteredResults = categoryResults;
+            state.search.isSearching = false;
+          });
+          get().search.addToHistory(suggestion.title);
+          return;
+        }
+        break;
+        
+      case 'chain':
+        if (suggestion.organizationIds) {
+          // Show all chain branches
+          const chainResults = allOrganizations.filter(org => 
+            suggestion.organizationIds!.includes(org.id)
+          );
+          set((state) => {
+            state.search.results = chainResults;
+            state.search.filteredResults = chainResults;
+            state.search.isSearching = false;
+          });
+          get().search.addToHistory(suggestion.title);
+          return;
+        }
+        break;
+        
+      case 'product':
+        // For product suggestions, perform a product search
+        get().search.search(suggestion.title);
+        break;
+        
+      case 'history':
+      case 'place':
+      default:
+        // Fallback to regular search
+        get().search.search(suggestion.title);
+        break;
     }
   },
 
@@ -322,6 +426,12 @@ export const createSearchSlice: StateCreator<
 
     set((state) => {
       state.search.filteredResults = filtered;
+    });
+  },
+
+  setSearchContext: (context: SearchContext | null) => {
+    set((state) => {
+      state.search.searchContext = context;
     });
   },
 });
