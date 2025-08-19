@@ -56,6 +56,7 @@ export function MobileMapShell({
   };
   const [currentSnap, setCurrentSnap] = useState<number>(initialSnap ?? snapPoints[1]);
   const [isCartSheetOpen, setIsCartSheetOpen] = useState<boolean>(false);
+  const [cartViewMode, setCartViewMode] = useState<'cart' | 'success'>('cart');
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
   const bottomSheetRef = useRef<BottomSheetRef>(null);
@@ -145,13 +146,25 @@ export function MobileMapShell({
     }
   }, [actions, search.query, chat]);
 
+  const clearCart = useStore((state) => state.cart.clearCart);
+  
   const handleCheckout = useCallback(() => {
-    debugLog('Opening cart sheet with total:', cart.cart.total, 'items:', cart.cart.count);
-    setIsCartSheetOpen(true);
-  }, [cart.cart.total, cart.cart.count]);
+    if (isCartSheetOpen && cartViewMode === 'cart') {
+      // If cart sheet is open and in cart view, complete the order
+      debugLog('Completing order, total:', cart.cart.total);
+      clearCart();
+      setCartViewMode('success');
+    } else {
+      // Otherwise, open cart sheet
+      debugLog('Opening cart sheet, total:', cart.cart.total);
+      setIsCartSheetOpen(true);
+      setCartViewMode('cart');
+    }
+  }, [cart.cart.total, isCartSheetOpen, cartViewMode, clearCart]);
 
   const handleCartSheetClose = useCallback(() => {
     setIsCartSheetOpen(false);
+    setCartViewMode('cart'); // Reset view mode when closing
   }, []);
 
   // Chat sheet handlers
@@ -316,6 +329,8 @@ export function MobileMapShell({
             <CartSheetPage 
               isOpen={isCartSheetOpen}
               onClose={handleCartSheetClose}
+              viewMode={cartViewMode}
+              onViewModeChange={setCartViewMode}
             />
           </BottomSheet>
         </div>
@@ -325,7 +340,8 @@ export function MobileMapShell({
       <CartNavbar
         totalAmount={cart.cart.total}
         itemCount={cart.cart.count}
-        isVisible={cart.cart.count > 0}
+        isVisible={(cart.cart.count > 0 || (isCartSheetOpen && cartViewMode === 'cart')) && cartViewMode !== 'success'}
+        isInCartView={isCartSheetOpen && cartViewMode === 'cart'}
         onCheckout={handleCheckout}
       />
 

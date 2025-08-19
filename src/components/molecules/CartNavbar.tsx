@@ -2,21 +2,17 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { tokens } from '@/lib/ui/tokens';
 
 interface CartNavbarProps {
   totalAmount: number;
   itemCount: number;
   isVisible: boolean;
+  isInCartView?: boolean;
   onCheckout: () => void;
 }
 
-export function CartNavbar({ totalAmount, isVisible, onCheckout }: CartNavbarProps) {
-  // Debug logging
-  console.log('CartNavbar render:', { totalAmount, isVisible });
-  
+export function CartNavbar({ totalAmount, isVisible, isInCartView = false, onCheckout }: CartNavbarProps) {
   if (!isVisible) {
-    console.log('CartNavbar hidden - no items');
     return null;
   }
 
@@ -42,11 +38,12 @@ export function CartNavbar({ totalAmount, isVisible, onCheckout }: CartNavbarPro
       >
         <button
           onClick={onCheckout}
-          className="w-full flex flex-row gap-1.5 items-center justify-center py-[14px] px-4 rounded-[10px]"
+          className="w-full flex flex-row gap-1.5 items-center justify-center py-[14px] px-4 rounded-[10px] hover:brightness-110 active:scale-[0.98] transition-all duration-150"
           style={{
             backgroundColor: '#1db93c',
             border: 'none',
             cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(29, 185, 60, 0.3)',
           }}
         >
           <Image 
@@ -57,7 +54,7 @@ export function CartNavbar({ totalAmount, isVisible, onCheckout }: CartNavbarPro
             className="w-6 h-6"
           />
           <span className="font-semibold text-white text-[16px] tracking-[-0.24px]">
-            Заказать за {totalAmount} ₽
+            {isInCartView ? `Оформить заказ за ${totalAmount} ₽` : `Заказать за ${totalAmount} ₽`}
           </span>
         </button>
       </div>

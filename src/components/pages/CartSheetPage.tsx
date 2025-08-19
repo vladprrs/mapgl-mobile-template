@@ -8,12 +8,13 @@ import { tokens } from '@/lib/ui/tokens';
 interface CartSheetPageProps {
   isOpen: boolean;
   onClose: () => void;
+  viewMode: 'cart' | 'success';
+  onViewModeChange: (mode: 'cart' | 'success') => void;
 }
 
-export function CartSheetPage({ isOpen, onClose }: CartSheetPageProps) {
+export function CartSheetPage({ isOpen, onClose, viewMode, onViewModeChange }: CartSheetPageProps) {
   const cartItems = useStore((state) => state.cart.cart.items);
   const updateQuantity = useStore((state) => state.cart.updateQuantity);
-  const cartTotal = useStore((state) => state.cart.cart.total);
   
   const [selectedTimeOption, setSelectedTimeOption] = useState<'express' | 'click'>('express');
   const [promoCode, setPromoCode] = useState('');
@@ -21,16 +22,155 @@ export function CartSheetPage({ isOpen, onClose }: CartSheetPageProps) {
 
   // Convert Map to array of cart items
   const cartProducts = Array.from(cartItems.values());
-  
-  console.log('CartSheetPage - Cart items:', cartItems);
-  console.log('CartSheetPage - Cart products:', cartProducts);
 
   const handleQuantityChange = (id: string, quantity: number) => {
-    console.log('CartSheetPage - Updating quantity:', { id, quantity });
     updateQuantity(id, quantity);
   };
 
-  if (!isOpen) return null;
+  const handleCloseFromSuccess = () => {
+    // Reset view mode and close sheet
+    onViewModeChange('cart');
+    onClose();
+  };
+
+  if (!isOpen) {
+    // Reset view mode when sheet is closed
+    if (viewMode === 'success') {
+      onViewModeChange('cart');
+    }
+    return null;
+  }
+
+  // Success view
+  if (viewMode === 'success') {
+    return (
+      <div className="bg-white rounded-t-[16px] h-full flex flex-col" style={{ paddingTop: '6px' }}>
+        {/* Header with blur backdrop */}
+        <div 
+          className="absolute top-0 left-0 right-0 z-10 pb-2 pt-4"
+          style={{
+            backdropFilter: 'blur(20px)',
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            borderTopLeftRadius: tokens.borders.radius.lg,
+            borderTopRightRadius: tokens.borders.radius.lg
+          }}
+        >
+          <div className="flex items-center px-4">
+            <div className="flex-1 text-center">
+              <h2 
+                className="text-[16px]"
+                style={{
+                  fontFamily: 'SB Sans Text, sans-serif',
+                  fontWeight: 600,
+                  color: tokens.colors.text.primary,
+                  lineHeight: '20px'
+                }}
+              >
+                Заказ оформлен
+              </h2>
+            </div>
+            <button 
+              onClick={handleCloseFromSuccess}
+              className="p-2.5 rounded-lg"
+              style={{ backgroundColor: 'rgba(20,20,20,0.06)' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path 
+                  d="M12 4L4 12M4 4L12 12" 
+                  stroke="#141414" 
+                  strokeWidth="1.5" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Success content */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
+          {/* Success Icon */}
+          <div 
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              backgroundColor: '#1db93c',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: tokens.spacing[6],
+            }}
+          >
+            <svg 
+              width="40" 
+              height="40" 
+              viewBox="0 0 24 24" 
+              fill="none"
+            >
+              <path 
+                d="M5 13l4 4L19 7" 
+                stroke="white" 
+                strokeWidth="3" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          {/* Success Message */}
+          <h1 
+            style={{
+              fontSize: tokens.typography.fontSize['2xl'],
+              fontWeight: tokens.typography.fontWeight.semibold,
+              color: tokens.colors.text.primary,
+              marginBottom: tokens.spacing[8],
+              textAlign: 'center',
+            }}
+          >
+            Ваш заказ успешно оформлен
+          </h1>
+
+          {/* App Download Section */}
+          <div 
+            style={{
+              backgroundColor: tokens.colors.background.secondary,
+              borderRadius: tokens.borders.radius.lg,
+              padding: tokens.spacing[6],
+              width: '100%',
+              maxWidth: '400px',
+              textAlign: 'center',
+            }}
+          >
+            <p 
+              style={{
+                fontSize: tokens.typography.fontSize.base,
+                color: tokens.colors.text.secondary,
+                marginBottom: tokens.spacing[4],
+              }}
+            >
+              В нем вы можете отслеживать статус заказа
+            </p>
+
+            <button
+              onClick={() => window.open('https://apps.apple.com/', '_blank')}
+              className="w-full py-3 px-4 rounded-lg"
+              style={{
+                backgroundColor: '#1db93c',
+                color: 'white',
+                fontSize: tokens.typography.fontSize.base,
+                fontWeight: tokens.typography.fontWeight.medium,
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Скачать приложение Самокат
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Empty state
   if (cartProducts.length === 0) {
@@ -334,6 +474,7 @@ export function CartSheetPage({ isOpen, onClose }: CartSheetPageProps) {
             </div>
           </div>
         </div>
+
 
         {/* Bottom spacing for CartNavbar */}
         <div className="h-4" />
