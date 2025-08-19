@@ -35,19 +35,25 @@ import { useActions } from '@/stores';
 
 // Atomic selectors (performance)
 const query = useStore(state => state.search.query);
+const cartTotal = useStore(state => state.cart.cart.total);
 const actions = useActions();
 
 // Cross-slice actions for complex workflows
 await actions.performSearch('restaurants');
+
+// Cart state management
+const clearCart = useStore(state => state.cart.clearCart);
+const updateQuantity = useStore(state => state.cart.updateQuantity);
 ```
 
 ## 📁 Key File Locations
 ```
 src/
 ├── components/atoms/      # Button, Icon, RatingStars
-├── components/molecules/  # SearchInput, FriendAvatars, ContactInfo  
-├── components/organisms/  # SearchBar, OrganizationHeader
-├── stores/slices/        # Map, Search, UI state
+├── components/molecules/  # SearchInput, FriendAvatars, ContactInfo, CartNavbar
+├── components/organisms/  # SearchBar, OrganizationHeader, CheckoutItemCard
+├── components/pages/      # CartSheetPage (with cart/success views)
+├── stores/slices/        # Map, Search, UI, Cart state
 ├── __mocks__/search/     # Product aliases, suggestions
 └── lib/ui/tokens.ts      # Design tokens
 ```
@@ -65,6 +71,19 @@ SearchBar organism:
 - Search pages: Auto-expand to 90%
 - Dashboard: Stay at 50%
 - Organization details: Secondary background (#F1F1F1)
+
+### Cart & Order Flow
+```typescript
+// Cart overlay managed separately from main bottom sheet
+CartSheetPage: Overlay component with two view modes
+├── 'cart' view: Shows items, quantities, delivery options
+└── 'success' view: Order confirmation with app download
+
+// Single floating CartNavbar button handles all actions:
+- From search/other: "Заказать за X ₽" → Opens cart overlay
+- From cart view: "Оформить заказ за X ₽" → Shows success view
+- No duplicate buttons inside cart content
+```
 
 ### Product Search System
 Location: `src/__mocks__/search/productAliases.ts`
@@ -87,9 +106,11 @@ const FOOD_CATEGORIES = ['ресторан', 'кафе', 'пицца', 'суши
 - ❌ NEVER import molecules from other molecules
 - ❌ NEVER use hardcoded colors/spacing
 - ❌ NEVER manage state outside Zustand
+- ❌ NEVER duplicate buttons (one CartNavbar button for all cart actions)
 - ✅ ALWAYS use design tokens
 - ✅ ALWAYS use atomic selectors for performance
 - ✅ ALWAYS run `npm run type-check` and `npm run lint` before commit
+- ✅ ALWAYS keep cart overlay separate from main bottom sheet
 
 ## 🐛 Quick Fixes
 - Hydration errors: Use dynamic imports with `ssr: false`
