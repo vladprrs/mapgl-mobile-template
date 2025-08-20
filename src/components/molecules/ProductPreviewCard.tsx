@@ -3,7 +3,7 @@
 import React from 'react';
 import { ProductImage } from '@/components/atoms';
 
-interface ProductCardProps {
+interface ProductPreviewCardProps {
   id: string;
   image?: string;
   image2?: string; // For "all products" variant with stacked images
@@ -15,7 +15,7 @@ interface ProductCardProps {
   className?: string;
 }
 
-export function ProductCard({ 
+export function ProductPreviewCard({ 
   id, 
   image, 
   image2,
@@ -25,7 +25,7 @@ export function ProductCard({
   type = 'product',
   onClick,
   className = ''
-}: ProductCardProps) {
+}: ProductPreviewCardProps) {
   const handleClick = () => {
     if (onClick) {
       onClick(id);

@@ -49,7 +49,6 @@ export function OrganizationPage({
   // Debug log to verify category detection
   React.useEffect(() => {
     if (organization) {
-      console.log(`Organization "${organization.name}" - Category: "${organization.category}" - Food establishment: ${isFoodEstablishment}`);
     }
   }, [organization, isFoodEstablishment]);
 
@@ -152,7 +151,6 @@ export function OrganizationPage({
 function OverviewTabContent({ organization }: { organization: SearchResult }) {
   const handleNavigate = () => {
     // TODO: Open navigation/map functionality
-    console.log('Navigate to:', organization.address);
   };
 
   return (
@@ -375,7 +373,6 @@ function PricesTabContent({ organization }: { organization: SearchResult }) {
   const products = organization.products || defaultProducts;
 
   const handleAddToCart = (product: typeof products[0]) => {
-    console.log('Adding to cart:', product);
     addToCart({
       productId: product.id,
       title: product.title,
@@ -387,7 +384,6 @@ function PricesTabContent({ organization }: { organization: SearchResult }) {
   };
 
   const handleQuantityChange = (productId: string, quantity: number) => {
-    console.log('Updating quantity:', { productId, quantity });
     if (quantity === 0) {
       updateQuantity(productId, 0);
     } else {

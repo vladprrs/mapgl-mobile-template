@@ -107,7 +107,6 @@ export const createSearchSlice: StateCreator<
     });
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 300));
       
       let results: SearchResult[] = [];
       let searchContext: SearchContext | null = null;
@@ -211,7 +210,6 @@ export const createSearchSlice: StateCreator<
     }
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Use new smart suggestions system
       const smartSuggestions = getSuggestions(query).map((s) => ({

@@ -4,7 +4,7 @@ import React from 'react';
 import { ProductImage } from '@/components/atoms/ProductImage';
 import { AddToCartButton } from '@/components/molecules/AddToCartButton';
 
-interface ProductCardProps {
+interface CartProductCardProps {
   id: string;
   image: string;
   title: string;
@@ -16,7 +16,7 @@ interface ProductCardProps {
   onUpdateQuantity?: (quantity: number) => void;
 }
 
-export function ProductCard({
+export function CartProductCard({
   id,
   image,
   title,
@@ -25,7 +25,7 @@ export function ProductCard({
   quantity = 0,
   onAddToCart = () => {},
   onUpdateQuantity = () => {}
-}: ProductCardProps) {
+}: CartProductCardProps) {
   // Determine button state based on quantity
   const getButtonState = () => {
     if (quantity > 0) return 'added';
@@ -48,7 +48,6 @@ export function ProductCard({
     }
   };
   
-  console.log('ProductCard rendering:', { id, image, title, price, oldPrice, quantity });
   
   // Placeholder image if image doesn't exist
   const PLACEHOLDER = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="142" height="142" fill="%23f1f1f1"%3E%3Crect width="142" height="142" /%3E%3Ctext x="71" y="71" text-anchor="middle" dy=".3em" font-family="sans-serif" font-size="12" fill="%23898989"%3ENo Image%3C/text%3E%3C/svg%3E';

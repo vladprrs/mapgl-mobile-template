@@ -19,7 +19,7 @@ export { AssistantMessage } from './AssistantMessage';
 export { CartNavbar } from './CartNavbar';
 export { ChatInput } from './ChatInput';
 export { FriendAvatars } from './FriendAvatars';
-export { ProductCard } from './ProductCard';
+export { ProductPreviewCard } from './ProductPreviewCard';
 export { ProductsCarousel } from './ProductsCarousel';
 export { QuickAction } from './QuickAction';
 export { RecommendationCard } from './RecommendationCard';
