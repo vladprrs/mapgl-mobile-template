@@ -176,12 +176,6 @@ export function MobileMapShell({
     actions.closeChat();
   }, [actions]);
 
-  // Debug cart state
-  console.log('MobileMapShell cart state:', { 
-    total: cart.cart.total, 
-    count: cart.cart.count, 
-    isVisible: cart.cart.count > 0 
-  });
 
   const handleSnapChange = useCallback((snap: number) => {
     // Update current snap state

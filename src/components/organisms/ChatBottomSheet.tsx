@@ -62,12 +62,10 @@ export function ChatBottomSheet({ isOpen, onClose, onBack }: ChatBottomSheetProp
   };
 
   const handleProductClick = (productId: string, storeId: string) => {
-    console.log('Product clicked:', { productId, storeId });
     // TODO: Add product to cart or show product details
   };
 
   const handleOrderClick = (storeId: string) => {
-    console.log('Order clicked for store:', storeId);
     // TODO: Navigate to store or open order flow
   };
 

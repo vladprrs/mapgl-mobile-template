@@ -25,7 +25,6 @@ export function StoreRecommendationCard({
 
   const handleMoreClick = () => {
     // Could open store details or show more products
-    console.log('More options for store:', store.name);
   };
 
   return (

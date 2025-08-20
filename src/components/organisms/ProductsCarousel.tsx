@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ProductCard } from './ProductCard';
+import { CartProductCard } from './CartProductCard';
 import useStore from '@/stores';
 
 interface Product {
@@ -60,10 +60,8 @@ export function ProductsCarousel({
   const addToCart = useStore((state) => state.cart.addToCart);
   const updateQuantity = useStore((state) => state.cart.updateQuantity);
   
-  console.log('ProductsCarousel products:', productsToShow);
 
   const handleAddToCart = (product: Product) => {
-    console.log('Adding to cart:', product);
     addToCart({
       productId: product.id,
       title: product.title,
@@ -75,7 +73,6 @@ export function ProductsCarousel({
   };
 
   const handleUpdateQuantity = (productId: string, quantity: number) => {
-    console.log('Updating quantity:', { productId, quantity });
     updateQuantity(productId, quantity);
   };
 
@@ -138,10 +135,9 @@ export function ProductsCarousel({
         {productsToShow.map((product) => {
           const cartItem = cartItems.get(product.id);
           const quantity = cartItem ? cartItem.quantity : 0;
-          console.log('Rendering ProductCard:', { id: product.id, image: product.image, title: product.title, price: product.price, quantity });
           return (
             <div key={product.id} className="flex-shrink-0">
-              <ProductCard
+              <CartProductCard
                 id={product.id}
                 image={product.image}
                 title={product.title}
