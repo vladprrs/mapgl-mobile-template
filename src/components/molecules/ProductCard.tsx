@@ -1,108 +1,132 @@
 'use client';
 
-import React from 'react';
-import { ProductImage } from '@/components/atoms';
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { tokens } from '@/lib/ui/tokens';
+import { AddToCartButton } from './AddToCartButton';
 
 interface ProductCardProps {
   id: string;
-  image?: string;
-  image2?: string; // For "all products" variant with stacked images
-  title: string;
-  price?: number;
+  name: string;
+  specification: string;
+  price: number;
   oldPrice?: number;
-  type?: 'product' | 'all';
-  onClick?: (productId: string) => void;
-  className?: string;
+  image: string;
+  onAddToCart?: (id: string) => void;
+  initialQuantity?: number;
 }
 
-export function ProductCard({ 
-  id, 
-  image, 
-  image2,
-  title, 
-  price, 
-  oldPrice, 
-  type = 'product',
-  onClick,
-  className = ''
+/**
+ * ProductCard Molecule
+ * Based on Figma node-id 430-248630
+ * 
+ * Features:
+ * - Square product image (171x171px)
+ * - Product name with 2-line ellipsis
+ * - Specification text
+ * - Price button with strikethrough old price
+ * - Quantity controls after first add
+ */
+export function ProductCard({
+  id,
+  name,
+  specification,
+  price,
+  oldPrice,
+  image,
+  onAddToCart,
+  initialQuantity = 0
 }: ProductCardProps) {
-  const handleClick = () => {
-    if (onClick) {
-      onClick(id);
+  const [quantity, setQuantity] = useState(initialQuantity);
+
+  const handleAdd = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    if (onAddToCart) {
+      onAddToCart(id);
     }
   };
 
-  const isAllProductsCard = type === 'all';
+  const handleRemove = () => {
+    const newQuantity = Math.max(0, quantity - 1);
+    setQuantity(newQuantity);
+  };
+
+  // Determine button state based on quantity and discount
+  const getButtonState = () => {
+    if (quantity > 0) return 'added';
+    return oldPrice && oldPrice > price ? 'discount' : 'default';
+  };
 
   return (
-    <button
-      onClick={handleClick}
-      className={`flex flex-row gap-1 items-center p-2 bg-[rgba(20,20,20,0.06)] rounded-xl w-72 h-[88px] shrink-0 border-none cursor-pointer active:scale-95 transition-transform text-left ${className}`}
+    <div 
+      className="flex flex-col"
+      style={{
+        width: '171px',
+      }}
     >
-      {/* Product Image or Stacked Images */}
-      <div className="w-[72px] h-[72px] shrink-0 relative">
-        {isAllProductsCard && image && image2 ? (
-          // Stacked images for "All products" card
-          <>
-            {/* Back image with dark overlay and rotation */}
-            <div 
-              className="absolute inset-0"
-              style={{ 
-                transform: 'rotate(355deg)',
-                zIndex: 1,
-              }}
-            >
-              <div className="relative w-full h-full">
-                <ProductImage src={image2} alt="" size={72} />
-                {/* Dark overlay */}
-                <div 
-                  className="absolute inset-0 rounded-lg"
-                  style={{ 
-                    backgroundColor: 'rgba(20,20,20,0.3)',
-                    borderRadius: '8px',
-                  }}
-                />
-              </div>
-            </div>
-            
-            {/* Front image with rotation */}
-            <div 
-              className="absolute inset-0"
-              style={{ 
-                transform: 'rotate(5deg)',
-                zIndex: 2,
-              }}
-            >
-              <ProductImage src={image} alt={title} size={72} />
-            </div>
-          </>
-        ) : (
-          // Single image for regular product cards
-          <ProductImage src={image || ''} alt={title} size={72} />
-        )}
+      {/* Product Image */}
+      <div 
+        className="relative overflow-hidden mb-2"
+        style={{
+          width: '171px',
+          height: '171px',
+          borderRadius: tokens.borders.radius.lg, // rounded-xl (12px)
+          backgroundColor: tokens.colors.background.secondary,
+        }}
+      >
+        <Image
+          src={image}
+          alt={name}
+          width={171}
+          height={171}
+          className="object-cover w-full h-full"
+          unoptimized
+        />
       </div>
-      
-      {/* Text container */}
-      <div className="flex flex-col flex-grow px-2 min-w-0">
-        {/* Product title */}
-        <div className="font-medium text-base text-[#141414] truncate">
-          {title}
-        </div>
-        
-        {/* Price (only for regular product cards) */}
-        {!isAllProductsCard && price !== undefined && (
-          <div className="flex items-center gap-2">
-            <div className="font-medium text-[19px] text-[#141414] leading-6">
-              {price} ₽
-            </div>
-            {oldPrice && (
-              <div className="text-sm text-[#898989] line-through">
-                {oldPrice} ₽
-              </div>
-            )}
-          </div>
-        )}
+
+      {/* Product Info */}
+      <div className="flex flex-col gap-1">
+        {/* Product Name */}
+        <h3
+          className="line-clamp-2"
+          style={{
+            fontSize: '11px',
+            fontWeight: 600, // semibold
+            color: '#595959',
+            lineHeight: '14px',
+            fontFamily: 'SB Sans Text, sans-serif',
+            minHeight: '28px', // Ensures consistent height for 2 lines
+          }}
+        >
+          {name}
+        </h3>
+
+        {/* Specification */}
+        <p
+          style={{
+            fontSize: '11px',
+            fontWeight: 400,
+            color: '#A6A6A6',
+            lineHeight: '14px',
+            fontFamily: 'SB Sans Text, sans-serif',
+          }}
+        >
+          {specification}
+        </p>
       </div>
-    </button>
+
+      {/* Unified Add to Cart Button */}
+      <div className="mt-2">
+        <AddToCartButton
+          price={price}
+          oldPrice={oldPrice}
+          quantity={quantity}
+          state={getButtonState()}
+          onAdd={handleAdd}
+          onRemove={handleRemove}
+        />
+      </div>
+    </div>
   );
 }

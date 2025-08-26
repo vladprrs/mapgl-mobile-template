@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { OrganizationHeader } from '@/components/organisms/OrganizationHeader';
 import { CheckoutItemCard } from '@/components/organisms/CheckoutItemCard';
+import { ProductsCarousel } from '@/components/organisms/ProductsCarousel';
 import { AddressCard, ContactInfo } from '@/components/molecules';
 import type { TabItem } from '@/components/molecules';
 import { tokens } from '@/lib/ui/tokens';
@@ -11,6 +12,7 @@ import type { SearchResult } from '@/stores/types';
 
 interface OrganizationPageProps {
   className?: string;
+  onSamokatOpen?: (query?: string) => void;
 }
 
 /**
@@ -25,6 +27,7 @@ interface OrganizationPageProps {
  */
 export function OrganizationPage({
   className = '',
+  onSamokatOpen,
 }: OrganizationPageProps) {
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   
@@ -49,7 +52,6 @@ export function OrganizationPage({
   // Debug log to verify category detection
   React.useEffect(() => {
     if (organization) {
-      console.log(`Organization "${organization.name}" - Category: "${organization.category}" - Food establishment: ${isFoodEstablishment}`);
     }
   }, [organization, isFoodEstablishment]);
 
@@ -136,7 +138,7 @@ export function OrganizationPage({
           minHeight: '800px', // Make it tall enough to test scrolling
         }}
       >
-        {activeTab === 'overview' && <OverviewTabContent organization={organization} />}
+        {activeTab === 'overview' && <OverviewTabContent organization={organization} onSamokatOpen={onSamokatOpen} />}
         {activeTab === 'menu' && <MenuTabContent />}
         {activeTab === 'prices' && <PricesTabContent organization={organization} />}
         {activeTab === 'photos' && <PhotosTabContent />}
@@ -149,10 +151,9 @@ export function OrganizationPage({
 }
 
 // Tab Content Components
-function OverviewTabContent({ organization }: { organization: SearchResult }) {
+function OverviewTabContent({ organization, onSamokatOpen }: { organization: SearchResult; onSamokatOpen?: (query?: string) => void }) {
   const handleNavigate = () => {
     // TODO: Open navigation/map functionality
-    console.log('Navigate to:', organization.address);
   };
 
   return (
@@ -208,6 +209,16 @@ function OverviewTabContent({ organization }: { organization: SearchResult }) {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Products Carousel Section */}
+      <div>
+        <ProductsCarousel
+          title="Товары"
+          subtitle="Популярные товары и услуги"
+          products={organization.products || []}
+          onHeaderClick={() => onSamokatOpen?.("Товары для фитнеса")}
+        />
       </div>
 
       {/* Contact Section */}
@@ -375,7 +386,6 @@ function PricesTabContent({ organization }: { organization: SearchResult }) {
   const products = organization.products || defaultProducts;
 
   const handleAddToCart = (product: typeof products[0]) => {
-    console.log('Adding to cart:', product);
     addToCart({
       productId: product.id,
       title: product.title,
@@ -387,7 +397,6 @@ function PricesTabContent({ organization }: { organization: SearchResult }) {
   };
 
   const handleQuantityChange = (productId: string, quantity: number) => {
-    console.log('Updating quantity:', { productId, quantity });
     if (quantity === 0) {
       updateQuantity(productId, 0);
     } else {

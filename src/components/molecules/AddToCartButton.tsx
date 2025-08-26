@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-type ButtonState = 'default' | 'discount' | 'added' | 'checkout';
+type ButtonState = 'default' | 'discount' | 'added';
 
 interface AddToCartButtonProps {
   price: number;
@@ -26,10 +26,18 @@ export function AddToCartButton({
   // Format price helper
   const formatPrice = (priceValue: number) => `${priceValue} ₽`;
   
-  // For 'added' state, show minus and plus buttons with quantity
+  // For 'added' state, show minus and plus buttons with quantity (Figma node 474-80383)
   if (state === 'added' && quantity > 0) {
     return (
-      <div className="bg-[#1db93c] flex flex-row gap-1.5 items-center justify-center px-3 py-1.5 rounded-[10px] w-full">
+      <div 
+        className="flex flex-row gap-1.5 items-center justify-center px-3 py-1.5 w-full transition-all active:scale-95"
+        style={{
+          backgroundColor: '#1db93c',
+          borderRadius: '10px',
+          height: '32px',
+          border: 'none',
+        }}
+      >
         {/* Minus button */}
         <button 
           onClick={onRemove} 
@@ -47,9 +55,11 @@ export function AddToCartButton({
         {/* Quantity and price */}
         <div className="flex flex-row items-center gap-1.5 flex-1 justify-center">
           <span 
-            className="text-white font-medium text-[16px] leading-5"
+            className="text-white text-[16px] whitespace-nowrap"
             style={{
               fontFamily: 'SB Sans Text, sans-serif',
+              fontWeight: 500,
+              lineHeight: '20px',
               letterSpacing: '-0.24px',
             }}
           >
@@ -74,30 +84,41 @@ export function AddToCartButton({
     );
   }
 
-  // Default and discount states
+  // Default and discount states (Figma nodes: 474-80391 default, 462-80511 discount)
   return (
     <button 
       onClick={onAdd}
-      className="bg-[rgba(20,20,20,0.06)] flex flex-row gap-1.5 items-center justify-center pl-4 pr-3 py-1.5 rounded-[10px] w-full border-none cursor-pointer"
+      className="flex flex-row gap-1.5 items-center justify-center pl-4 pr-3 py-1.5 w-full border-none cursor-pointer transition-all active:scale-95"
+      style={{
+        backgroundColor: 'rgba(20, 20, 20, 0.06)',
+        borderRadius: '10px',
+        height: '32px',
+      }}
     >
-      {/* Price display logic */}
+      {/* Price display logic - HORIZONTAL layout */}
       <div className="flex flex-row items-center gap-1.5 flex-1">
         {oldPrice && state === 'discount' ? (
-          <div className="flex flex-col items-start gap-0.5">
+          // Correct horizontal layout for discount state (Figma node 462-80511)
+          <div className="flex flex-row items-center gap-1.5">
+            {/* Strikethrough old price */}
             <span 
-              className="text-[#898989] line-through text-[12px] leading-[14px]"
+              className="text-[#898989] line-through text-[16px] whitespace-nowrap"
               style={{
                 fontFamily: 'SB Sans Text, sans-serif',
-                fontWeight: 400,
+                fontWeight: 500,
+                lineHeight: '20px',
+                letterSpacing: '-0.24px',
               }}
             >
               {formatPrice(oldPrice)}
             </span>
+            {/* Current price */}
             <span 
-              className="text-[#141414] text-[16px] leading-5"
+              className="text-[#141414] text-[16px] whitespace-nowrap"
               style={{
                 fontFamily: 'SB Sans Text, sans-serif',
                 fontWeight: 500,
+                lineHeight: '20px',
                 letterSpacing: '-0.24px',
               }}
             >
@@ -105,11 +126,13 @@ export function AddToCartButton({
             </span>
           </div>
         ) : (
+          /* Default state - just current price */
           <span 
-            className="text-[#141414] text-[16px] leading-5"
+            className="text-[#141414] text-[16px] whitespace-nowrap"
             style={{
               fontFamily: 'SB Sans Text, sans-serif',
               fontWeight: 500,
+              lineHeight: '20px',
               letterSpacing: '-0.24px',
             }}
           >
@@ -118,13 +141,23 @@ export function AddToCartButton({
         )}
       </div>
       
-      <Image
-        src="/assets/figma/buttons/aa67d1c61241635581e5a619ec8eea047f2f9ba1.svg"
-        alt="Add"
-        width={24}
-        height={24}
-        className="size-6 flex-shrink-0"
-      />
+      {/* Plus icon - #1BA136 green */}
+      <div className="w-6 h-6 flex-shrink-0">
+        <svg 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none"
+          style={{ width: '100%', height: '100%' }}
+        >
+          <path 
+            fillRule="evenodd" 
+            clipRule="evenodd" 
+            d="M11 13V20H13V13H20V11H13V4H11V11H4V13H11Z" 
+            fill="#1BA136"
+          />
+        </svg>
+      </div>
     </button>
   );
 }

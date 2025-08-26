@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ProductCard } from '@/components/molecules';
+import { ProductPreviewCard } from './ProductPreviewCard';
 
 interface Product {
   id: string;
@@ -34,7 +34,7 @@ export function ProductsCarousel({ products, onProductClick }: ProductsCarouselP
       
       <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide pl-2 pr-4 pt-2">
         {products.map((product) => (
-          <ProductCard
+          <ProductPreviewCard
             key={product.id}
             id={product.id}
             image={product.image}

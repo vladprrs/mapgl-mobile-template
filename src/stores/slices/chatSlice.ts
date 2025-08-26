@@ -18,7 +18,6 @@ export const createChatSlice: StateCreator<AppStore, [], [], ChatSlice> = (set) 
 
   // Actions
   openChat: () => {
-    console.log('Opening AI chat');
     set((state) => ({
       chat: {
         ...state.chat,
@@ -28,7 +27,6 @@ export const createChatSlice: StateCreator<AppStore, [], [], ChatSlice> = (set) 
   },
 
   closeChat: () => {
-    console.log('Closing AI chat');
     set((state) => ({
       chat: {
         ...state.chat,
@@ -48,7 +46,6 @@ export const createChatSlice: StateCreator<AppStore, [], [], ChatSlice> = (set) 
       timestamp: new Date(),
     };
 
-    console.log('Sending message:', text);
     
     set((state) => ({
       chat: {

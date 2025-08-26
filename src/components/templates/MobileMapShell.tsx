@@ -4,7 +4,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { BottomSheet, BottomSheetRef, SearchBar, SearchFilters, ChatBottomSheet } from '@/components/organisms';
 import { CartNavbar } from '@/components/molecules';
 import { ScreenRenderer } from '@/components/templates';
-import { CartSheetPage } from '@/components/pages/CartSheetPage';
+import { CartSheetPage, SamokatProductsPage } from '@/components/pages';
 import { ScreenType } from '@/components/templates/types';
 import { debugLog } from '@/lib/logging';
 // tokens import removed - not used
@@ -57,6 +57,8 @@ export function MobileMapShell({
   const [currentSnap, setCurrentSnap] = useState<number>(initialSnap ?? snapPoints[1]);
   const [isCartSheetOpen, setIsCartSheetOpen] = useState<boolean>(false);
   const [cartViewMode, setCartViewMode] = useState<'cart' | 'success'>('cart');
+  const [isSamokatOpen, setIsSamokatOpen] = useState<boolean>(false);
+  const [samokatSearchQuery, setSamokatSearchQuery] = useState<string>('');
   const previousSnapRef = useRef<number>(initialSnap ?? snapPoints[1]);
   const pendingAdjustmentRef = useRef<{ old: number; new: number } | null>(null);
   const bottomSheetRef = useRef<BottomSheetRef>(null);
@@ -167,6 +169,17 @@ export function MobileMapShell({
     setCartViewMode('cart'); // Reset view mode when closing
   }, []);
 
+  const handleSamokatOpen = useCallback((query?: string) => {
+    setSamokatSearchQuery(query || 'Товары для фитнеса');
+    setIsSamokatOpen(true);
+    debugLog('Opening Samokat products page with query:', query);
+  }, []);
+
+  const handleSamokatClose = useCallback(() => {
+    setIsSamokatOpen(false);
+    debugLog('Closing Samokat products page');
+  }, []);
+
   // Chat sheet handlers
   const handleChatBack = useCallback(() => {
     actions.closeChat();
@@ -176,12 +189,6 @@ export function MobileMapShell({
     actions.closeChat();
   }, [actions]);
 
-  // Debug cart state
-  console.log('MobileMapShell cart state:', { 
-    total: cart.cart.total, 
-    count: cart.cart.count, 
-    isVisible: cart.cart.count > 0 
-  });
 
   const handleSnapChange = useCallback((snap: number) => {
     // Update current snap state
@@ -294,7 +301,7 @@ export function MobileMapShell({
         header={getHeaderContent()}
         stickyHeader={getStickyHeaderContent()}
       >
-        <ScreenRenderer items={items} />
+        <ScreenRenderer items={items} onSamokatOpen={handleSamokatOpen} />
       </BottomSheet>
 
       {/* Cart BottomSheet Overlay - appears above main sheet */}
@@ -350,6 +357,14 @@ export function MobileMapShell({
         isOpen={chat.isChatOpen}
         onClose={handleChatClose}
         onBack={handleChatBack}
+        onSamokatOpen={handleSamokatOpen}
+      />
+      
+      {/* Samokat Products Overlay */}
+      <SamokatProductsPage
+        isOpen={isSamokatOpen}
+        onClose={handleSamokatClose}
+        searchQuery={samokatSearchQuery}
       />
     </div>
   );

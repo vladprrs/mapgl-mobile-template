@@ -12,6 +12,7 @@ interface ChatBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onBack: () => void;
+  onSamokatOpen?: (query?: string) => void;
 }
 
 /**
@@ -28,7 +29,7 @@ interface ChatBottomSheetProps {
  * - Keyboard-aware positioning
  * - Safe area inset support
  */
-export function ChatBottomSheet({ isOpen, onClose, onBack }: ChatBottomSheetProps) {
+export function ChatBottomSheet({ isOpen, onClose, onBack, onSamokatOpen }: ChatBottomSheetProps) {
   const bottomSheetRef = useRef<SheetRef>(null);
   
   // Get chat data from store
@@ -62,13 +63,17 @@ export function ChatBottomSheet({ isOpen, onClose, onBack }: ChatBottomSheetProp
   };
 
   const handleProductClick = (productId: string, storeId: string) => {
-    console.log('Product clicked:', { productId, storeId });
     // TODO: Add product to cart or show product details
   };
 
   const handleOrderClick = (storeId: string) => {
-    console.log('Order clicked for store:', storeId);
-    // TODO: Navigate to store or open order flow
+    if (storeId === 'samokat' && onSamokatOpen) {
+      // Get the current search query to pass to Samokat page
+      const currentQuery = messages.find(m => m.sender === 'user')?.text;
+      onSamokatOpen(currentQuery);
+    } else {
+      // TODO: Handle other stores (mvideo, ozon)
+    }
   };
 
   const handleClose = () => {

@@ -50,7 +50,6 @@ export function SearchResultsList({
     
     // Add search query as first user message if it exists
     if (currentQuery) {
-      console.log('AI search helper clicked - adding search query to chat:', currentQuery);
       chat.addMessage({
         text: currentQuery,
         sender: 'user',
@@ -139,7 +138,7 @@ export function SearchResultsList({
                   title="Товары"
                   subtitle="Пригодятся для занятий спортом"
                   products={[]} // Use default mock products
-                  onSeeAll={() => console.log('See all products')}
+                  onSeeAll={() => {}}
                 />
               </div>
             </React.Fragment>

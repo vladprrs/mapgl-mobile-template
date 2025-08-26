@@ -30,7 +30,6 @@ export const createOrganizationSlice: StateCreator<
     });
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 200));
       
       const organization = allOrganizations.find(org => org.id === id);
       

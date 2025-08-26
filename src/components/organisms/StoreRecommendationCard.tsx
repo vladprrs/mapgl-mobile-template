@@ -4,6 +4,7 @@ import React from 'react';
 import { Button, Text, Icon } from '@/components/atoms';
 import { StoreHeader, ProductsCarousel } from '@/components/molecules';
 import { tokens } from '@/lib/ui/tokens';
+import { getRecommendedProducts } from '@/lib/data/products';
 import type { StoreRecommendation } from '@/stores/types';
 
 interface StoreRecommendationCardProps {
@@ -17,6 +18,20 @@ export function StoreRecommendationCard({
   onProductClick, 
   onOrderClick 
 }: StoreRecommendationCardProps) {
+  // Get recommended products based on store type
+  const storeType = store.id as 'ozon' | 'samokat' | 'mvideo';
+  const recommendedProducts = getRecommendedProducts(storeType);
+  
+  // Transform products to match ProductsCarousel interface
+  const carouselProducts = recommendedProducts.map(product => ({
+    id: product.id,
+    image: product.image,
+    title: product.title,
+    price: product.price,
+    oldPrice: product.oldPrice,
+    type: 'product' as const
+  }));
+
   const handleOrderClick = () => {
     if (onOrderClick) {
       onOrderClick(store.id);
@@ -25,7 +40,34 @@ export function StoreRecommendationCard({
 
   const handleMoreClick = () => {
     // Could open store details or show more products
-    console.log('More options for store:', store.name);
+  };
+
+  // Customize button color based on store
+  const getButtonColor = () => {
+    switch (store.id) {
+      case 'ozon':
+        return '#005BFF'; // Ozon blue
+      case 'samokat':
+        return '#FF6B00'; // Samokat orange
+      case 'mvideo':
+        return '#E31235'; // MVideo red
+      default:
+        return '#8257FD'; // Default purple
+    }
+  };
+
+  // Customize button text based on store
+  const getButtonText = () => {
+    switch (store.id) {
+      case 'ozon':
+        return 'Заказать на Ozon';
+      case 'samokat':
+        return 'Заказать в Самокат';
+      case 'mvideo':
+        return 'Купить в МВидео';
+      default:
+        return 'Заказать заказ';
+    }
   };
 
   return (
@@ -44,11 +86,14 @@ export function StoreRecommendationCard({
         images={store.images}
         deliveryTime={store.deliveryTime}
         rating={store.rating}
+        rideTime={store.rideTime}
+        hasAward={store.hasAward}
+        storeId={store.id}
       />
       
       {/* Products Carousel */}
       <ProductsCarousel
-        products={store.products}
+        products={carouselProducts}
         onProductClick={onProductClick}
       />
       
@@ -72,7 +117,7 @@ export function StoreRecommendationCard({
             onClick={handleOrderClick}
             className="flex-1"
             style={{
-              backgroundColor: '#8257FD',
+              backgroundColor: getButtonColor(),
               color: 'white',
               border: 'none',
               borderRadius: tokens.borders.radius.md, // 8px
@@ -83,7 +128,7 @@ export function StoreRecommendationCard({
               transition: 'all 0.2s ease',
             }}
           >
-            Заказать заказ
+            {getButtonText()}
           </Button>
           
           {/* More Options Button */}

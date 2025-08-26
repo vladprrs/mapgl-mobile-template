@@ -6,3 +6,4 @@ export { AddressPage } from './AddressPage';
 export { MasterDetailsPage } from './MasterDetailsPage';
 export { MastersListPage } from './MastersListPage';
 export { CartSheetPage } from './CartSheetPage';
+export { SamokatProductsPage } from './SamokatProductsPage';

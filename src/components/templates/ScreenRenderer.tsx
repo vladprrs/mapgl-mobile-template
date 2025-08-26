@@ -17,9 +17,10 @@ import type { AdviceItem } from '@/__mocks__/advice/types';
 interface ScreenRendererProps {
   items?: AdviceItem[];
   className?: string;
+  onSamokatOpen?: (query?: string) => void;
 }
 
-export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
+export function ScreenRenderer({ items, className = '', onSamokatOpen }: ScreenRendererProps) {
   const ui = useStore((state) => state.ui);
   const search = useStore((state) => state.search);
   const currentScreen = ui.currentScreen;
@@ -58,7 +59,7 @@ export function ScreenRenderer({ items, className = '' }: ScreenRendererProps) {
       
       case ScreenType.ORGANIZATION_DETAILS:
         return (
-          <OrganizationPage />
+          <OrganizationPage onSamokatOpen={onSamokatOpen} />
         );
       
       case ScreenType.ADDRESS_DETAILS:
