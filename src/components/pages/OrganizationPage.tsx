@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { OrganizationHeader } from '@/components/organisms/OrganizationHeader';
 import { CheckoutItemCard } from '@/components/organisms/CheckoutItemCard';
+import { ProductsCarousel } from '@/components/organisms/ProductsCarousel';
 import { AddressCard, ContactInfo } from '@/components/molecules';
 import type { TabItem } from '@/components/molecules';
 import { tokens } from '@/lib/ui/tokens';
@@ -11,6 +12,7 @@ import type { SearchResult } from '@/stores/types';
 
 interface OrganizationPageProps {
   className?: string;
+  onSamokatOpen?: (query?: string) => void;
 }
 
 /**
@@ -25,6 +27,7 @@ interface OrganizationPageProps {
  */
 export function OrganizationPage({
   className = '',
+  onSamokatOpen,
 }: OrganizationPageProps) {
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   
@@ -135,7 +138,7 @@ export function OrganizationPage({
           minHeight: '800px', // Make it tall enough to test scrolling
         }}
       >
-        {activeTab === 'overview' && <OverviewTabContent organization={organization} />}
+        {activeTab === 'overview' && <OverviewTabContent organization={organization} onSamokatOpen={onSamokatOpen} />}
         {activeTab === 'menu' && <MenuTabContent />}
         {activeTab === 'prices' && <PricesTabContent organization={organization} />}
         {activeTab === 'photos' && <PhotosTabContent />}
@@ -148,7 +151,7 @@ export function OrganizationPage({
 }
 
 // Tab Content Components
-function OverviewTabContent({ organization }: { organization: SearchResult }) {
+function OverviewTabContent({ organization, onSamokatOpen }: { organization: SearchResult; onSamokatOpen?: (query?: string) => void }) {
   const handleNavigate = () => {
     // TODO: Open navigation/map functionality
   };
@@ -206,6 +209,16 @@ function OverviewTabContent({ organization }: { organization: SearchResult }) {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Products Carousel Section */}
+      <div>
+        <ProductsCarousel
+          title="Товары"
+          subtitle="Популярные товары и услуги"
+          products={organization.products || []}
+          onHeaderClick={() => onSamokatOpen?.("Товары для фитнеса")}
+        />
       </div>
 
       {/* Contact Section */}
