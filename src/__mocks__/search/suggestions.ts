@@ -245,7 +245,7 @@ export const getSuggestions = (query: string): SearchSuggestion[] => {
 
   // Check for AI assistant trigger for "автозапчасти"
   const aiSuggestions: AISuggestion[] = [];
-  if (lowerQuery.includes('автозапчасти')) {
+  if (lowerQuery.length >= 3 && 'автозапчасти'.startsWith(lowerQuery)) {
     aiSuggestions.push({
       id: 'ai-autoparts',
       type: 'ai_assistant',

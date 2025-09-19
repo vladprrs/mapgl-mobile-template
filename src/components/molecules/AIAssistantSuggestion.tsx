@@ -43,9 +43,17 @@ export function AIAssistantSuggestion({
         </div>
 
         {/* Content row - main clickable area */}
-        <button
+        <div
           onClick={onMainClick}
-          className="flex-1 bg-transparent box-border flex items-start justify-between min-h-px overflow-clip pb-[14px] pl-0 pr-4 pt-3 relative border-b hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onMainClick();
+            }
+          }}
+          className="flex-1 bg-transparent box-border flex items-start justify-between min-h-px overflow-clip pb-[14px] pl-0 pr-4 pt-3 relative border-b hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
           style={{ borderColor: tokens.colors.border.DEFAULT }}
           aria-label={`${text}${subtext ? `, ${subtext}` : ''}`}
         >
@@ -67,50 +75,37 @@ export function AIAssistantSuggestion({
               e.stopPropagation();
               onAssistantClick();
             }}
-            className="flex gap-[2px] items-start justify-start relative shrink-0 hover:opacity-80 transition-opacity"
+            className="flex gap-[4px] items-center justify-start relative shrink-0 hover:opacity-80 transition-opacity"
             aria-label="Подобрать с помощью AI"
           >
             <div
               className="bg-clip-text font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-nowrap tracking-[-0.24px]"
               style={{
                 WebkitTextFillColor: 'transparent',
-                backgroundImage: 'linear-gradient(90deg, #2563EB 0%, #1D4ED8 100%)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                backgroundImage: 'linear-gradient(90deg, #64D87B 0%, #3588FD 100%)',
                 color: tokens.colors.primary.DEFAULT
               }}
             >
               <p className="leading-5 whitespace-pre">Подобрать</p>
             </div>
-            <div className="h-5 relative shrink-0 w-6">
-              <div
-                className="absolute left-1/2 size-6 -translate-x-1/2 -translate-y-1/2"
-                style={{ top: 'calc(50% + 1px)' }}
-              >
-                <div className="absolute left-1/2 size-5 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                  {/* Arrow icon matching Figma design */}
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="block max-w-none w-full h-full"
-                  >
-                    <path
-                      d="M7 14L12 9.5L7 5"
-                      stroke={tokens.colors.primary.DEFAULT}
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
+            {/* AI Assistant Icon from Figma - positioned after text */}
+            <div className="shrink-0 size-4 flex items-center justify-center">
+              <Image
+                alt=""
+                className="block max-w-none size-full"
+                src="/372cefe28f9e3fe44b87a123fe8f122c7016e848.svg"
+                width={16}
+                height={16}
+                unoptimized
+              />
             </div>
           </button>
 
           {/* Bottom border shadow */}
           <div className="absolute inset-0 pointer-events-none shadow-[0px_-0.5px_0px_0px_inset_rgba(137,137,137,0.3)]" />
-        </button>
+        </div>
       </div>
     </div>
   );
