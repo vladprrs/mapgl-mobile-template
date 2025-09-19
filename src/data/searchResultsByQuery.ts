@@ -1135,6 +1135,143 @@ export const searchResultsByQuery: SearchResultsByQuery = {
       type: 'address',
       coords: [37.6173, 55.7558],
     }
+  ],
+
+  // Auto parts search results
+  'автозапчасти': [
+    // Position 1: Premium auto parts chain
+    {
+      id: 'auto-adv-1',
+      name: 'Exist.ru',
+      category: 'Магазин автозапчастей • Онлайн каталог',
+      isAdvertiser: true,
+      rating: 4.5,
+      reviewCount: 2341,
+      address: 'ул. Ленина, 45',
+      distance: '1.2 км',
+      logo: '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png',
+      gallery: [
+        '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png',
+        '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png',
+        '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png'
+      ],
+      promotionalText: 'Оригинальные запчасти с гарантией + бесплатная доставка от 3000₽!',
+      buttonLabel: 'Каталог',
+      closingStatus: {
+        text: 'Открыто до 20:00',
+        isWarning: false,
+      },
+    },
+    // Position 2: Local auto parts chain
+    {
+      id: 'auto-adv-2',
+      name: 'БИ-БИ Автозапчасти',
+      category: 'Автомагазин • Сеть магазинов',
+      isAdvertiser: true,
+      rating: 4.8,
+      reviewCount: 567,
+      address: 'пр. Мира, 123',
+      distance: '800 м',
+      logo: '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png',
+      gallery: [
+        '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png',
+        '/icons/eae313a48883a46e7a2a60ee806e73a8052191be.png'
+      ],
+      promotionalText: 'Подбор запчастей по VIN коду + установка в наших сервисах',
+      buttonLabel: 'Подобрать',
+      closingStatus: {
+        text: 'Открыто до 21:00',
+        isWarning: false,
+      },
+    },
+    // Position 3: Online auto parts store
+    {
+      id: 'auto-reg-3',
+      name: 'Автодок',
+      category: 'Интернет-магазин автозапчастей',
+      isAdvertiser: false,
+      address: 'ул. Автомобильная, 15',
+      distance: '950 м',
+      rating: 4.2,
+      reviewCount: 89,
+      closingStatus: {
+        text: 'Заказ онлайн круглосуточно',
+        isWarning: false,
+      },
+      friendsVisited: {
+        friends: [
+          { id: '1', name: 'Михаил', avatar: '/avatars/23edad0153988d6704197a43ed4d17e51f00e455.png' }
+        ],
+        rating: 4.2
+      },
+    },
+    // Position 4: Local auto parts shop
+    {
+      id: 'auto-reg-4',
+      name: 'АвтоЗапчасти 24',
+      category: 'Магазин автозапчастей',
+      isAdvertiser: false,
+      address: 'ул. Гаражная, 78',
+      distance: '1.1 км',
+      rating: 4.4,
+      reviewCount: 156,
+      closingStatus: {
+        text: 'Работает круглосуточно',
+        isWarning: false,
+      },
+    },
+    // Position 5: Auto parts with tire service
+    {
+      id: 'auto-reg-5',
+      name: 'Колёса и Запчасти',
+      category: 'Автозапчасти • Шиномонтаж',
+      isAdvertiser: false,
+      address: 'Автомобильный переулок, 5',
+      distance: '1.3 км',
+      rating: 4.6,
+      reviewCount: 234,
+      closingStatus: {
+        text: 'Открыто до 19:00',
+        isWarning: false,
+      },
+      friendsVisited: {
+        friends: [
+          { id: '2', name: 'Алексей', avatar: '/avatars/7c555ac081e621955c2c245891b952413a9a27c3.png' },
+          { id: '3', name: 'Дмитрий', avatar: '/avatars/5becee8b64e742d845f3d3853a20fc8aa217f421.png' }
+        ],
+        rating: 4.6
+      },
+    },
+    // Position 6: Auto service with parts
+    {
+      id: 'auto-reg-6',
+      name: 'Автосервис Профи',
+      category: 'Автосервис • Запчасти и ремонт',
+      isAdvertiser: false,
+      address: 'ул. Механиков, 32',
+      distance: '1.5 км',
+      rating: 4.3,
+      reviewCount: 78,
+      closingStatus: {
+        text: 'Закроется через 40 минут',
+        isWarning: true,
+      },
+    },
+    // Position 7: Used auto parts
+    {
+      id: 'auto-reg-7',
+      name: 'Б/У Запчасти',
+      category: 'Разборка автомобилей • Б/У запчасти',
+      isAdvertiser: false,
+      address: 'Промышленная зона, участок 12',
+      distance: '2.1 км',
+      rating: 4.0,
+      reviewCount: 45,
+      closingStatus: {
+        text: 'Открыто до 18:00',
+        isWarning: false,
+      },
+    }
   ]
 };
 

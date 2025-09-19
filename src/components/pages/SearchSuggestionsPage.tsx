@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { SuggestRow } from '@/components/molecules';
+import { SuggestRow, AIAssistantSuggestion } from '@/components/molecules';
 import { RecommendationsSection, SearchHistorySection, CityHighlightsSection } from '@/components/organisms';
 import useStore from '@/stores';
+import { useActions } from '@/stores';
 import { getSuggestions, getDefaultSuggestions, type SearchSuggestion } from '@/__mocks__/search/suggestions';
 
 interface SearchSuggestionsProps {
@@ -24,6 +25,7 @@ export function SearchSuggestionsPage({
   const query = useStore((state) => state.search.query);
   const searchHistory = useStore((state) => state.search.history);
   const search = useStore((state) => state.search);
+  const actions = useActions();
   
   // State for instant suggestions with debounce
   const [instantSuggestions, setInstantSuggestions] = useState<SearchSuggestion[]>([]);
@@ -66,8 +68,31 @@ export function SearchSuggestionsPage({
     return () => clearTimeout(timer);
   }, [query, searchHistory]);
   
+  // Handle AI assistant button click (Подобрать button)
+  const handleAIAssistantClick = () => {
+    // Open AI chat with context about автозапчасти
+    actions.openChat();
+
+    // Add the search query as the first user message to provide context
+    const chat = useStore.getState().chat;
+    chat.addMessage({
+      text: 'автозапчасти',
+      sender: 'user',
+    });
+  };
+
+  // Handle main row click for AI suggestion (search for автозапчасти)
+  const handleAIMainClick = () => {
+    actions.performSearch('автозапчасти');
+  };
+
   // Handle smart suggestion selection
   const handleSuggestionClick = (suggestion: SearchSuggestion) => {
+    // AI assistant suggestions are handled separately with their own click handlers
+    if (suggestion.type === 'ai_assistant') {
+      return; // This shouldn't be called for AI suggestions now
+    }
+
     // Convert our new suggestion format to the store's expected format
     const storeSuggestion = {
       id: suggestion.id,
@@ -79,7 +104,7 @@ export function SearchSuggestionsPage({
       organizationIds: 'organizationIds' in suggestion ? suggestion.organizationIds : undefined,
       category: suggestion.category
     };
-    
+
     // Use the store's smart selection logic
     search.selectSuggestion(storeSuggestion);
   };
@@ -121,15 +146,31 @@ export function SearchSuggestionsPage({
       {/* Suggestion list */}
       {!isLoading && (
         <div className="flex flex-col">
-          {instantSuggestions.map((suggestion) => (
-            <SuggestRow
-              key={suggestion.id}
-              type={suggestion.type}
-              title={suggestion.text}
-              subtitle={suggestion.subtitle}
-              onClick={() => handleSuggestionClick(suggestion)}
-            />
-          ))}
+          {instantSuggestions.map((suggestion) => {
+            // Render AI assistant suggestion with two click zones
+            if (suggestion.type === 'ai_assistant') {
+              return (
+                <AIAssistantSuggestion
+                  key={suggestion.id}
+                  text={suggestion.text}
+                  subtext={suggestion.subtitle}
+                  onMainClick={handleAIMainClick}
+                  onAssistantClick={handleAIAssistantClick}
+                />
+              );
+            }
+
+            // Render regular suggestions
+            return (
+              <SuggestRow
+                key={suggestion.id}
+                type={suggestion.type}
+                title={suggestion.text}
+                subtitle={suggestion.subtitle}
+                onClick={() => handleSuggestionClick(suggestion)}
+              />
+            );
+          })}
         </div>
       )}
       
