@@ -98,32 +98,6 @@ export function SearchResultsList({
       role="list"
       aria-label="Search results"
     >
-      {/* Product search banner - blue banner with search context message */}
-      {searchContext?.type === 'product_search' && searchContext.message && (
-        <div role="listitem">
-          <div
-            style={{
-              backgroundColor: '#E3F2FD', // Light blue background
-              borderLeft: `4px solid ${tokens.colors.primary.DEFAULT}`, // Blue left border
-              borderRadius: tokens.borders.radius.DEFAULT,
-              padding: `${tokens.spacing[3]} ${tokens.spacing[4]}`, // 12px top/bottom, 16px left/right
-              marginBottom: tokens.spacing[2], // 8px margin bottom
-            }}
-          >
-            <Text
-              size="sm"
-              style={{
-                color: tokens.colors.primary.DEFAULT,
-                fontWeight: '500',
-                lineHeight: '1.4',
-              }}
-            >
-              {searchContext.message}
-            </Text>
-          </div>
-        </div>
-      )}
-
       {/* AI Search Helper - show only for product/alias searches */}
       {query.trim() && searchContext?.type === 'product_search' && (
         <div role="listitem">

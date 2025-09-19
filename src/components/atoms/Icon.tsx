@@ -261,10 +261,25 @@ export function Icon({
     // Star icon for ratings
     'star-filled': (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ display: 'block' }}>
-        <path 
-          d="M8 1L9.854 5.146L14.5 5.5L11.25 8.5L12.208 13.5L8 11L3.792 13.5L4.75 8.5L1.5 5.5L6.146 5.146L8 1Z" 
+        <path
+          d="M8 1L9.854 5.146L14.5 5.5L11.25 8.5L12.208 13.5L8 11L3.792 13.5L4.75 8.5L1.5 5.5L6.146 5.146L8 1Z"
           fill={color}
         />
+      </svg>
+    ),
+    // Robot icon for AI suggestions
+    robot: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ display: 'block' }}>
+        <rect x="5" y="6" width="10" height="8" rx="2" stroke={color} strokeWidth="1.5" fill="none"/>
+        <rect x="6.5" y="4" width="7" height="3" rx="1.5" stroke={color} strokeWidth="1.5" fill="none"/>
+        <circle cx="8" cy="9" r="1" fill={color}/>
+        <circle cx="12" cy="9" r="1" fill={color}/>
+        <path d="M8 11.5H12" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M10 3V4" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M5 8H3" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M17 8H15" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M7 14V16" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M13 14V16" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     ),
   };

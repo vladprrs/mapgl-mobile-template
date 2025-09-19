@@ -232,6 +232,20 @@ export const mockCafeResults: SearchResult[] = [
     },
     coords: [82.9277, 55.0485],
   },
+  {
+    id: 'c3',
+    name: 'Starbucks',
+    category: 'Кофейня',
+    address: 'Новый Арбат, 19',
+    distance: '1.1 км',
+    rating: 4.3,
+    reviewCount: 122,
+    closingStatus: {
+      text: 'Круглосуточно',
+      isWarning: false,
+    },
+    coords: [82.9277, 55.0485],
+  },
 ];
 
 // Export different states for testing

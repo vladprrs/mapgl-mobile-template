@@ -23,7 +23,7 @@ const defaultSuggestions: HistoryItem[] = [
   },
   { 
     id: 'def-2', 
-    title: 'Фитнес залы', 
+    title: 'Фитнес', 
     subtitle: 'Спорт и отдых',
     isDefault: true
   },

@@ -68,6 +68,8 @@ export function ProductsCarousel({
     updateQuantity(productId, quantity);
   };
 
+  const headerOffset = `-${tokens.spacing[3]}`;
+
   return (
     <div className="bg-white rounded-xl overflow-clip pb-3 pt-2">
       {/* Header - exactly from Figma */}
@@ -80,8 +82,8 @@ export function ProductsCarousel({
             border: 'none',
             padding: tokens.spacing[3],
             borderRadius: tokens.borders.radius.sm,
-            marginLeft: -tokens.spacing[3],
-            marginRight: -tokens.spacing[3],
+            marginLeft: headerOffset,
+            marginRight: headerOffset,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = tokens.colors.background.tertiary;
