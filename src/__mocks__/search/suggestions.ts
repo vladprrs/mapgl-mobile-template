@@ -59,7 +59,16 @@ export interface ProductSuggestion {
   count: number;
 }
 
-export type SearchSuggestion = OrganizationSuggestion | CategorySuggestion | ChainSuggestion | HistorySuggestion | ProductSuggestion;
+export interface AISuggestion {
+  id: string;
+  type: 'ai_assistant';
+  text: string;
+  subtitle?: string;
+  category: string;
+  icon?: string;
+}
+
+export type SearchSuggestion = OrganizationSuggestion | CategorySuggestion | ChainSuggestion | HistorySuggestion | ProductSuggestion | AISuggestion;
 
 // Legacy suggestion types for backwards compatibility
 export interface SavedAddressSuggestion {
@@ -230,9 +239,21 @@ export const getSuggestions = (query: string): SearchSuggestion[] => {
   if (!query || query.trim().length === 0) {
     return [];
   }
-  
+
   const lowerQuery = query.toLowerCase().trim();
   const allSuggestions = generateSuggestions();
+
+  // Check for AI assistant trigger for "автозапчасти"
+  const aiSuggestions: AISuggestion[] = [];
+  if (lowerQuery.includes('автозапчасти')) {
+    aiSuggestions.push({
+      id: 'ai-autoparts',
+      type: 'ai_assistant',
+      text: 'Автозапчасти',
+      subtitle: 'с помощью AI-помощника',
+      category: 'ai_assistant'
+    });
+  }
   
   // Common search terms and their category mappings
   const synonyms: Record<string, string[]> = {
@@ -316,16 +337,20 @@ export const getSuggestions = (query: string): SearchSuggestion[] => {
     return false;
   });
 
-  // Sort filtered suggestions by priority: categories > products > chains > organizations
+  // Sort filtered suggestions by priority: ai_assistant > history > categories > products > chains > organizations
   const priority = {
+    'ai_assistant': -1, // AI suggestions appear first
+    'history': 0, // History suggestions should appear second
     'category': 1,
     'product': 2,
     'chain': 3,
-    'organization': 4,
-    'history': 0 // History suggestions should appear first
+    'organization': 4
   };
 
-  return filteredSuggestions
+  // Combine AI suggestions with filtered suggestions
+  const allCombinedSuggestions = [...aiSuggestions, ...filteredSuggestions];
+
+  return allCombinedSuggestions
     .sort((a, b) => (priority[a.type] || 5) - (priority[b.type] || 5))
     .slice(0, 10); // Limit to top 10 suggestions
 };

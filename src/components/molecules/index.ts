@@ -15,6 +15,7 @@ export { SecondaryLine } from './SecondaryLine';
 
 // UI Molecules
 export { AddToCartButton } from './AddToCartButton';
+export { AIAssistantSuggestion } from './AIAssistantSuggestion';
 export { AssistantMessage } from './AssistantMessage';
 export { CartNavbar } from './CartNavbar';
 export { ChatInput } from './ChatInput';
